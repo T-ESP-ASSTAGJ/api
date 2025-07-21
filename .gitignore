@@ -1,0 +1,31 @@
+# Env and IDE
+.env.local
+.env.*.local
+/.idea
+/.vscode
+
+# Symfony cache & logs
+/var/
+/vendor/
+/var/cache/
+/var/log/
+/var/data/
+
+# Docker
+/docker-compose.override.yaml
+.DS_Store
+*.log
+
+# Assets
+/public/bundles/
+/public/nelmioapidoc/
+
+###> phpunit/phpunit ###
+/phpunit.xml
+/.phpunit.cache/
+###< phpunit/phpunit ###
+
+###> friendsofphp/php-cs-fixer ###
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
+###< friendsofphp/php-cs-fixer ###
