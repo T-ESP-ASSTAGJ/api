@@ -3,6 +3,8 @@
 - Symfony Plugin
 - PHP Annotations
 - PHP Inspections (EA Extended)
+- PHP Toolbox
+- PHPUnit Enhancements
 - Git Toolbox
 
 ## Getting Started

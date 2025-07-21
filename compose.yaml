@@ -1,5 +1,6 @@
 services:
   php:
+    container_name: jamly-api
     image: ${IMAGES_PREFIX:-}app-php
     restart: unless-stopped
     environment:
@@ -38,6 +39,7 @@ services:
 
 ###> doctrine/doctrine-bundle ###
   database:
+    container_name: jamly-database
     image: postgres:${POSTGRES_VERSION:-16}-alpine
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-app}
