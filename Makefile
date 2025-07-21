@@ -1,4 +1,3 @@
-SHELL := /bin/bash
 LAST_COMMIT := $(shell git log -1 --oneline --pretty=format:"%h - %an, %ar")
 BOLD_GREEN := \033[1;32m
 NC := \033[0m
