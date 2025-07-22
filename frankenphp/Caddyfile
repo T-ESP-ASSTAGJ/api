@@ -4,6 +4,8 @@
 	{$CADDY_GLOBAL_OPTIONS}
 
 	frankenphp {
+	    php_ini memory_limit 512M
+
 		{$FRANKENPHP_CONFIG}
 
 		worker {

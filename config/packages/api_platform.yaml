@@ -1,7 +1,13 @@
 api_platform:
-    title: API Platform
-    version: 1.0.0
-    defaults:
-        stateless: true
-        cache_headers:
-            vary: ['Content-Type', 'Authorization', 'Origin']
+    title: 'Jamly API'
+    description: 'API documentation of Jamly'
+    version: '1.0.0'
+    formats:
+        json: ['application/json']
+
+    swagger:
+        versions: [3]
+        api_keys:
+            apiKey:
+                name: Authorization
+                type: header
