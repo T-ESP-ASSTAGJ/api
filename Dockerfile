@@ -7,7 +7,6 @@ FROM dunglas/frankenphp:1-php8.4 AS frankenphp_upstream
 # https://docs.docker.com/develop/develop-images/multistage-build/#stop-at-a-specific-build-stage
 # https://docs.docker.com/compose/compose-file/#target
 
-
 # Base FrankenPHP image
 FROM frankenphp_upstream AS frankenphp_base
 
@@ -18,20 +17,20 @@ VOLUME /app/var/
 # persistent / runtime deps
 # hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
-	acl \
-	file \
-	gettext \
-	git \
-	&& rm -rf /var/lib/apt/lists/*
+    acl \
+    file \
+    gettext \
+    git \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN set -eux; \
-	install-php-extensions \
-		@composer \
-		apcu \
-		intl \
-		opcache \
-		zip \
-	;
+    install-php-extensions \
+       @composer \
+       apcu \
+       intl \
+       opcache \
+       zip \
+    ;
 
 # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
 ENV COMPOSER_ALLOW_SUPERUSER=1
@@ -66,35 +65,90 @@ ENV FRANKENPHP_WORKER_CONFIG=watch
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
 RUN set -eux; \
-	install-php-extensions \
-		xdebug \
-	;
+    install-php-extensions \
+       xdebug \
+    ;
 
 COPY --link frankenphp/conf.d/20-app.dev.ini $PHP_INI_DIR/app.conf.d/
 
 CMD [ "frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile", "--watch" ]
 
-# Prod FrankenPHP image
-FROM frankenphp_base AS frankenphp_prod
+# Staging FrankenPHP image
+FROM frankenphp_base AS frankenphp_staging
 
-ENV APP_ENV=prod
+ARG VERSION
+ARG GIT_COMMIT
+ARG BUILD_DATE
+
+ENV APP_ENV=staging
+
+LABEL org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.revision="${GIT_COMMIT}" \
+      org.opencontainers.image.created="${BUILD_DATE}" \
+      org.opencontainers.image.title="Jamly API Staging"
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
+# Install xdebug for debugging in staging if needed (optional)
+RUN set -eux; \
+    install-php-extensions \
+       xdebug \
+    ;
+
+# Create staging-specific config if needed
 COPY --link frankenphp/conf.d/20-app.prod.ini $PHP_INI_DIR/app.conf.d/
 
 # prevent the reinstallation of vendors at every changes in the source code
 COPY --link composer.* symfony.* ./
 RUN set -eux; \
-	composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress
+    composer install --no-cache --prefer-dist --no-autoloader --no-scripts --no-progress
 
 # copy sources
 COPY --link . ./
 RUN rm -Rf frankenphp/
 
 RUN set -eux; \
-	mkdir -p var/cache var/log; \
-	composer dump-autoload --classmap-authoritative --no-dev; \
-	composer dump-env prod; \
-	composer run-script --no-dev post-install-cmd; \
-	chmod +x bin/console; sync;
+    mkdir -p var/cache var/log; \
+    composer dump-autoload --classmap-authoritative; \
+    composer dump-env staging; \
+    composer run-script post-install-cmd; \
+    chmod +x bin/console; sync;
+
+CMD [ "frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile" ]
+
+# Prod FrankenPHP image
+FROM frankenphp_base AS frankenphp_prod
+
+ARG VERSION
+ARG GIT_COMMIT
+ARG BUILD_DATE
+
+ENV APP_ENV=prod
+
+LABEL org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.revision="${GIT_COMMIT}" \
+      org.opencontainers.image.created="${BUILD_DATE}" \
+      org.opencontainers.image.title="Jamly API Production"
+
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+
+COPY --link frankenphp/conf.d/20-app.prod.ini $PHP_INI_DIR/app.conf.d/
+LABEL org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.revision="${GIT_COMMIT}" \
+      org.opencontainers.image.created="${BUILD_DATE}" \
+      org.opencontainers.image.title="Jamly API Production"
+# prevent the reinstallation of vendors at every changes in the source code
+COPY --link composer.* symfony.* ./
+RUN set -eux; \
+    composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress
+
+# copy sources
+COPY --link . ./
+RUN rm -Rf frankenphp/
+
+RUN set -eux; \
+    mkdir -p var/cache var/log; \
+    composer dump-autoload --classmap-authoritative --no-dev; \
+    composer dump-env prod; \
+    composer run-script --no-dev post-install-cmd; \
+    chmod +x bin/console; sync;
