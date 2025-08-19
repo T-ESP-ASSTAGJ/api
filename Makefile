@@ -16,7 +16,7 @@ install:         ## Install dependencies
 
 start:           ## Start the API
 	@echo -e "\r\n${BOLD_GREEN}# Starting API${NC}\r\n"
-	@docker compose up
+	@docker compose --env-file .env.local up
 
 stop:            ## Stop the API
 	@echo -e "\r\n${BOLD_GREEN}# Stopping API${NC}\r\n"
