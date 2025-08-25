@@ -65,7 +65,7 @@ jobs:
   security-scan:
     name: Trivy Security Scan
     needs: build
-    uses: T-ESP-ASSTAGJ/infra/.github/workflows/trivy-pipeline-scan.yml@main
+    uses: T-ESP-ASSTAGJ/infra/.github/workflows/trivy-scan.yml@main
     with:
       image_name: 'ghcr.io/t-esp-asstagj/jamly-api'
       image_tag: ${{ github.sha }}
