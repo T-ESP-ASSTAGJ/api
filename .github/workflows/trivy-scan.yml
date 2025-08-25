@@ -9,15 +9,8 @@ on:
 
 jobs:
   security-scan:
-    name: 🔍 Trivy Security Scan
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run Trivy security scan
-        uses: T-ESP-ASSTAGJ/infra/.github/workflows/trivy-scan.yml@TEM-71
-        with:
-          trivy_config_file: '.github/trivy.yaml'
-          discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+    name: Trivy Security Scan
+    uses: T-ESP-ASSTAGJ/infra/.github/workflows/trivy-scan.yml@TEM-71
+    with:
+      trivy_config_file: '.github/trivy.yaml'
+      discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
