@@ -67,9 +67,9 @@ jobs:
     needs: build
     uses: T-ESP-ASSTAGJ/infra/.github/workflows/trivy-pipeline-scan.yml@main
     with:
-      image_name: ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}
+      image_name: 'ghcr.io/t-esp-asstagj/jamly-api'
       image_tag: ${{ github.sha }}
       trivy_config_file: '.github/trivy.yaml'
-      discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      discord_webhook_url: '${{ secrets.DISCORD_WEBHOOK_URL }}'
     secrets: inherit
 
