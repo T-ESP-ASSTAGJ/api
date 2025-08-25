@@ -7,68 +7,17 @@ on:
   pull_request:
     branches: [main, TEM-71]
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: jamly-api
-
 jobs:
-  build:
-    name: Build & Push Docker Image
+  security-scan:
+    name: 🔍 Trivy Security Scan
     runs-on: ubuntu-latest
-    outputs:
-      image_tag: ${{ steps.meta.outputs.tags }}
-      image_digest: ${{ steps.build.outputs.digest }}
 
     steps:
-      # 1. Télécharger le code source
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Configurer Docker Buildx (pour builds avancés)
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      # 3. Se connecter au registre GitHub Container Registry
-      - name: Log in to Container Registry
-        uses: docker/login-action@v3
+      - name: Run Trivy security scan
+        uses: T-ESP-ASSTAGJ/infra/.github/workflows/trivy-scan.yml@TEM-71
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}  # Token automatique GitHub
-
-      # 4. Générer les métadonnées (tags, labels)
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=sha,prefix={{branch}}-
-            type=raw,value=latest,enable={{is_default_branch}}
-
-      # 5. Builder et pusher l'image Docker
-      - name: Build and push Docker image
-        id: build
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  security-scan:
-    name: Trivy Security Scan
-    needs: build
-    uses: T-ESP-ASSTAGJ/infra/.github/workflows/trivy-scan.yml@TEM-71
-    with:
-      image_name: 'ghcr.io/t-esp-asstagj/jamly-api'
-      image_tag: ${{ github.sha }}
-      trivy_config_file: '.github/trivy.yaml'
-    secrets:
-      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-
+          trivy_config_file: '.github/trivy.yaml'
+          discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
