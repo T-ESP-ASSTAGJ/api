@@ -16,6 +16,6 @@ jobs:
       contents: read
       pull-requests: write
     with:
-      trivy_config_file: '.github/trivy.yaml'
+      image_name: 'jamly-api'
     secrets:
       discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
