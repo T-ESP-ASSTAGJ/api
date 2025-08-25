@@ -32,6 +32,8 @@
 
 ## Docs
 
+[XDebug extension](https://addons.mozilla.org/en-GB/firefox/addon/xdebug-helper-by-jetbrains/)
+
 1. [Options available](docs/options.md)
 2. [Using Symfony Docker with an existing project](docs/existing-project.md)
 3. [Support for extra services](docs/extra-services.md)
