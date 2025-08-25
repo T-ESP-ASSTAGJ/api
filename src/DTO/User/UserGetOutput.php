@@ -8,15 +8,15 @@ use ApiPlatform\Metadata\ApiProperty;
 
 class UserGetOutput
 {
-    #[ApiProperty(example: 1)]
-    public int $id;
-
     #[ApiProperty(example: 'John')]
     public string $username;
 
     #[ApiProperty(example: 'john@doe.com')]
     public string $email;
 
+    /**
+     * @var array <string>
+     */
     #[ApiProperty(example: 'ROLE_USER')]
     public array $roles;
 }
