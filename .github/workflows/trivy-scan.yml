@@ -61,7 +61,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # Job de scan de sécurité
   security-scan:
     name: Trivy Security Scan
     needs: build
