@@ -16,6 +16,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Create .env.local with secrets
+        run: |
+          echo "APP_SECRET=${{ secrets.APP_SECRET }}" >> .env.local
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env.local
+          echo "MERCURE_JWT_SECRET=${{ secrets.MERCURE_JWT_SECRET }}" >> .env.local
+          echo "MERCURE_URL=https://example.com/.well-known/mercure" >> .env.local
+          echo "MERCURE_PUBLIC_URL=https://example.com/.well-known/mercure" >> .env.local
+          echo "✅ Created .env.local with GitHub secrets"
+
       - name: Build Docker image
         run: |
           docker build -t jamly-api:${{ github.sha }} --target frankenphp_staging .
