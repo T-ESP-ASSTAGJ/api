@@ -12,3 +12,6 @@ jobs:
       target_branch: ${{ github.ref_name }}
     secrets:
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      PR_BACK_REMINDER_WEBHOOK_URL: ${{ secrets.PR_BACK_REMINDER_WEBHOOK_URL }}
+      PR_FRONT_REMINDER_WEBHOOK_URL: ${{ secrets.PR_FRONT_REMINDER_WEBHOOK_URL }}
+      PR_DEVOPS_REMINDER_WEBHOOK_URL: ${{ secrets.PR_DEVOPS_REMINDER_WEBHOOK_URL }}
