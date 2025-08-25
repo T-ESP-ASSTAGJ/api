@@ -33,7 +33,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}          # Ton username GitHub
+          username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}  # Token automatique GitHub
 
       # 4. Générer les métadonnées (tags, labels)
@@ -53,12 +53,12 @@ jobs:
         id: build
         uses: docker/build-push-action@v5
         with:
-          context: .                              # Dossier actuel
-          file: ./Dockerfile                      # Chemin vers le Dockerfile
-          push: true                              # Push vers le registre
-          tags: ${{ steps.meta.outputs.tags }}   # Tags générés à l'étape 4
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha                    # Cache GitHub Actions
+          cache-from: type=gha
           cache-to: type=gha,mode=max
 
   # Job de scan de sécurité
@@ -69,7 +69,7 @@ jobs:
     with:
       image_name: ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}
       image_tag: ${{ github.sha }}
-      trivy_config_file: '.github/trivy-config/trivy.yaml'
+      trivy_config_file: '.github/trivy.yaml'
       discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
-    secrets: inherit  # Important : passer tous les secrets
+    secrets: inherit
 
