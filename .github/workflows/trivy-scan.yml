@@ -70,6 +70,6 @@ jobs:
       image_name: 'ghcr.io/t-esp-asstagj/jamly-api'
       image_tag: ${{ github.sha }}
       trivy_config_file: '.github/trivy.yaml'
-      discord_webhook_url: '${{ secrets.DISCORD_WEBHOOK_URL }}'
-    secrets: inherit
+    secrets:
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
