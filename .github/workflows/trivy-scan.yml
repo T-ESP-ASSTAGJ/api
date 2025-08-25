@@ -37,7 +37,7 @@ jobs:
           name: docker-image
           path: /tmp/jamly-api.tar
           retention-days: 1
-
+ # security scan
   security-scan:
     name: Trivy Security Scan
     needs: build-image
