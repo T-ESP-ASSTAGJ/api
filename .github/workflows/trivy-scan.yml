@@ -13,4 +13,5 @@ jobs:
     uses: T-ESP-ASSTAGJ/infra/.github/workflows/trivy-scan.yml@TEM-71
     with:
       trivy_config_file: '.github/trivy.yaml'
+    secrets:
       discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
