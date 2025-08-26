@@ -68,6 +68,7 @@ jobs:
       security-events: write
       contents: read
       pull-requests: write
+      packages: read
     with:
       image_name: ${{ needs.build-image.outputs.image_url }}
       image_tag: ${{ github.sha }}
