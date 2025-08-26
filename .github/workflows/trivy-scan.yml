@@ -40,6 +40,7 @@ jobs:
       - name: Build and push Docker image
         id: build
         run: |
+          # Utiliser l'organisation
           REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           IMAGE_URL="ghcr.io/${REPO_OWNER}/jamly-api"
           
@@ -72,3 +73,4 @@ jobs:
       image_tag: ${{ github.sha }}
     secrets:
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
