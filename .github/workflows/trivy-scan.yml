@@ -67,11 +67,11 @@ jobs:
     permissions:
       security-events: write
       contents: read
-      pull-requests: write
       packages: read
+      pull-requests: write
     with:
       image_name: ${{ needs.build-image.outputs.image_url }}
       image_tag: ${{ github.sha }}
     secrets:
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_TOKEN: ${{ secrets.GHCR_PAT }}
