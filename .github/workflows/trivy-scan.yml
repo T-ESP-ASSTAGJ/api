@@ -11,6 +11,9 @@ jobs:
   build-image:
     name: Build Docker Image
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     outputs:
       image_url: ${{ steps.build.outputs.image_url }}
 
@@ -37,7 +40,6 @@ jobs:
       - name: Build and push Docker image
         id: build
         run: |
-          # Convertir le nom du repo en minuscules pour le registry
           REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           IMAGE_URL="ghcr.io/${REPO_OWNER}/jamly-api"
           
