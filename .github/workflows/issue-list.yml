@@ -1,14 +1,17 @@
-name: JIRA Integration
-run-name: "🔷 [${{ github.workflow }} #${{ github.run_number }}] ${{ github.head_ref }} by @${{ github.actor }}"
+name: Issue List CI
+run-name: "📝 [${{ github.workflow }} #${{ github.run_number }}] ${{ github.head_ref }} by @${{ github.actor }}"
 
 on:
   pull_request:
     types: [opened, reopened, synchronize, closed]
+    branches:
+      - staging
+      - main
   workflow_dispatch:
 
 jobs:
-  jira-integration:
-    uses: T-ESP-ASSTAGJ/infra/.github/workflows/reusable-jira.yml@main
+  issue-list:
+    uses: T-ESP-ASSTAGJ/infra/.github/workflows/reusable-issue-list.yml@main
     with:
       repository_name: "api"
       issue_prefix: "TEM"
