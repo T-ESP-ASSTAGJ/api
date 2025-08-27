@@ -18,4 +18,4 @@ jobs:
       dev_tag: "#STAGING"
       prod_tag: "#MASTER"
       trad_tag: "#TRAD"
-      reviewers: "tlebeau13,SergioMiGuPr"
+      reviewers: "tlebeau13"
