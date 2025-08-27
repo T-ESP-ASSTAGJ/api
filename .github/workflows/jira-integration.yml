@@ -1,13 +1,19 @@
-name: Jira Integration
+name: JIRA Integration
+run-name: "🔷 [${{ github.workflow }} #${{ github.run_number }}] ${{ github.head_ref }} by @${{ github.actor }}"
 
 on:
-  push:
-    branches-ignore: [main, develop, staging]
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+  workflow_dispatch:
 
 jobs:
-  jira:
-    uses: T-ESP-ASSTAGJ/infra/.github/workflows/jira-gitmoji-integration.yml@main
+  jira-integration:
+    uses: T-ESP-ASSTAGJ/infra/.github/workflows/reusable-jira.yml@main
     with:
       repository_name: "api"
+      issue_prefix: "TEM"
+      jira_url: "https://t-esp-asstagj.atlassian.net"
+      jira_mail: "jamly.pro@gmail.com"
     secrets:
       JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.AUTO_DEPLOY_TOKEN }}
