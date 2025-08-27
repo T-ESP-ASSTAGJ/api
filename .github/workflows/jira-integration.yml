@@ -13,4 +13,7 @@ jobs:
       repository_name: "api"
       issue_prefix: "TEM"
       jira_url: "https://t-esp-asstagj.atlassian.net"
-      jira_mail: "jamly.pro@gmail.com"
+      jira_mail: "your-email@domain.com"
+    secrets:
+      JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+      AUTO_DEPLOY_TOKEN: ${{ secrets.AUTO_DEPLOY_TOKEN }}

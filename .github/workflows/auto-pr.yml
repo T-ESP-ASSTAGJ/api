@@ -19,3 +19,5 @@ jobs:
       prod_tag: "#MASTER"
       trad_tag: "#TRAD"
       reviewers: "tlebeau13"
+    secrets:
+      AUTO_DEPLOY_TOKEN: ${{ secrets.AUTO_DEPLOY_TOKEN }}
