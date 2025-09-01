@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Processor\User;
+namespace App\State\User;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
@@ -43,6 +43,9 @@ final readonly class UserCreateProcessor implements ProcessorInterface
             $user->setEmail($data->email);
             $user->setPassword($this->passwordHasher->hashPassword($user, $data->password));
             $user->setRoles(['ROLE_USER']);
+            $user->setBio($data->bio);
+            $user->setProfilePicture($data->profilePicture);
+            $user->setIsConfirmed(false);
 
             $violations = $this->validator->validate($user);
             if ($violations->count() > 0) {

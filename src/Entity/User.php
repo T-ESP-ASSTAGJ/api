@@ -13,8 +13,10 @@ use ApiPlatform\Metadata\Put;
 use App\DTO\User\UserCreateInput;
 use App\DTO\User\UserGetOutput;
 use App\Entity\Interface\TimeStampableInterface;
-use App\Processor\User\UserCreateProcessor;
 use App\Repository\UserRepository;
+use App\State\User\UserCreateProcessor;
+use App\State\User\UserGetCollectionProvider;
+use App\State\User\UserGetProvider;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -24,14 +26,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     shortName: 'User',
     operations: [
-        new Get(output: UserGetOutput::class),
-        new GetCollection(output: UserGetOutput::class),
+        new Get(output: UserGetOutput::class, provider: UserGetProvider::class),
+        new GetCollection(output: UserGetOutput::class, provider: UserGetCollectionProvider::class),
         new Post(
             uriTemplate: '/register',
             input: UserCreateInput::class,
             output: UserGetOutput::class,
             name: 'user_register',
-            processor: UserCreateProcessor::class
+            processor: UserCreateProcessor::class,
         ),
         new Put(output: UserGetOutput::class),
         new Delete(output: false),
@@ -68,6 +70,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
 
     #[ORM\Column(name: 'password', type: 'string', length: 255)]
     private string $password;
+
+    #[ORM\Column(name: 'profile_picture', type: 'string', length: 255, nullable: true)]
+    private ?string $profilePicture = null;
+
+    #[ORM\Column(name: 'bio', type: 'string', length: 255, nullable: true)]
+    private ?string $bio = null;
+
+    #[ORM\Column(name: 'is_confirmed', type: 'boolean')]
+    private bool $isConfirmed = false;
 
     public function getId(): ?int
     {
@@ -137,6 +148,42 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     public function setPassword(string $password): static
     {
         $this->password = $password;
+
+        return $this;
+    }
+
+    public function getProfilePicture(): ?string
+    {
+        return $this->profilePicture;
+    }
+
+    public function setProfilePicture(string $profilePicture): static
+    {
+        $this->profilePicture = $profilePicture;
+
+        return $this;
+    }
+
+    public function getBio(): ?string
+    {
+        return $this->bio;
+    }
+
+    public function setBio(?string $bio): static
+    {
+        $this->bio = $bio;
+
+        return $this;
+    }
+
+    public function isConfirmed(): bool
+    {
+        return $this->isConfirmed;
+    }
+
+    public function setIsConfirmed(bool $isConfirmed): static
+    {
+        $this->isConfirmed = $isConfirmed;
 
         return $this;
     }
