@@ -2,10 +2,10 @@ name: Trivy Scan
 
 on:
   push:
-    branches: [main, staging, TEM-71]
+    branches: [main, staging]
   workflow_dispatch:
   pull_request:
-    branches: [main, TEM-71]
+    branches: [main, staging]
 
 jobs:
   build-image:
