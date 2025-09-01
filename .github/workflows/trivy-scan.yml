@@ -1,0 +1,77 @@
+name: Trivy Scan
+
+on:
+  push:
+    branches: [main, staging]
+  workflow_dispatch:
+  pull_request:
+    branches: [main, staging]
+
+jobs:
+  build-image:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image_url: ${{ steps.build.outputs.image_url }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create .env.local with secrets
+        run: |
+          echo "APP_SECRET=${{ secrets.APP_SECRET }}" >> .env.local
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env.local
+          echo "MERCURE_JWT_SECRET=${{ secrets.MERCURE_JWT_SECRET }}" >> .env.local
+          echo "MERCURE_URL=https://example.com/.well-known/mercure" >> .env.local
+          echo "MERCURE_PUBLIC_URL=https://example.com/.well-known/mercure" >> .env.local
+          echo "✅ Created .env.local with GitHub secrets"
+
+      - name: Build and push Docker image
+        id: build
+        run: |
+          # Utiliser l'organisation
+          REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE_URL="ghcr.io/${REPO_OWNER}/jamly-api"
+          
+          echo "🐳 Building Docker image..."
+          docker build -t ${IMAGE_URL}:${{ github.sha }} --target frankenphp_staging .
+          
+          echo "📤 Pushing to GitHub Container Registry..."
+          docker push ${IMAGE_URL}:${{ github.sha }}
+          
+          # Tag latest pour la branche main
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "🏷️ Tagging as latest..."
+            docker tag ${IMAGE_URL}:${{ github.sha }} ${IMAGE_URL}:latest
+            docker push ${IMAGE_URL}:latest
+          fi
+          
+          echo "image_url=${IMAGE_URL}" >> $GITHUB_OUTPUT
+          echo "✅ Image pushed to ${IMAGE_URL}:${{ github.sha }}"
+
+  security-scan:
+    name: Trivy Security Scan
+    needs: build-image
+    uses: T-ESP-ASSTAGJ/infra/.github/workflows/trivy-scan.yml@TEM-71
+    permissions:
+      security-events: write
+      contents: read
+      packages: read
+      pull-requests: write
+    with:
+      image_name: ${{ needs.build-image.outputs.image_url }}
+      image_tag: ${{ github.sha }}
+    secrets:
+      DISCORD_WEBHOOK_URL: ${{ secrets.PR_EMERGENCY_WEBHOOK_URL }}
+      GH_TOKEN: ${{ secrets.GHCR_PAT }}
