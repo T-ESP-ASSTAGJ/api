@@ -73,5 +73,5 @@ jobs:
       image_name: ${{ needs.build-image.outputs.image_url }}
       image_tag: ${{ github.sha }}
     secrets:
-      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      DISCORD_WEBHOOK_URL: ${{ secrets.PR_EMERGENCY_WEBHOOK_URL }}
       GH_TOKEN: ${{ secrets.GHCR_PAT }}
