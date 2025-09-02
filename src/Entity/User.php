@@ -10,15 +10,15 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use App\DTO\User\UserCreateInput;
 use App\DTO\User\UserGetOutput;
+use App\DTO\User\UserMagicRegisterInput;
+use App\DTO\User\UserMagicRegisterOutput;
 use App\Entity\Interface\TimeStampableInterface;
 use App\Repository\UserRepository;
-use App\State\User\UserCreateProcessor;
 use App\State\User\UserGetCollectionProvider;
 use App\State\User\UserGetProvider;
+use App\State\User\UserMagicRegisterProcessor;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -29,11 +29,11 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Get(output: UserGetOutput::class, provider: UserGetProvider::class),
         new GetCollection(output: UserGetOutput::class, provider: UserGetCollectionProvider::class),
         new Post(
-            uriTemplate: '/register',
-            input: UserCreateInput::class,
-            output: UserGetOutput::class,
-            name: 'user_register',
-            processor: UserCreateProcessor::class,
+            uriTemplate: '/auth/magic-register',
+            input: UserMagicRegisterInput::class,
+            output: UserMagicRegisterOutput::class,
+            name: 'user_magic_register',
+            processor: UserMagicRegisterProcessor::class,
         ),
         new Put(output: UserGetOutput::class),
         new Delete(output: false),
@@ -42,9 +42,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Table(name: '`user`')]
-#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username'])]
-#[UniqueEntity(fields: ['username'], message: 'This username is already taken.')]
-#[UniqueEntity(fields: ['email'], message: 'This email is already registered.')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeStampableInterface
 {
     use Trait\TimeStampableTrait;
@@ -68,8 +65,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     #[ORM\Column(name: 'roles', type: 'json')]
     private array $roles = [];
 
-    #[ORM\Column(name: 'password', type: 'string', length: 255)]
+    #[ORM\Column(name: 'password', type: 'string', length: 255, nullable: true)]
     private string $password;
+
+    #[ORM\Column(name: 'phone_number', type: 'string', length: 20, unique: true, nullable: false)]
+    #[Assert\Regex('/\+?\d+/')]
+    private string $phoneNumber;
 
     #[ORM\Column(name: 'profile_picture', type: 'string', length: 255, nullable: true)]
     private ?string $profilePicture = null;
@@ -77,7 +78,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     #[ORM\Column(name: 'bio', type: 'string', length: 255, nullable: true)]
     private ?string $bio = null;
 
-    #[ORM\Column(name: 'is_confirmed', type: 'boolean')]
+    // TODO: change to is_verified, and handle email verification token/expiry
+    #[ORM\Column(name: 'is_confirmed', type: 'boolean', options: ['default' => false])]
     private bool $isConfirmed = false;
 
     public function getId(): ?int
@@ -116,7 +118,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
      */
     public function getUserIdentifier(): string
     {
-        return $this->username;
+        return $this->email;
     }
 
     /**
@@ -152,12 +154,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
         return $this;
     }
 
+    public function getPhoneNumber(): ?string
+    {
+        return $this->phoneNumber;
+    }
+
+    public function setPhoneNumber(string $phoneNumber): static
+    {
+        $this->phoneNumber = $phoneNumber;
+
+        return $this;
+    }
+
     public function getProfilePicture(): ?string
     {
         return $this->profilePicture;
     }
 
-    public function setProfilePicture(string $profilePicture): static
+    public function setProfilePicture(?string $profilePicture): static
     {
         $this->profilePicture = $profilePicture;
 

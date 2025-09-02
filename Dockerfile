@@ -59,13 +59,12 @@ ENV FRANKENPHP_WORKER_CONFIG=watch
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
 RUN set -eux; \
-    install-php-extensions \
-       xdebug \
-    ;
+    install-php-extensions xdebug; \
+    rm -f $PHP_INI_DIR/conf.d/docker-php-ext-xdebug.ini
 
 COPY --link frankenphp/conf.d/xdebug.dev.ini $PHP_INI_DIR/app.conf.d/
 
-CMD [ "frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile", "--watch" ]
+CMD [ "frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile" ]
 
 # Staging FrankenPHP image
 FROM frankenphp_base AS frankenphp_staging

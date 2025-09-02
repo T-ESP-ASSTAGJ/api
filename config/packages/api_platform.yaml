@@ -3,9 +3,9 @@ api_platform:
     description: 'API documentation of Jamly'
     version: '1.0.0'
     formats:
-      json: ['application/json']
+        json: ['application/json']
     error_formats:
-      json: ["application/json"]
+        json: ["application/json"]
     swagger:
         versions: [3]
         api_keys:
