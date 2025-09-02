@@ -1,4 +1,4 @@
-name: Trivy Scan - Api
+name: Trivy Scan -
 
 on:
   push:
