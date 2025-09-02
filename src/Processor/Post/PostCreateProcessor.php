@@ -2,57 +2,57 @@
 
 declare(strict_types=1);
 
-namespace App\Processor\User;
+namespace App\Processor\Post;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
-use App\DTO\User\UserCreateInput;
-use App\DTO\User\UserGetOutput;
-use App\Entity\User;
+use App\DTO\Post\PostCreateInput;
+use App\DTO\Post\PostGetOutput;
+use App\Entity\Post;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * @implements ProcessorInterface<UserCreateInput, UserGetOutput>
+ * @implements ProcessorInterface<PostCreateInput, PostGetOutput>
  */
-final readonly class UserCreateProcessor implements ProcessorInterface
+final readonly class PostCreateProcessor implements ProcessorInterface
 {
     public function __construct(
         private EntityManagerInterface $em,
-        private UserPasswordHasherInterface $passwordHasher,
         private ValidatorInterface $validator,
         private ObjectMapperInterface $objectMapper,
     ) {
     }
 
     /**
-     * @param UserCreateInput      $data
+     * @param PostCreateInput      $data
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *
-     * @return UserGetOutput
+     * @return PostGetOutput
      */
     public function process(mixed $data, ?Operation $operation = null, array $uriVariables = [], array $context = []): mixed
     {
-        if ($data instanceof UserCreateInput) {
-            $user = new User();
-            $user->setUsername($data->username);
-            $user->setEmail($data->email);
-            $user->setPassword($this->passwordHasher->hashPassword($user, $data->password));
-            $user->setRoles(['ROLE_USER']);
+        if ($data instanceof PostCreateInput) {
+            $post = new Post();
+            $post->setUserId($data->userId);
+            $post->setSongPreviewUrl($data->songPreviewUrl);
+            $post->setCaption($data->caption);
+            $post->setTrack($data->track);
+            $post->setPhotoUrl($data->photoUrl);
+            $post->setLocation($data->location);
 
-            $violations = $this->validator->validate($user);
+            $violations = $this->validator->validate($post);
             if ($violations->count() > 0) {
                 throw new ValidationException($violations);
             }
 
-            $this->em->persist($user);
+            $this->em->persist($post);
             $this->em->flush();
 
-            return $this->objectMapper->map($user, UserGetOutput::class);
+            return $this->objectMapper->map($post, PostGetOutput::class);
         }
 
         return $data;
