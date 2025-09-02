@@ -19,9 +19,121 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
-    # Spotify Service Configuration
-    App\Service\SpotifyService:
+    # HTTP Clients Configuration
+    spotify.api.client:
+        class: Symfony\Contracts\HttpClient\HttpClientInterface
+        factory: ['@http_client', 'withOptions']
         arguments:
+            - base_uri: '%env(SPOTIFY_API_URL)%'
+              headers:
+                'Accept': 'application/json'
+                'Content-Type': 'application/json'
+
+    spotify.auth.client:
+        class: Symfony\Contracts\HttpClient\HttpClientInterface
+        factory: ['@http_client', 'withOptions']
+        arguments:
+            - headers:
+                'Content-Type': 'application/x-www-form-urlencoded'
+                'Accept': 'application/json'
+
+    # Spotify Services Configuration
+    App\Service\Spotify\SpotifyAuthService:
+        arguments:
+            $spotifyApiClient: '@spotify.api.client'
+            $spotifyAuthClient: '@spotify.auth.client'
             $clientId: '%env(SPOTIFY_CLIENT_ID)%'
             $clientSecret: '%env(SPOTIFY_CLIENT_SECRET)%'
             $redirectUri: '%env(SPOTIFY_REDIRECT_URI)%'
+            $authUrl: '%env(SPOTIFY_AUTH_URL)%'
+            $tokenUrl: '%env(SPOTIFY_TOKEN_URL)%'
+
+    App\Service\Spotify\SpotifyService:
+        arguments:
+            $spotifyApiClient: '@spotify.api.client'
+
+    # Deezer HTTP Clients
+    deezer.api.client:
+        class: Symfony\Contracts\HttpClient\HttpClientInterface
+        factory: ['@http_client', 'withOptions']
+        arguments:
+            - base_uri: '%env(DEEZER_API_URL)%'
+              headers:
+                'Accept': 'application/json'
+
+    deezer.auth.client:
+        class: Symfony\Contracts\HttpClient\HttpClientInterface
+        factory: ['@http_client', 'withOptions']
+        arguments:
+            - headers:
+                'Accept': 'application/json'
+
+    # SoundCloud HTTP Clients
+    soundcloud.api.client:
+        class: Symfony\Contracts\HttpClient\HttpClientInterface
+        factory: ['@http_client', 'withOptions']
+        arguments:
+            - base_uri: '%env(SOUNDCLOUD_API_URL)%'
+              headers:
+                'Accept': 'application/json'
+
+    soundcloud.auth.client:
+        class: Symfony\Contracts\HttpClient\HttpClientInterface
+        factory: ['@http_client', 'withOptions']
+        arguments:
+            - headers:
+                'Content-Type': 'application/x-www-form-urlencoded'
+                'Accept': 'application/json'
+
+    # Apple Music HTTP Client
+    applemusic.api.client:
+        class: Symfony\Contracts\HttpClient\HttpClientInterface
+        factory: ['@http_client', 'withOptions']
+        arguments:
+            - base_uri: '%env(APPLE_MUSIC_API_URL)%'
+              headers:
+                'Accept': 'application/json'
+                'Content-Type': 'application/json'
+
+    # Deezer Services Configuration
+    App\Service\Deezer\DeezerAuthService:
+        arguments:
+            $deezerApiClient: '@deezer.api.client'
+            $deezerAuthClient: '@deezer.auth.client'
+            $clientId: '%env(DEEZER_CLIENT_ID)%'
+            $clientSecret: '%env(DEEZER_CLIENT_SECRET)%'
+            $redirectUri: '%env(DEEZER_REDIRECT_URI)%'
+            $authUrl: '%env(DEEZER_AUTH_URL)%'
+            $tokenUrl: '%env(DEEZER_TOKEN_URL)%'
+
+    App\Service\Deezer\DeezerService:
+        arguments:
+            $deezerApiClient: '@deezer.api.client'
+
+    # SoundCloud Services Configuration
+    App\Service\SoundCloud\SoundCloudAuthService:
+        arguments:
+            $soundCloudApiClient: '@soundcloud.api.client'
+            $soundCloudAuthClient: '@soundcloud.auth.client'
+            $clientId: '%env(SOUNDCLOUD_CLIENT_ID)%'
+            $clientSecret: '%env(SOUNDCLOUD_CLIENT_SECRET)%'
+            $redirectUri: '%env(SOUNDCLOUD_REDIRECT_URI)%'
+            $authUrl: '%env(SOUNDCLOUD_AUTH_URL)%'
+            $tokenUrl: '%env(SOUNDCLOUD_TOKEN_URL)%'
+
+    App\Service\SoundCloud\SoundCloudService:
+        arguments:
+            $soundCloudApiClient: '@soundcloud.api.client'
+
+    # Apple Music Services Configuration
+    App\Service\AppleMusic\AppleMusicAuthService:
+        arguments:
+            $appleMusicApiClient: '@applemusic.api.client'
+            $teamId: '%env(APPLE_MUSIC_TEAM_ID)%'
+            $keyId: '%env(APPLE_MUSIC_KEY_ID)%'
+            $privateKey: '%env(APPLE_MUSIC_PRIVATE_KEY)%'
+
+    App\Service\AppleMusic\AppleMusicService:
+        arguments:
+            $appleMusicApiClient: '@applemusic.api.client'
+            $developerToken: '%env(APPLE_MUSIC_DEVELOPER_TOKEN)%'
