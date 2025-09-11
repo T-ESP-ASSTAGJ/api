@@ -7,30 +7,19 @@ namespace App\Service\Spotify;
 use App\DTO\Spotify\UserProfileDTO;
 use App\DTO\Spotify\TrackDTO;
 use App\DTO\Spotify\PlaylistDTO;
+use App\DTO\Spotify\AlbumDTO;
+use App\DTO\Spotify\ArtistDTO;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Exception\ServerException;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class SpotifyService
 {
     public function __construct(
-        private readonly HttpClientInterface $spotifyApiClient
+        private readonly HttpClientInterface $spotifyApiClient,
+        private readonly ObjectMapperInterface $objectMapper
     ) {}
-
-    public function getUserProfile(string $accessToken): UserProfileDTO
-    {
-        try {
-            $response = $this->spotifyApiClient->request('GET', '/me', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $accessToken,
-                ],
-            ]);
-
-            return UserProfileDTO::fromArray($response->toArray());
-        } catch (ClientException | ServerException $e) {
-            throw new \Exception('Failed to get user profile: ' . $e->getMessage());
-        }
-    }
 
     public function getUserPlaylists(string $accessToken, int $limit = 20): array
     {
@@ -45,7 +34,7 @@ class SpotifyService
             ]);
 
             $data = $response->toArray();
-            return array_map(fn($item) => PlaylistDTO::fromArray($item), $data['items'] ?? []);
+            return array_map(fn($item) => $this->objectMapper->map((object) $item, PlaylistDTO::class), $data['items'] ?? []);
         } catch (ClientException | ServerException $e) {
             throw new \Exception('Failed to get user playlists: ' . $e->getMessage());
         }
@@ -68,7 +57,7 @@ class SpotifyService
             $data = $response->toArray();
             
             if ($type === 'track' && isset($data['tracks']['items'])) {
-                return array_map(fn($item) => TrackDTO::fromArray($item), $data['tracks']['items']);
+                return array_map(fn($item) => $this->objectMapper->map((object) $item, TrackDTO::class), $data['tracks']['items']);
             }
             
             return $data;
@@ -86,13 +75,14 @@ class SpotifyService
                 ],
             ]);
 
-            return TrackDTO::fromArray($response->toArray());
+            $data = $response->toArray();
+            return $this->objectMapper->map((object) $data, TrackDTO::class);
         } catch (ClientException | ServerException $e) {
             throw new \Exception('Failed to get track: ' . $e->getMessage());
         }
     }
 
-    public function getAlbum(string $accessToken, string $albumId): array
+    public function getAlbum(string $accessToken, string $albumId): AlbumDTO
     {
         try {
             $response = $this->spotifyApiClient->request('GET', '/albums/' . $albumId, [
@@ -101,13 +91,14 @@ class SpotifyService
                 ],
             ]);
 
-            return $response->toArray();
+            $data = $response->toArray();
+            return $this->objectMapper->map((object) $data, AlbumDTO::class);
         } catch (ClientException | ServerException $e) {
             throw new \Exception('Failed to get album: ' . $e->getMessage());
         }
     }
 
-    public function getArtist(string $accessToken, string $artistId): array
+    public function getArtist(string $accessToken, string $artistId): ArtistDTO
     {
         try {
             $response = $this->spotifyApiClient->request('GET', '/artists/' . $artistId, [
@@ -116,7 +107,8 @@ class SpotifyService
                 ],
             ]);
 
-            return $response->toArray();
+            $data = $response->toArray();
+            return $this->objectMapper->map((object) $data, ArtistDTO::class);
         } catch (ClientException | ServerException $e) {
             throw new \Exception('Failed to get artist: ' . $e->getMessage());
         }

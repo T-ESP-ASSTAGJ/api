@@ -7,7 +7,7 @@ namespace App\Service\Spotify;
 use App\Entity\Token;
 use App\Entity\User;
 use App\Repository\TokenRepository;
-use App\DTO\Spotify\UserProfileDTO;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Exception\ServerException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -18,6 +18,7 @@ class SpotifyAuthService
         private readonly HttpClientInterface $spotifyApiClient,
         private readonly HttpClientInterface $spotifyAuthClient,
         private readonly TokenRepository $tokenRepository,
+        private readonly EntityManagerInterface $entityManager,
         private readonly string $clientId,
         private readonly string $clientSecret,
         private readonly string $redirectUri,
@@ -60,7 +61,7 @@ class SpotifyAuthService
             // Remove existing token for this user and platform
             $existingToken = $this->tokenRepository->findByUserAndPlatform($user, Token::PLATFORM_SPOTIFY);
             if ($existingToken) {
-                $this->tokenRepository->remove($existingToken, true);
+                $this->entityManager->remove($existingToken);
             }
 
             // Create new token
@@ -76,7 +77,8 @@ class SpotifyAuthService
             $userProfile = $this->getUserProfile($tokenData['access_token']);
             $token->setPlatformUserId($userProfile['id']);
 
-            $this->tokenRepository->save($token, true);
+            $this->entityManager->persist($token);
+            $this->entityManager->flush();
 
             return $token;
         } catch (ClientException | ServerException $e) {
@@ -117,7 +119,8 @@ class SpotifyAuthService
                 $token->setScopes(explode(' ', $tokenData['scope']));
             }
 
-            $this->tokenRepository->save($token, true);
+            $this->entityManager->persist($token);
+            $this->entityManager->flush();
 
             return $token;
         } catch (ClientException | ServerException $e) {
