@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Processor\Post;
+namespace App\State\Post;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;

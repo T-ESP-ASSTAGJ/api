@@ -13,7 +13,7 @@ use ApiPlatform\Metadata\Put;
 use App\DTO\Post\PostCreateInput;
 use App\DTO\Post\PostGetOutput;
 use App\Entity\Interface\TimeStampableInterface;
-use App\Processor\Post\PostCreateProcessor;
+use App\State\Post\PostCreateProcessor;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ApiResource(
