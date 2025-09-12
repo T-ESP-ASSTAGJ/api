@@ -42,6 +42,7 @@ services:
         arguments:
             $spotifyApiClient: '@spotify.api.client'
             $spotifyAuthClient: '@spotify.auth.client'
+            $entityManager: '@doctrine.orm.entity_manager'
             $clientId: '%env(SPOTIFY_CLIENT_ID)%'
             $clientSecret: '%env(SPOTIFY_CLIENT_SECRET)%'
             $redirectUri: '%env(SPOTIFY_REDIRECT_URI)%'
