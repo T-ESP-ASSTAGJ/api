@@ -18,3 +18,38 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    # HTTP Clients Configuration
+    spotify.api.client:
+        class: Symfony\Contracts\HttpClient\HttpClientInterface
+        factory: ['@http_client', 'withOptions']
+        arguments:
+            - base_uri: '%env(SPOTIFY_API_URL)%'
+              headers:
+                'Accept': 'application/json'
+                'Content-Type': 'application/json'
+
+    spotify.auth.client:
+        class: Symfony\Contracts\HttpClient\HttpClientInterface
+        factory: ['@http_client', 'withOptions']
+        arguments:
+            - headers:
+                'Content-Type': 'application/x-www-form-urlencoded'
+                'Accept': 'application/json'
+
+    # Spotify Services Configuration
+    App\Service\Spotify\SpotifyAuthService:
+        arguments:
+            $spotifyApiClient: '@spotify.api.client'
+            $spotifyAuthClient: '@spotify.auth.client'
+            $entityManager: '@doctrine.orm.entity_manager'
+            $clientId: '%env(SPOTIFY_CLIENT_ID)%'
+            $clientSecret: '%env(SPOTIFY_CLIENT_SECRET)%'
+            $redirectUri: '%env(SPOTIFY_REDIRECT_URI)%'
+            $authUrl: '%env(SPOTIFY_AUTH_URL)%'
+            $tokenUrl: '%env(SPOTIFY_TOKEN_URL)%'
+
+    App\Service\Spotify\SpotifyService:
+        arguments:
+            $spotifyApiClient: '@spotify.api.client'
+
