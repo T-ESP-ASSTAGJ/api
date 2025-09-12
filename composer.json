@@ -14,6 +14,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/orm": "^3.5",
         "gedmo/doctrine-extensions": "^3.20",
+        "lexik/jwt-authentication-bundle": "^3.1",
         "nelmio/cors-bundle": "^2.5",
         "phpdocumentor/reflection-docblock": "^5.6",
         "phpstan/phpdoc-parser": "^2.2",
@@ -26,6 +27,7 @@
         "symfony/framework-bundle": "7.3.*",
         "symfony/mercure-bundle": "^0.3.9",
         "symfony/monolog-bundle": "^3.10",
+        "symfony/object-mapper": "7.3.*",
         "symfony/property-access": "7.3.*",
         "symfony/property-info": "7.3.*",
         "symfony/runtime": "7.3.*",
@@ -39,6 +41,7 @@
     },
     "config": {
         "allow-plugins": {
+            "captainhook/captainhook-phar": true,
             "php-http/discovery": true,
             "symfony/flex": true,
             "symfony/runtime": true
@@ -89,8 +92,11 @@
         }
     },
     "require-dev": {
+        "captainhook/captainhook-phar": "^5.25",
         "friendsofphp/php-cs-fixer": "^3.84",
         "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-doctrine": "^2.0",
+        "phpstan/phpstan-symfony": "^2.0",
         "phpunit/phpunit": "^11.5",
         "symfony/browser-kit": "7.3.*",
         "symfony/css-selector": "7.3.*",

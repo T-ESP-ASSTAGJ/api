@@ -8,7 +8,7 @@ interface TimeStampableInterface
 {
     public function getCreatedAt(): \DateTimeImmutable;
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): void;
+    public function setCreatedAt(): void;
 
     public function getUpdatedAt(): \DateTimeImmutable;
 

@@ -50,28 +50,21 @@ COPY --link frankenphp/conf.d/10-app.ini $PHP_INI_DIR/app.conf.d/
 COPY --link --chmod=755 frankenphp/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 COPY --link frankenphp/Caddyfile /etc/frankenphp/Caddyfile
 
-ENTRYPOINT ["docker-entrypoint"]
-
-HEALTHCHECK --start-period=60s CMD curl -f http://localhost:2019/metrics || exit 1
-CMD [ "frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile" ]
-
 # Dev FrankenPHP image
 FROM frankenphp_base AS frankenphp_dev
 
 ENV APP_ENV=dev
-ENV XDEBUG_MODE=off
 ENV FRANKENPHP_WORKER_CONFIG=watch
 
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
 RUN set -eux; \
-    install-php-extensions \
-       xdebug \
-    ;
+    install-php-extensions xdebug; \
+    rm -f $PHP_INI_DIR/conf.d/docker-php-ext-xdebug.ini
 
-COPY --link frankenphp/conf.d/20-app.dev.ini $PHP_INI_DIR/app.conf.d/
+COPY --link frankenphp/conf.d/xdebug.dev.ini $PHP_INI_DIR/app.conf.d/
 
-CMD [ "frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile", "--watch" ]
+CMD [ "frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile" ]
 
 # Staging FrankenPHP image
 FROM frankenphp_base AS frankenphp_staging

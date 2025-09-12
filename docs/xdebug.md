@@ -1,26 +1,20 @@
 # Using Xdebug
 
-The default development image is shipped with [Xdebug](https://xdebug.org/),
-a popular debugger and profiler for PHP.
+## PHP Interpreter
 
-Because it has a significant performance overhead, the step-by-step debugger is disabled by default.
-It can be enabled by setting the `XDEBUG_MODE` environment variable to `debug`.
 
-On Linux and Mac:
+Go to Settings | PHP and click on the ... next to CLI Interpreter.
 
-```
-XDEBUG_MODE=debug docker compose up --wait
-```
+Then configure the remote PHP interpreter as below and validate:
+![img.png](XDebug-1.png)
 
-On Windows:
+You should see your PHP version and its config file appear:
+![img.png](XDebug-2.png)
 
-```
-set XDEBUG_MODE=debug&& docker compose up --wait&set XDEBUG_MODE=
-```
+## Path mapping
 
-## Debugging with Xdebug and PHPStorm
+Click on the directory in Docker Container and create a volume between the Phoenix root and /application.
 
-First, [create a PHP debug remote server configuration](https://www.jetbrains.com/help/phpstorm/creating-a-php-debug-server-configuration.html):
 
 1. In the `Settings/Preferences` dialog, go to `PHP | Servers`
 2. Create a new server:
@@ -30,7 +24,6 @@ First, [create a PHP debug remote server configuration](https://www.jetbrains.co
    * Debugger: `Xdebug`
    * Check `Use path mappings`
    * Absolute path on the server: `/app`
-
 You can now use the debugger!
 
 1. In PHPStorm, open the `Run` menu and click on `Start Listening for PHP Debug Connections`
@@ -45,40 +38,3 @@ You can now use the debugger!
     ```console
     XDEBUG_SESSION=1 PHP_IDE_CONFIG="serverName=symfony" php bin/console ...
     ```
-
-## Debugging with Xdebug and VScode
-
-1. Install necessary [PHP extension for VScode](https://marketplace.visualstudio.com/items?itemName=DEVSENSE.phptools-vscode).
-2. Add [debug configuration](https://code.visualstudio.com/docs/debugtest/debugging-configuration#_launch-configurations) into your `.vscode\launch.json` file.
-
-    Example:
-    
-    ```
-    {
-        "version": "0.2.0",
-        "configurations": [
-            {
-                "name": "Listen for Xdebug",
-                "type": "php",
-                "request": "launch",
-                "port": 9003,
-                "pathMappings": {
-                    "/app": "${workspaceFolder}"
-                }
-            }
-        ]
-    }
-    ```
-    
-3. Use [Run and Debug](https://code.visualstudio.com/docs/debugtest/debugging#_start-a-debugging-session) options and run  `Listen for Xdebug` command to listen for upcomming connections with [the **Xdebug extension**](https://xdebug.org/docs/step_debug#browser-extensions) installed and active.
-
-## Troubleshooting
-
-Inspect the installation with the following command. The Xdebug version should be displayed.
-
-```console
-$ docker compose exec php php --version
-
-PHP ...
-    with Xdebug v3.x.x ...
-```

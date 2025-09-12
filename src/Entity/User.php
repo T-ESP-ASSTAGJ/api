@@ -1,25 +1,47 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use App\DTO\User\UserGetOutput;
+use App\DTO\User\UserMagicRegisterInput;
+use App\DTO\User\UserMagicRegisterOutput;
 use App\Entity\Interface\TimeStampableInterface;
 use App\Repository\UserRepository;
+use App\State\User\UserGetCollectionProvider;
+use App\State\User\UserGetProvider;
+use App\State\User\UserMagicRegisterProcessor;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     shortName: 'User',
-    operations: [new Get(), new GetCollection(), new Put(), new Delete()]
+    operations: [
+        new Get(output: UserGetOutput::class, provider: UserGetProvider::class),
+        new GetCollection(output: UserGetOutput::class, provider: UserGetCollectionProvider::class),
+        new Post(
+            uriTemplate: '/auth/magic-register',
+            input: UserMagicRegisterInput::class,
+            output: UserMagicRegisterOutput::class,
+            name: 'user_magic_register',
+            processor: UserMagicRegisterProcessor::class,
+        ),
+        new Put(output: UserGetOutput::class),
+        new Delete(output: false),
+    ]
 )]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 #[ORM\Table(name: '`user`')]
-#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeStampableInterface
 {
     use Trait\TimeStampableTrait;
@@ -30,9 +52,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     private ?int $id = null;
 
     #[ORM\Column(name: 'username', type: 'string', length: 180, unique: true)]
+    #[Assert\Length(min: 3, max: 180)]
     private string $username;
 
     #[ORM\Column(name: 'email', type: 'string', length: 180, unique: true)]
+    #[Assert\Email]
     private string $email;
 
     /**
@@ -41,8 +65,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     #[ORM\Column(name: 'roles', type: 'json')]
     private array $roles = [];
 
-    #[ORM\Column(name: 'password', type: 'string', length: 255)]
+    #[ORM\Column(name: 'password', type: 'string', length: 255, nullable: true)]
     private string $password;
+
+    #[ORM\Column(name: 'phone_number', type: 'string', length: 20, unique: true, nullable: false)]
+    #[Assert\Regex('/\+?\d+/')]
+    private string $phoneNumber;
+
+    #[ORM\Column(name: 'profile_picture', type: 'string', length: 255, nullable: true)]
+    private ?string $profilePicture = null;
+
+    #[ORM\Column(name: 'bio', type: 'string', length: 255, nullable: true)]
+    private ?string $bio = null;
+
+    // TODO: change to is_verified, and handle email verification token/expiry
+    #[ORM\Column(name: 'is_confirmed', type: 'boolean', options: ['default' => false])]
+    private bool $isConfirmed = false;
 
     public function getId(): ?int
     {
@@ -80,7 +118,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->username;
+        return $this->email;
     }
 
     /**
@@ -88,10 +126,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
      */
     public function getRoles(): array
     {
-        $roles = $this->roles;
-        $roles[] = 'ROLE_USER';
-
-        return array_unique($roles);
+        return $this->roles;
     }
 
     /**
@@ -115,6 +150,54 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     public function setPassword(string $password): static
     {
         $this->password = $password;
+
+        return $this;
+    }
+
+    public function getPhoneNumber(): ?string
+    {
+        return $this->phoneNumber;
+    }
+
+    public function setPhoneNumber(string $phoneNumber): static
+    {
+        $this->phoneNumber = $phoneNumber;
+
+        return $this;
+    }
+
+    public function getProfilePicture(): ?string
+    {
+        return $this->profilePicture;
+    }
+
+    public function setProfilePicture(?string $profilePicture): static
+    {
+        $this->profilePicture = $profilePicture;
+
+        return $this;
+    }
+
+    public function getBio(): ?string
+    {
+        return $this->bio;
+    }
+
+    public function setBio(?string $bio): static
+    {
+        $this->bio = $bio;
+
+        return $this;
+    }
+
+    public function isConfirmed(): bool
+    {
+        return $this->isConfirmed;
+    }
+
+    public function setIsConfirmed(bool $isConfirmed): static
+    {
+        $this->isConfirmed = $isConfirmed;
 
         return $this;
     }

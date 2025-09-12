@@ -16,7 +16,7 @@ install:         ## Install dependencies
 
 start:           ## Start the API
 	@echo -e "\r\n${BOLD_GREEN}# Starting API${NC}\r\n"
-	@docker compose up
+	@docker compose --env-file .env.local up
 
 stop:            ## Stop the API
 	@echo -e "\r\n${BOLD_GREEN}# Stopping API${NC}\r\n"
@@ -110,7 +110,7 @@ phpstan:         ## Execute PHPStan
 
 unit-test:       ## Run unit tests
 	@echo -e "\r\n${BOLD_GREEN}# Testing API${NC}\r\n"
-	@docker exec -it -u $$(id -u):$$(id -g) -eCOMPOSER_NO_INTERACTION=1 -eXDEBUG_MODE=coverage,debug api-appserver-xdebug bin/phpunit $${filter:+--filter=$(filter)} --exclude-group=functional
+	@docker exec -it -u $$(id -u):$$(id -g) -eCOMPOSER_NO_INTERACTION=1 -eXDEBUG_MODE=coverage,debug jamly-api bin/phpunit
 
 .PHONY: unit-test
 
