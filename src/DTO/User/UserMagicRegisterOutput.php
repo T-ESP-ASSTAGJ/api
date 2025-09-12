@@ -6,17 +6,16 @@ namespace App\DTO\User;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-class UserCreateInput
+class UserMagicRegisterOutput
 {
-    #[Assert\NotBlank]
-    #[Assert\Length(min: 3, max: 180)]
-    public string $username;
-
     #[Assert\NotBlank]
     #[Assert\Email]
     public string $email;
 
     #[Assert\NotBlank]
-    #[Assert\Length(min: 6)]
-    public string $password;
+    #[Assert\Length(min: 3, max: 180)]
+    public string $username;
+
+    #[Assert\NotBlank]
+    public string $token;
 }
