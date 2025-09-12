@@ -6,7 +6,7 @@ namespace App\DTO\PlatformAuth\Spotify;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
-use App\Processor\PlatformAuth\AuthSpotifyCallbackProcessor;
+use App\State\Spotify\AuthSpotifyCallbackProcessor;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(

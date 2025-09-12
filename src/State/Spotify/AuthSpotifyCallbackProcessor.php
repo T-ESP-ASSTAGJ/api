@@ -2,16 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Processor\PlatformAuth;
+namespace App\State\Spotify;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\DTO\PlatformAuth\Spotify\AuthSpotifyCallbackInput;
 use App\DTO\PlatformAuth\Spotify\AuthSpotifyCallbackOutput;
 use App\Entity\Token;
-use App\Entity\User;
 use App\Service\Spotify\SpotifyAuthService;
-use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 /**
  * @implements ProcessorInterface<AuthSpotifyCallbackInput, AuthSpotifyCallbackOutput>
