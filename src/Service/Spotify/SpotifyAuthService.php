@@ -8,24 +8,28 @@ use App\Entity\Token;
 use App\Entity\User;
 use App\Repository\TokenRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpClient\Exception\ClientException;
-use Symfony\Component\HttpClient\Exception\ServerException;
+use Random\RandomException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class SpotifyAuthService
+readonly class SpotifyAuthService
 {
     public function __construct(
-        private readonly HttpClientInterface $spotifyApiClient,
-        private readonly HttpClientInterface $spotifyAuthClient,
-        private readonly TokenRepository $tokenRepository,
-        private readonly EntityManagerInterface $entityManager,
-        private readonly string $clientId,
-        private readonly string $clientSecret,
-        private readonly string $redirectUri,
-        private readonly string $authUrl,
-        private readonly string $tokenUrl
-    ) {}
+        private HttpClientInterface $spotifyApiClient,
+        private HttpClientInterface $spotifyAuthClient,
+        private TokenRepository $tokenRepository,
+        private EntityManagerInterface $entityManager,
+        private string $clientId,
+        private string $redirectUri,
+        private string $authUrl,
+        private string $tokenUrl,
+    ) {
+    }
 
+    /**
+     * @param array<string> $scopes
+     *
+     * @throws RandomException
+     */
     public function getAuthorizationUrl(array $scopes = ['user-read-private', 'user-read-email']): string
     {
         $state = bin2hex(random_bytes(16));
@@ -38,7 +42,7 @@ class SpotifyAuthService
             'state' => $state,
         ];
 
-        return $this->authUrl . '?' . http_build_query($params);
+        return $this->authUrl.'?'.http_build_query($params);
     }
 
     public function exchangeCodeForToken(string $code, User $user): Token
@@ -55,7 +59,7 @@ class SpotifyAuthService
             $tokenData = $response->toArray();
 
             if (!isset($tokenData['access_token'])) {
-                throw new \Exception('No access token received from Spotify');
+                throw new \RuntimeException('No access token received from Spotify');
             }
 
             // Remove existing token for this user and platform
@@ -70,7 +74,7 @@ class SpotifyAuthService
                 ->setPlatform(Token::PLATFORM_SPOTIFY)
                 ->setAccessToken($tokenData['access_token'])
                 ->setRefreshToken($tokenData['refresh_token'] ?? null)
-                ->setExpiresAt(new \DateTime('+' . ($tokenData['expires_in'] ?? 3600) . ' seconds'))
+                ->setExpiresAt(new \DateTime('+'.($tokenData['expires_in'] ?? 3600).' seconds'))
                 ->setScopes(explode(' ', $tokenData['scope'] ?? ''));
 
             // Get user profile to set platform user ID
@@ -81,21 +85,19 @@ class SpotifyAuthService
             $this->entityManager->flush();
 
             return $token;
-        } catch (ClientException | ServerException $e) {
-            $errorData = json_decode($e->getResponse()->getContent(false), true);
-            $errorMessage = $errorData['error_description'] ?? $e->getMessage();
-            throw new \Exception('Failed to exchange code for token: ' . $errorMessage);
+        } catch (\Throwable $e) {
+            throw new \RuntimeException('Failed to exchange code for token: '.$e->getMessage());
         }
     }
 
     public function refreshToken(Token $token): Token
     {
-        if ($token->getPlatform() !== Token::PLATFORM_SPOTIFY) {
+        if (Token::PLATFORM_SPOTIFY !== $token->getPlatform()) {
             throw new \InvalidArgumentException('Token is not for Spotify platform');
         }
 
         if (!$token->getRefreshToken()) {
-            throw new \Exception('No refresh token available');
+            throw new \RuntimeException('No refresh token available');
         }
 
         try {
@@ -109,7 +111,7 @@ class SpotifyAuthService
             $tokenData = $response->toArray();
 
             $token->setAccessToken($tokenData['access_token'])
-                ->setExpiresAt(new \DateTime('+' . ($tokenData['expires_in'] ?? 3600) . ' seconds'));
+                ->setExpiresAt(new \DateTime('+'.($tokenData['expires_in'] ?? 3600).' seconds'));
 
             if (isset($tokenData['refresh_token'])) {
                 $token->setRefreshToken($tokenData['refresh_token']);
@@ -123,23 +125,24 @@ class SpotifyAuthService
             $this->entityManager->flush();
 
             return $token;
-        } catch (ClientException | ServerException $e) {
-            throw new \Exception('Failed to refresh token: ' . $e->getMessage());
+        } catch (\Throwable $e) {
+            throw new \RuntimeException('Failed to refresh token: '.$e->getMessage());
         }
     }
 
+    /** @return array<string> */
     private function getUserProfile(string $accessToken): array
     {
         try {
             $response = $this->spotifyApiClient->request('GET', '/me', [
                 'headers' => [
-                    'Authorization' => 'Bearer ' . $accessToken,
+                    'Authorization' => 'Bearer '.$accessToken,
                 ],
             ]);
 
             return $response->toArray();
-        } catch (ClientException | ServerException $e) {
-            throw new \Exception('Failed to get user profile: ' . $e->getMessage());
+        } catch (\Throwable $e) {
+            throw new \RuntimeException('Failed to get user profile: '.$e->getMessage());
         }
     }
 
@@ -147,6 +150,7 @@ class SpotifyAuthService
     {
         try {
             $this->getUserProfile($accessToken);
+
             return true;
         } catch (\Exception) {
             return false;

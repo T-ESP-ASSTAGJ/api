@@ -17,7 +17,7 @@ use App\Service\Spotify\SpotifyAuthService;
 final readonly class AuthSpotifyCallbackProcessor implements ProcessorInterface
 {
     public function __construct(
-        private SpotifyAuthService $spotifyAuthService
+        private readonly SpotifyAuthService $spotifyAuthService,
     ) {
     }
 
@@ -35,23 +35,26 @@ final readonly class AuthSpotifyCallbackProcessor implements ProcessorInterface
         $output->platform = Token::PLATFORM_SPOTIFY;
 
         // TODO: Handle user authentication - for now, we'll need to get the user from somewhere
-        $user = null; 
+        $user = null;
 
         if (!$user) {
             $output->success = false;
             $output->error = 'User must be authenticated';
+
             return $output;
         }
 
         if ($data->error) {
             $output->success = false;
-            $output->error = 'Authorization denied: ' . $data->error;
+            $output->error = 'Authorization denied: '.$data->error;
+
             return $output;
         }
 
         if (!$data->code) {
             $output->success = false;
             $output->error = 'Authorization code not provided';
+
             return $output;
         }
 

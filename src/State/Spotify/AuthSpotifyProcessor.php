@@ -16,7 +16,7 @@ use App\Service\Spotify\SpotifyAuthService;
 final readonly class AuthSpotifyProcessor implements ProcessorInterface
 {
     public function __construct(
-        private SpotifyAuthService $spotifyAuthService
+        private SpotifyAuthService $spotifyAuthService,
     ) {
     }
 

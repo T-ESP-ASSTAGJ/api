@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace App\DTO\Spotify;
 
-class ArtistDTO
+readonly class ArtistDTO
 {
     public function __construct(
-        public readonly string $id,
-        public readonly string $name,
-        public readonly array $genres,
-        public readonly ?string $imageUrl,
-        public readonly string $externalUrl,
-        public readonly int $followers,
-        public readonly int $popularity
-    ) {}
+        public string $id,
+        public string $name,
+        /** @var array<string> */
+        public array $genres,
+        public ?string $imageUrl,
+        public string $externalUrl,
+        public int $followers,
+        public int $popularity,
+    ) {
+    }
 }
