@@ -8,16 +8,12 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\DTO\User\UserGetOutput;
-use App\DTO\User\UserMagicRegisterInput;
-use App\DTO\User\UserMagicRegisterOutput;
 use App\Entity\Interface\TimeStampableInterface;
 use App\Repository\UserRepository;
 use App\State\User\UserGetCollectionProvider;
 use App\State\User\UserGetProvider;
-use App\State\User\UserMagicRegisterProcessor;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -28,13 +24,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Get(output: UserGetOutput::class, provider: UserGetProvider::class),
         new GetCollection(output: UserGetOutput::class, provider: UserGetCollectionProvider::class),
-        new Post(
-            uriTemplate: '/auth/magic-register',
-            input: UserMagicRegisterInput::class,
-            output: UserMagicRegisterOutput::class,
-            name: 'user_magic_register',
-            processor: UserMagicRegisterProcessor::class,
-        ),
         new Put(output: UserGetOutput::class),
         new Delete(output: false),
     ]
@@ -51,9 +40,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     #[ORM\Column(name: 'id', type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'username', type: 'string', length: 180, unique: true)]
+    #[ORM\Column(name: 'username', type: 'string', length: 180, unique: true, nullable: true)]
     #[Assert\Length(min: 3, max: 180)]
-    private string $username;
+    private ?string $username = null;
 
     #[ORM\Column(name: 'email', type: 'string', length: 180, unique: true)]
     #[Assert\Email]
@@ -68,7 +57,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     #[ORM\Column(name: 'password', type: 'string', length: 255, nullable: true)]
     private string $password;
 
-    #[ORM\Column(name: 'phone_number', type: 'string', length: 20, unique: true, nullable: false)]
+    #[ORM\Column(name: 'phone_number', type: 'string', length: 20, unique: true, nullable: true)]
     #[Assert\Regex('/\+?\d+/')]
     private string $phoneNumber;
 
@@ -78,9 +67,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     #[ORM\Column(name: 'bio', type: 'string', length: 255, nullable: true)]
     private ?string $bio = null;
 
-    // TODO: change to is_verified, and handle email verification token/expiry
-    #[ORM\Column(name: 'is_confirmed', type: 'boolean', options: ['default' => false])]
-    private bool $isConfirmed = false;
+    #[ORM\Column(name: 'is_verified', type: 'boolean', options: ['default' => false])]
+    private bool $isVerified = false;
+
+    #[ORM\Column(name: 'needs_profile', type: 'boolean', options: ['default' => true])]
+    private bool $needsProfile = true;
 
     public function getId(): ?int
     {
@@ -190,16 +181,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
         return $this;
     }
 
-    public function isConfirmed(): bool
+    public function getIsVerified(): bool
     {
-        return $this->isConfirmed;
+        return $this->isVerified;
     }
 
-    public function setIsConfirmed(bool $isConfirmed): static
+    public function setIsVerified(bool $isVerified): static
     {
-        $this->isConfirmed = $isConfirmed;
+        $this->isVerified = $isVerified;
 
         return $this;
+    }
+
+    public function getNeedsProfile(): bool
+    {
+        return $this->needsProfile;
+    }
+
+    public function setNeedsProfile(bool $needsProfile): static
+    {
+        $this->needsProfile = $needsProfile;
+
+        return $this;
+    }
+
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
+    {
+        if (empty($this->roles)) {
+            $this->roles = ['ROLE_USER'];
+        }
     }
 
     /**
