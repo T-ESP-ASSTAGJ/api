@@ -11,6 +11,9 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
+/**
+ * @implements ProviderInterface<UserGetOutput>
+ */
 final readonly class UserGetCollectionProvider implements ProviderInterface
 {
     public function __construct(
@@ -19,6 +22,9 @@ final readonly class UserGetCollectionProvider implements ProviderInterface
     ) {
     }
 
+    /**
+     * @return UserGetOutput[]
+     */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
         /** @var User[] $users */

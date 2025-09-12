@@ -1,0 +1,11 @@
+framework:
+    mailer:
+        dsn: '%env(MAILER_DSN)%'
+        envelope:
+            sender: 'jamly.pro@gmail.com'
+
+when@dev:
+    framework:
+        mailer:
+            envelope:
+                recipients: ['jamly.pro@gmail.com']

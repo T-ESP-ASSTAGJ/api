@@ -6,6 +6,10 @@ api_platform:
         json: ['application/json']
     error_formats:
         json: ["application/json"]
+    mapping:
+        paths:
+            - '%kernel.project_dir%/src/Entity'
+            - '%kernel.project_dir%/src/DTO'
     swagger:
         versions: [3]
         api_keys:

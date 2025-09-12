@@ -12,6 +12,9 @@ use App\Repository\UserRepository;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
+/**
+ * @implements ProviderInterface<UserGetOutput>
+ */
 final readonly class UserGetProvider implements ProviderInterface
 {
     public function __construct(

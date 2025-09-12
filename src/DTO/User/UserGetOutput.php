@@ -6,14 +6,16 @@ namespace App\DTO\User;
 
 class UserGetOutput
 {
-    public string $username;
+    public string $email;
+
+    public ?string $username = null;
 
     /**
      * @var array <string>
      */
     public array $roles;
 
-    public ?string $bio;
+    public ?string $bio = null;
     public ?string $profilePicture = null;
-    public bool $isConfirmed;
+    public bool $isVerified;
 }
