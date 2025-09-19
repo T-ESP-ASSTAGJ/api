@@ -19,6 +19,7 @@ readonly class SpotifyAuthService
         private TokenRepository $tokenRepository,
         private EntityManagerInterface $entityManager,
         private string $clientId,
+        private string $clientSecret,
         private string $redirectUri,
         private string $authUrl,
         private string $tokenUrl,
@@ -53,6 +54,8 @@ readonly class SpotifyAuthService
                     'grant_type' => 'authorization_code',
                     'code' => $code,
                     'redirect_uri' => $this->redirectUri,
+                    'client_id' => $this->clientId,
+                    'client_secret' => $this->clientSecret,
                 ],
             ]);
 
@@ -105,6 +108,8 @@ readonly class SpotifyAuthService
                 'body' => [
                     'grant_type' => 'refresh_token',
                     'refresh_token' => $token->getRefreshToken(),
+                    'client_id' => $this->clientId,
+                    'client_secret' => $this->clientSecret,
                 ],
             ]);
 
