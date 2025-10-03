@@ -12,7 +12,11 @@ NC := \033[0m
 
 install:         ## Install dependencies
 	@echo -e "\r\n${BOLD_GREEN}# Installing dependencies${NC}\r\n"
-	@docker compose build
+	@docker compose --env-file .env.local build
+	@echo -e "\r\n${BOLD_GREEN}# Running composer install${NC}\r\n"
+	@docker compose --env-file .env.local run --rm php composer install
+	@echo -e "\r\n${BOLD_GREEN}# Generating JWT keys${NC}\r\n"
+	@docker compose --env-file .env.local run --rm php bin/console lexik:jwt:generate-keypair --skip-if-exists || echo "JWT key generation skipped (will be available after full setup)"
 
 start:           ## Start the API
 	@echo -e "\r\n${BOLD_GREEN}# Starting API${NC}\r\n"
