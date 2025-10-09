@@ -16,7 +16,6 @@ final class Version20250919143501 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql('DROP SEQUENCE spotify_token_id_seq CASCADE');
         $this->addSql('CREATE TABLE message (id SERIAL NOT NULL, author_id INT NOT NULL, conversation_id INT NOT NULL, type VARCHAR(20) NOT NULL, content TEXT DEFAULT NULL, track JSON DEFAULT NULL, track_metadata JSON DEFAULT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_B6BD307FF675F31B ON message (author_id)');
         $this->addSql('COMMENT ON COLUMN message.created_at IS \'(DC2Type:datetime_immutable)\'');
@@ -26,7 +25,6 @@ final class Version20250919143501 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->addSql('CREATE SCHEMA public');
         $this->addSql('CREATE SEQUENCE spotify_token_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('ALTER TABLE message DROP CONSTRAINT FK_B6BD307FF675F31B');
         $this->addSql('DROP TABLE message');

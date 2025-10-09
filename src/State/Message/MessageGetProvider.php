@@ -41,13 +41,13 @@ final readonly class MessageGetProvider implements ProviderInterface
             throw new \RuntimeException('Message not found');
         }
 
+        /** @var User|null $user */
         $user = $this->security->getUser();
 
         if ($message->isMusicMessage() && $message->getTrack()) {
-            $recipient = $user instanceof User ? $user : null;
             $trackMetadata = $this->musicMetadataService->getTrackMetadata(
                 $message->getTrack(),
-                $recipient
+                $user
             );
             $message->setTrackMetadata($trackMetadata);
         }

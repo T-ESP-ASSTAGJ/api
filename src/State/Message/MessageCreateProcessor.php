@@ -38,46 +38,46 @@ final readonly class MessageCreateProcessor implements ProcessorInterface
      */
     public function process(mixed $data, ?Operation $operation = null, array $uriVariables = [], array $context = []): mixed
     {
-        if ($data instanceof MessageCreateInput) {
-            $user = $this->security->getUser();
-            if (!$user instanceof User) {
-                throw new \RuntimeException('User must be authenticated');
-            }
-
-            $message = new Message();
-            $message->setConversationId($data->conversationId);
-            $message->setAuthor($user);
-            $message->setType($data->type);
-            $message->setContent($data->content);
-
-            if ('music' === $data->type && $data->track) {
-                $message->setTrack($data->track);
-
-                $trackMetadata = $this->musicMetadataService->getTrackMetadata($data->track);
-                $message->setTrackMetadata($trackMetadata);
-            }
-
-            $violations = $this->validator->validate($message);
-            if ($violations->count() > 0) {
-                throw new ValidationException($violations);
-            }
-
-            $this->em->persist($message);
-            $this->em->flush();
-
-            return new MessageGetOutput(
-                id: $message->getId(),
-                type: $message->getType(),
-                content: $message->getContent(),
-                trackMetadata: $message->getTrackMetadata(),
-                author: [
-                    'id' => $message->getAuthor()->getId(),
-                    'username' => $message->getAuthor()->getUsername(),
-                ],
-                createdAt: $message->getCreatedAt()->format('c')
-            );
+        if (!$data instanceof MessageCreateInput) {
+            return $data;
         }
 
-        return $data;
+        $user = $this->security->getUser();
+        if (!$user instanceof User) {
+            throw new \RuntimeException('User must be authenticated');
+        }
+
+        $message = new Message();
+        $message->setConversationId($data->conversationId);
+        $message->setAuthor($user);
+        $message->setType($data->type);
+        $message->setContent($data->content);
+
+        if (Message::TYPE_MUSIC === $data->type && $data->track) {
+            $message->setTrack($data->track);
+
+            $trackMetadata = $this->musicMetadataService->getTrackMetadata($data->track);
+            $message->setTrackMetadata($trackMetadata);
+        }
+
+        $violations = $this->validator->validate($message);
+        if ($violations->count() > 0) {
+            throw new ValidationException($violations);
+        }
+
+        $this->em->persist($message);
+        $this->em->flush();
+
+        return new MessageGetOutput(
+            id: $message->getId(),
+            type: $message->getType(),
+            content: $message->getContent(),
+            trackMetadata: $message->getTrackMetadata(),
+            author: [
+                'id' => $message->getAuthor()->getId(),
+                'username' => $message->getAuthor()->getUsername(),
+            ],
+            createdAt: $message->getCreatedAt()->format('c')
+        );
     }
 }
