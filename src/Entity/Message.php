@@ -17,6 +17,7 @@ use App\Repository\MessageRepository;
 use App\State\Message\MessageCreateProcessor;
 use App\State\Message\MessageGetProvider;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     shortName: 'Message',
@@ -60,6 +61,7 @@ class Message implements TimeStampableInterface
     private User $author;
 
     #[ORM\Column(name: 'type', type: 'string', length: 20)]
+    #[Assert\Choice(choices: [self::TYPE_TEXT, self::TYPE_MUSIC], message: 'Choose a valid message type.')]
     private string $type = self::TYPE_TEXT;
 
     #[ORM\Column(name: 'content', type: 'text', nullable: true)]

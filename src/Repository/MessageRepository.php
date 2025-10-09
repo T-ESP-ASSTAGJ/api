@@ -29,22 +29,4 @@ class MessageRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-
-    public function save(Message $message, bool $flush = false): void
-    {
-        $this->getEntityManager()->persist($message);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
-
-    public function remove(Message $message, bool $flush = false): void
-    {
-        $this->getEntityManager()->remove($message);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
 }
