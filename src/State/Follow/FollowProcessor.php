@@ -6,8 +6,8 @@ namespace App\State\Follow;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\DTO\Auth\AuthRequestInput;
-use App\DTO\Follow\FollowInput;
+use App\ApiResource\Auth\AuthRequestInput;
+use App\ApiResource\Follow\FollowInput;
 use App\Entity\Follow as FollowEntity;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;

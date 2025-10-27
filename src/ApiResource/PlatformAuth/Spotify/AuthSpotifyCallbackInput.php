@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\DTO\PlatformAuth\Spotify;
+namespace App\ApiResource\PlatformAuth\Spotify;
 
 class AuthSpotifyCallbackInput
 {

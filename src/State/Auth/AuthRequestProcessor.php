@@ -6,8 +6,8 @@ namespace App\State\Auth;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\DTO\Auth\AuthRequestInput;
-use App\DTO\Auth\AuthRequestOutput;
+use App\ApiResource\Auth\AuthRequestInput;
+use App\ApiResource\Auth\AuthRequestOutput;
 use App\Entity\VerificationUser;
 use Doctrine\ORM\EntityManagerInterface;
 use Random\RandomException;

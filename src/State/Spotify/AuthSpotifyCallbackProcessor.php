@@ -6,8 +6,8 @@ namespace App\State\Spotify;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\DTO\PlatformAuth\Spotify\AuthSpotifyCallbackInput;
-use App\DTO\PlatformAuth\Spotify\AuthSpotifyCallbackOutput;
+use App\ApiResource\PlatformAuth\Spotify\AuthSpotifyCallbackInput;
+use App\ApiResource\PlatformAuth\Spotify\AuthSpotifyCallbackOutput;
 use App\Entity\Token;
 use App\Service\Spotify\SpotifyAuthService;
 
