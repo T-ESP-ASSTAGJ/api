@@ -21,7 +21,7 @@
         output discard
     }
 
-    root /app/public
+    root * /app/public
     encode zstd br gzip
 
     mercure {
@@ -40,15 +40,20 @@
     # Disable Topics tracking if not enabled explicitly: https://github.com/jkarlin/topics
     header ?Permissions-Policy "browsing-topics=()"
 
+    # Catch requests that are NOT Mercure and NOT static files
     @phpRoute {
         not path /.well-known/mercure*
         not file {path}
     }
+
+    # Rewrite those requests to index.php
     rewrite @phpRoute index.php
 
+    # Process the resulting index.php file using FrankenPHP worker
     @frontController path index.php
     php @frontController
 
+    # Ensure files like index.php cannot be directly browsed
     file_server {
         hide *.php
     }
