@@ -13,9 +13,9 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Get(
             uriTemplate: '/auth/spotify/callback',
+            shortName: 'AuthSpotify',
             input: AuthSpotifyCallbackInput::class,
             output: AuthSpotifyCallbackOutput::class,
-            name: 'spotify_callback',
             processor: AuthSpotifyCallbackProcessor::class
         ),
     ],
