@@ -14,6 +14,7 @@ use App\Entity\Interface\TimeStampableInterface;
 use App\Repository\UserRepository;
 use App\State\User\UserGetCollectionProvider;
 use App\State\User\UserGetProvider;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -72,6 +73,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
 
     #[ORM\Column(name: 'needs_profile', type: 'boolean', options: ['default' => true])]
     private bool $needsProfile = true;
+
+    #[ORM\OneToMany(targetEntity: Follow::class, mappedBy: 'followed')]
+    private Collection $followerRelations;
+
+    #[ORM\OneToMany(targetEntity: Follow::class, mappedBy: 'follower')]
+    private Collection $followedRelations;
 
     public function getId(): ?int
     {
