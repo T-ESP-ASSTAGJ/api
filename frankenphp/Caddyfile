@@ -16,7 +16,7 @@
     }
 }
 
-localhost {
+:80, :443 {
     log {
         output discard
     }
