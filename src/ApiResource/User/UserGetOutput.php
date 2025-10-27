@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\DTO\User;
+namespace App\ApiResource\User;
 
 class UserGetOutput
 {

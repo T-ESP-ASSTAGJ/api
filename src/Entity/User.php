@@ -9,7 +9,7 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Put;
-use App\DTO\User\UserGetOutput;
+use App\ApiResource\User\UserGetOutput;
 use App\Entity\Interface\TimeStampableInterface;
 use App\Repository\UserRepository;
 use App\State\User\UserGetCollectionProvider;

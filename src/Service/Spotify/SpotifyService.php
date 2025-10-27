@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace App\Service\Spotify;
 
-use App\DTO\Spotify\AlbumDTO;
-use App\DTO\Spotify\ArtistDTO;
-use App\DTO\Spotify\PlaylistDTO;
-use App\DTO\Spotify\TrackDTO;
-use Symfony\Component\HttpClient\Exception\ClientException;
-use Symfony\Component\HttpClient\Exception\ServerException;
+use App\ApiResource\Spotify\AlbumDTO;
+use App\ApiResource\Spotify\ArtistDTO;
+use App\ApiResource\Spotify\PlaylistDTO;
+use App\ApiResource\Spotify\TrackDTO;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
