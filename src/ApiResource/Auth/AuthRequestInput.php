@@ -13,9 +13,9 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Post(
             uriTemplate: '/auth/request',
+            shortName: 'Auth',
             input: AuthRequestInput::class,
             output: AuthRequestOutput::class,
-            name: 'auth_request',
             provider: null,
             processor: AuthRequestProcessor::class
         ),
