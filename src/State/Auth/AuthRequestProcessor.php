@@ -10,7 +10,10 @@ use App\ApiResource\Auth\AuthRequestInput;
 use App\ApiResource\Auth\AuthRequestOutput;
 use App\Entity\VerificationUser;
 use Doctrine\ORM\EntityManagerInterface;
+use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Random\RandomException;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
@@ -24,6 +27,8 @@ readonly class AuthRequestProcessor implements ProcessorInterface
     public function __construct(
         private EntityManagerInterface $entityManager,
         private MailerInterface $mailer,
+        private string $environment,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -66,12 +71,16 @@ readonly class AuthRequestProcessor implements ProcessorInterface
             throw new BadRequestHttpException('Could not process the request.'.$e->getMessage());
         }
 
-        $email = (new Email())
-            ->to($data->email)
-            ->subject('Your verification code')
-            ->text('Your verification code is : '.$rawCode);
+        if ('dev' === $this->environment) {
+            $this->logger->debug(sprintf('Verification code for %s is: %s', $data->email, $rawCode));
+        } else {
+            $email = (new Email())
+                ->to($data->email)
+                ->subject('Your verification code')
+                ->text('Your verification code is : '.$rawCode);
 
-        $this->mailer->send($email);
+            $this->mailer->send($email);
+        }
 
         $output = new AuthRequestOutput();
         $output->message = 'If a matching email was found, a code has been sent.';

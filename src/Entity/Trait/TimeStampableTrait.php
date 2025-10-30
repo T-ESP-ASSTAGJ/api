@@ -27,9 +27,9 @@ trait TimeStampableTrait
     }
 
     #[ORM\PreUpdate]
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): void
+    public function setUpdatedAt(): void
     {
-        $this->updatedAt = $updatedAt;
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
     public function getCreatedAt(): \DateTimeImmutable

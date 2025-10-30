@@ -12,5 +12,5 @@ interface TimeStampableInterface
 
     public function getUpdatedAt(): \DateTimeImmutable;
 
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): void;
+    public function setUpdatedAt(): void;
 }
