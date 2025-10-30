@@ -7,6 +7,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Post;
+use App\ApiResource\Follow\UnfollowOutput;
 use App\Entity\Interface\TimeStampableInterface;
 use App\State\Follow\FollowProcessor;
 use Doctrine\ORM\Mapping as ORM;
@@ -15,12 +16,14 @@ use Doctrine\ORM\Mapping as ORM;
     operations: [
         new Post(
             uriTemplate: '/users/{id}/follow',
-            deserialize: false,
+            defaults: ['_api_receive' => false],
+            input: false,
             name: 'follow',
             processor: FollowProcessor::class
         ),
         new Delete(
             uriTemplate: '/users/{id}/unfollow',
+            output: UnfollowOutput::class,
             read: false,
             name: 'unfollow',
             processor: FollowProcessor::class
@@ -38,13 +41,13 @@ class Follow implements TimeStampableInterface
     #[ORM\Column(name: 'id', type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'followerRelations')]
+    #[ORM\ManyToOne(inversedBy: 'following')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $follower = null;
+    private ?User $follower = null;  // The user who follows
 
-    #[ORM\ManyToOne(inversedBy: 'followerRelations')]
+    #[ORM\ManyToOne(inversedBy: 'followers')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $followed = null;
+    private ?User $followedUser = null;  // The user being followed
 
     public function getId(): ?int
     {
@@ -63,14 +66,14 @@ class Follow implements TimeStampableInterface
         return $this;
     }
 
-    public function getFollowed(): ?User
+    public function getFollowedUser(): ?User
     {
-        return $this->followed;
+        return $this->followedUser;
     }
 
-    public function setFollowed(?User $followed): self
+    public function setFollowedUser(?User $followedUser): self
     {
-        $this->followed = $followed;
+        $this->followedUser = $followedUser;
 
         return $this;
     }

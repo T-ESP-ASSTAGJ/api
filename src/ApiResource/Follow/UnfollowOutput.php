@@ -6,8 +6,8 @@ namespace App\ApiResource\Follow;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class FollowInput
+final class UnfollowOutput
 {
     #[Assert\NotNull]
-    public ?int $userId = null;
+    public string $message;
 }

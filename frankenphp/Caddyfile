@@ -2,7 +2,9 @@
     skip_install_trust
 
     log {
-        output discard
+        output stdout
+        format console
+        level ERROR
     }
 
     frankenphp {
@@ -17,10 +19,6 @@
 }
 
 :80, :443 {
-    log {
-        output discard
-    }
-
     root * /app/public
     encode zstd br gzip
 
