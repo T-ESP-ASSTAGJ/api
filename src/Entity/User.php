@@ -9,25 +9,35 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Put;
-use App\ApiResource\User\UserGetOutput;
 use App\Entity\Interface\TimeStampableInterface;
 use App\Repository\UserRepository;
-use App\State\User\UserGetCollectionProvider;
-use App\State\User\UserGetProvider;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     shortName: 'User',
     operations: [
-        new Get(output: UserGetOutput::class, provider: UserGetProvider::class),
-        new GetCollection(output: UserGetOutput::class, provider: UserGetCollectionProvider::class),
-        new Put(output: UserGetOutput::class),
-        new Delete(output: false),
-    ]
+        new Get(
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true]
+        ),
+        new GetCollection(
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true],
+        ),
+        new Put(
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ, self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
+            denormalizationContext: ['groups' => ['user:write']],
+            security: "is_granted('ROLE_USER') and object == user"
+        ),
+        new Delete(
+            security: "is_granted('ROLE_USER') and object == user",
+            output: false
+        ),
+    ],
 )]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -36,23 +46,44 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
 {
     use Trait\TimeStampableTrait;
 
+    public const SERIALIZATION_GROUP_READ = 'user:read';
+    public const SERIALIZATION_GROUP_DETAIL = 'user:detail';
+    public const SERIALIZATION_GROUP_WRITE = 'user:write';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id', type: 'integer')]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
     private ?int $id = null;
 
     #[ORM\Column(name: 'username', type: 'string', length: 180, unique: true, nullable: true)]
     #[Assert\Length(min: 3, max: 180)]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+        self::SERIALIZATION_GROUP_WRITE,
+    ])]
     private ?string $username = null;
 
     #[ORM\Column(name: 'email', type: 'string', length: 180, unique: true)]
     #[Assert\Email]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
     private string $email;
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column(name: 'roles', type: 'json')]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
     private array $roles = [];
 
     #[ORM\Column(name: 'password', type: 'string', length: 255, nullable: true)]
@@ -63,22 +94,61 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     private string $phoneNumber;
 
     #[ORM\Column(name: 'profile_picture', type: 'string', length: 255, nullable: true)]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+        self::SERIALIZATION_GROUP_WRITE,
+    ])]
     private ?string $profilePicture = null;
 
     #[ORM\Column(name: 'bio', type: 'string', length: 255, nullable: true)]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+        self::SERIALIZATION_GROUP_WRITE,
+    ])]
     private ?string $bio = null;
 
     #[ORM\Column(name: 'is_verified', type: 'boolean', options: ['default' => false])]
+    #[Groups([
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
     private bool $isVerified = false;
 
     #[ORM\Column(name: 'needs_profile', type: 'boolean', options: ['default' => true])]
     private bool $needsProfile = true;
 
-    #[ORM\OneToMany(targetEntity: Follow::class, mappedBy: 'followed')]
-    private Collection $followerRelations;
-
+    /** @var Collection<int, Follow> */
     #[ORM\OneToMany(targetEntity: Follow::class, mappedBy: 'follower')]
-    private Collection $followedRelations;
+    private Collection $following;
+
+    /** @var Collection<int, Follow> */
+    #[ORM\OneToMany(targetEntity: Follow::class, mappedBy: 'followedUser')]
+    private Collection $followers;
+
+    /** @return Collection<int|null> */
+    #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
+    public function getFollowedUsers(): Collection
+    {
+        return $this->following->map(fn (Follow $follow) => [
+            'id' => $follow->getFollowedUser()?->getId(),
+        ]);
+    }
+
+    /** @return Collection<int|null> */
+    #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
+    public function getFollowerUsers(): Collection
+    {
+        return $this->followers->map(fn (Follow $follow) => [
+            'id' => $follow->getFollower()?->getId(),
+        ]);
+    }
+
+    public function __construct()
+    {
+        $this->following = new ArrayCollection();
+        $this->followers = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -210,6 +280,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
         $this->needsProfile = $needsProfile;
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Follow>
+     */
+    public function getFollowers(): Collection
+    {
+        return $this->followers;
+    }
+
+    /**
+     * @return Collection<int, Follow>
+     */
+    public function getFollowing(): Collection
+    {
+        return $this->following;
     }
 
     #[ORM\PrePersist]

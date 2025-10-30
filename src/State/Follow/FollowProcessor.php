@@ -6,8 +6,7 @@ namespace App\State\Follow;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\ApiResource\Auth\AuthRequestInput;
-use App\ApiResource\Follow\FollowInput;
+use App\ApiResource\Follow\UnfollowOutput;
 use App\Entity\Follow as FollowEntity;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,6 +14,9 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * @implements ProcessorInterface<null, FollowEntity|UnfollowOutput>
+ */
 final readonly class FollowProcessor implements ProcessorInterface
 {
     public function __construct(
@@ -24,11 +26,12 @@ final readonly class FollowProcessor implements ProcessorInterface
     }
 
     /**
-     * @param AuthRequestInput     $data
+     * @param null                 $data
+     * @param Operation|null       $operation
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      */
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): FollowEntity|FollowInput|null
+    public function process($data, $operation, array $uriVariables = [], array $context = []): FollowEntity|UnfollowOutput
     {
         $currentUser = $this->security->getUser();
 
@@ -42,6 +45,7 @@ final readonly class FollowProcessor implements ProcessorInterface
             throw new BadRequestHttpException('Missing user ID to follow.');
         }
 
+        /** @var User|null $userToFollow */
         $userToFollow = $this->em->getRepository(User::class)->find($userIdToFollow);
 
         if (!$userToFollow) {
@@ -54,16 +58,16 @@ final readonly class FollowProcessor implements ProcessorInterface
 
         $follow = $this->em->getRepository(FollowEntity::class)->findOneBy([
             'follower' => $currentUser,
-            'followed' => $userToFollow,
+            'followedUser' => $userToFollow,
         ]);
 
         if ('follow' === $operation->getName()) {
             if ($follow) {
-                throw new \RuntimeException('Already following this user.');
+                throw new BadRequestHttpException('Already following this user.');
             }
             $newFollow = new FollowEntity();
             $newFollow->setFollower($currentUser);
-            $newFollow->setFollowed($userToFollow);
+            $newFollow->setFollowedUser($userToFollow);
             $newFollow->setCreatedAt();
 
             $this->em->persist($newFollow);
@@ -74,14 +78,17 @@ final readonly class FollowProcessor implements ProcessorInterface
 
         if ('unfollow' === $operation->getName()) {
             if (!$follow) {
-                throw new \RuntimeException('You are not following this user.');
+                throw new BadRequestHttpException('You are not following this user.');
             }
             $this->em->remove($follow);
             $this->em->flush();
 
-            return null;
+            $output = new UnfollowOutput();
+            $output->message = 'Successfully unfollowed the user.';
+
+            return $output;
         }
 
-        return $data;
+        throw new \RuntimeException('Unsupported operation.');
     }
 }
