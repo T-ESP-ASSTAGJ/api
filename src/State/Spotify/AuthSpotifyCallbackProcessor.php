@@ -8,7 +8,6 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\PlatformAuth\Spotify\AuthSpotifyCallbackInput;
 use App\ApiResource\PlatformAuth\Spotify\AuthSpotifyCallbackOutput;
-use App\Entity\Token;
 use App\Entity\User;
 use App\Service\Spotify\SpotifyAuthService;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -36,26 +35,11 @@ final readonly class AuthSpotifyCallbackProcessor implements ProcessorInterface
     public function process(mixed $data, $operation = null, array $uriVariables = [], array $context = []): mixed
     {
         $output = new AuthSpotifyCallbackOutput();
-        $output->platform = Token::PLATFORM_SPOTIFY;
 
         /** @var User|null $user */
         $user = $this->security->getUser();
         if (!$user) {
             throw new UnauthorizedHttpException('Bearer', 'User not authenticated.');
-        }
-
-        if ($data->error) {
-            $output->success = false;
-            $output->error = 'Authorization denied: '.$data->error;
-
-            return $output;
-        }
-
-        if (!$data->code) {
-            $output->success = false;
-            $output->error = 'Authorization code not provided';
-
-            return $output;
         }
 
         try {
