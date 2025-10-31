@@ -7,7 +7,6 @@ namespace App\ApiResource\Message;
 readonly class MessageGetOutput
 {
     public function __construct(
-        public int $id,
         public string $type,
         public ?string $content,
         /**

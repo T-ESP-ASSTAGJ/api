@@ -13,7 +13,6 @@ use ApiPlatform\Metadata\Put;
 use App\ApiResource\Message\MessageCreateInput;
 use App\ApiResource\Message\MessageGetOutput;
 use App\Entity\Interface\TimeStampableInterface;
-use App\Repository\MessageRepository;
 use App\State\Message\MessageCreateProcessor;
 use App\State\Message\MessageGetProvider;
 use Doctrine\ORM\Mapping as ORM;
@@ -38,7 +37,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Delete(output: false),
     ]
 )]
-#[ORM\Entity(repositoryClass: MessageRepository::class)]
+#[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Table(name: 'message')]
 class Message implements TimeStampableInterface
@@ -67,6 +66,7 @@ class Message implements TimeStampableInterface
     #[ORM\Column(name: 'content', type: 'text', nullable: true)]
     private ?string $content = null;
 
+    // TODO: Change to Track Entity when implemented
     /**
      * @var array{
      *     platform: string,
@@ -77,6 +77,7 @@ class Message implements TimeStampableInterface
     #[ORM\Column(name: 'track', type: 'json', nullable: true)]
     private ?array $track = null;
 
+    // TODO: Remove when Track Entity when implemented
     /**
      * @var array{
      *     title: string,
