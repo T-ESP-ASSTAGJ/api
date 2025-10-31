@@ -55,5 +55,4 @@ readonly class AuthVerificationInput
         public ?string $code = null,
     ) {
     }
-
 }

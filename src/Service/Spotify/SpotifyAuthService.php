@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Repository\TokenRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Random\RandomException;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 readonly class SpotifyAuthService
@@ -18,9 +19,13 @@ readonly class SpotifyAuthService
         private HttpClientInterface $spotifyAuthClient,
         private TokenRepository $tokenRepository,
         private EntityManagerInterface $entityManager,
+        #[Autowire(env: 'SPOTIFY_CLIENT_ID')]
         private string $clientId,
+        #[Autowire(env: 'SPOTIFY_REDIRECT_URI')]
         private string $redirectUri,
+        #[Autowire(env: 'SPOTIFY_AUTH_URL')]
         private string $authUrl,
+        #[Autowire(env: 'SPOTIFY_TOKEN_URL')]
         private string $tokenUrl,
     ) {
     }
