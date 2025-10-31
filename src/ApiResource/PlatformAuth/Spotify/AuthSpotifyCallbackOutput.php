@@ -6,8 +6,8 @@ namespace App\ApiResource\PlatformAuth\Spotify;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use App\Entity\Token;
 use App\State\Spotify\AuthSpotifyCallbackProcessor;
-use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     operations: [
@@ -24,10 +24,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class AuthSpotifyCallbackOutput
 {
     public bool $success;
-
-    #[Assert\NotBlank]
-    public string $platform;
-
+    public string $platform = Token::PLATFORM_SPOTIFY;
     public ?string $expires_at = null;
     public ?string $message = null;
     public ?string $error = null;

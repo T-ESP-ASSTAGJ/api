@@ -5,21 +5,19 @@ declare(strict_types=1);
 namespace App\ApiResource\PlatformAuth\Spotify;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
 use App\State\Spotify\AuthSpotifyProcessor;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     operations: [
-        new Get(
+        new Post(
             uriTemplate: '/auth/spotify/authorize',
             shortName: 'AuthSpotify',
-            input: false,
             output: AuthSpotifyOutput::class,
             processor: AuthSpotifyProcessor::class
         ),
     ],
-    provider: null
 )]
 class AuthSpotifyOutput
 {
