@@ -9,6 +9,7 @@ use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\PlatformAuth\Spotify\AuthSpotifyOutput;
 use App\Entity\Token;
 use App\Service\Spotify\SpotifyAuthService;
+use Random\RandomException;
 
 /**
  * @implements ProcessorInterface<null, AuthSpotifyOutput>
@@ -26,9 +27,9 @@ final readonly class AuthSpotifyProcessor implements ProcessorInterface
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *
-     * @return AuthSpotifyOutput
+     * @throws RandomException
      */
-    public function process(mixed $data, $operation = null, array $uriVariables = [], array $context = []): mixed
+    public function process(mixed $data, $operation = null, array $uriVariables = [], array $context = []): AuthSpotifyOutput
     {
         $authUrl = $this->spotifyAuthService->getAuthorizationUrl([
             'user-read-private',

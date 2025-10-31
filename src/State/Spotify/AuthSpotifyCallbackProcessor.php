@@ -9,7 +9,10 @@ use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\PlatformAuth\Spotify\AuthSpotifyCallbackInput;
 use App\ApiResource\PlatformAuth\Spotify\AuthSpotifyCallbackOutput;
 use App\Entity\Token;
+use App\Entity\User;
 use App\Service\Spotify\SpotifyAuthService;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 /**
  * @implements ProcessorInterface<AuthSpotifyCallbackInput, AuthSpotifyCallbackOutput>
@@ -18,6 +21,7 @@ final readonly class AuthSpotifyCallbackProcessor implements ProcessorInterface
 {
     public function __construct(
         private readonly SpotifyAuthService $spotifyAuthService,
+        private Security $security,
     ) {
     }
 
@@ -34,14 +38,10 @@ final readonly class AuthSpotifyCallbackProcessor implements ProcessorInterface
         $output = new AuthSpotifyCallbackOutput();
         $output->platform = Token::PLATFORM_SPOTIFY;
 
-        // TODO: Handle user authentication - for now, we'll need to get the user from somewhere
-        $user = null;
-
+        /** @var User|null $user */
+        $user = $this->security->getUser();
         if (!$user) {
-            $output->success = false;
-            $output->error = 'User must be authenticated';
-
-            return $output;
+            throw new UnauthorizedHttpException('Bearer', 'User not authenticated.');
         }
 
         if ($data->error) {

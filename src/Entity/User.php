@@ -126,24 +126,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     #[ORM\OneToMany(targetEntity: Follow::class, mappedBy: 'followedUser')]
     private Collection $followers;
 
-    /** @return Collection<int|null> */
-    #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
-    public function getFollowedUsers(): Collection
-    {
-        return $this->following->map(fn (Follow $follow) => [
-            'id' => $follow->getFollowedUser()?->getId(),
-        ]);
-    }
-
-    /** @return Collection<int|null> */
-    #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
-    public function getFollowerUsers(): Collection
-    {
-        return $this->followers->map(fn (Follow $follow) => [
-            'id' => $follow->getFollower()?->getId(),
-        ]);
-    }
-
     public function __construct()
     {
         $this->following = new ArrayCollection();
@@ -282,20 +264,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
         return $this;
     }
 
-    /**
-     * @return Collection<int, Follow>
-     */
-    public function getFollowers(): Collection
+    /** @return array<int, array{id: int|null, username: string|null}> */
+    #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
+    public function getFollowed(): array
     {
-        return $this->followers;
+        return $this->following->map(fn (Follow $follow) => [
+            'id' => $follow->getFollowedUser()?->getId(),
+            'username' => $follow->getFollowedUser()?->getUsername(),
+        ])->toArray();
     }
 
-    /**
-     * @return Collection<int, Follow>
-     */
-    public function getFollowing(): Collection
+    /** @return array<int, array{id: int|null, username: string|null}> */
+    #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
+    public function getFollower(): array
     {
-        return $this->following;
+        return $this->followers->map(fn (Follow $follow) => [
+            'id' => $follow->getFollower()?->getId(),
+            'username' => $follow->getFollower()?->getUsername(),
+        ])->toArray();
     }
 
     #[ORM\PrePersist]
