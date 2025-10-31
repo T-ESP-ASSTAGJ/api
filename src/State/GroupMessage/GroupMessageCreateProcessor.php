@@ -7,8 +7,8 @@ namespace App\State\GroupMessage;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
-use App\DTO\GroupMessage\GroupMessageCreateInput;
-use App\DTO\GroupMessage\GroupMessageGetOutput;
+use App\ApiResource\GroupMessage\GroupMessageGetOutput;
+use App\ApiResource\GroupMessageCreateInput;
 use App\Entity\GroupMessage;
 use App\Entity\User;
 use App\Service\Message\MusicMetadataService;
@@ -30,9 +30,9 @@ final readonly class GroupMessageCreateProcessor implements ProcessorInterface
     }
 
     /**
-     * @param GroupMessageCreateInput   $data
-     * @param array<string, mixed> $uriVariables
-     * @param array<string, mixed> $context
+     * @param GroupMessageCreateInput $data
+     * @param array<string, mixed>    $uriVariables
+     * @param array<string, mixed>    $context
      *
      * @return GroupMessageGetOutput
      */

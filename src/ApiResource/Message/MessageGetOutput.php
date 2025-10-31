@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\DTO\GroupMessage;
+namespace App\ApiResource\Message;
 
-readonly class GroupMessageGetOutput
+readonly class MessageGetOutput
 {
     public function __construct(
         public int $id,
-        public int $groupId,
         public string $type,
         public ?string $content,
         /**

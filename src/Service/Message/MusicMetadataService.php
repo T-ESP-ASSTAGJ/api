@@ -19,6 +19,7 @@ readonly class MusicMetadataService
 
     /**
      * @param array{platform: string, track_id: string, fallback_ids: array<string, string>} $track
+     *
      * @return array{title: string, artist: string, album_cover: string, preview_url: string|null, platform_link: string, availability: string}
      */
     public function getTrackMetadata(array $track, ?User $recipient = null): array
@@ -112,6 +113,7 @@ readonly class MusicMetadataService
 
     /**
      * @param array{platform: string, track_id: string, fallback_ids: array<string, string>} $track
+     *
      * @return array{title: string, artist: string, album_cover: string, preview_url: string|null, platform_link: string, availability: string}
      */
     private function createUnavailableMetadata(array $track): array
