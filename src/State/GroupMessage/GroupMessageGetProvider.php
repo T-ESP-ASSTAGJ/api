@@ -6,7 +6,7 @@ namespace App\State\GroupMessage;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\DTO\GroupMessage\GroupMessageGetOutput;
+use App\ApiResource\GroupMessage\GroupMessageGetOutput;
 use App\Entity\GroupMessage;
 use App\Entity\User;
 use App\Repository\GroupMessageRepository;
