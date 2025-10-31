@@ -6,7 +6,7 @@ namespace App\ApiResource\Follow;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class UnfollowOutput
+final class FollowOutput
 {
     #[Assert\NotNull]
     public string $message;

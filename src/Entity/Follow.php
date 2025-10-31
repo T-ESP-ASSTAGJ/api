@@ -7,7 +7,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Post;
-use App\ApiResource\Follow\UnfollowOutput;
+use App\ApiResource\Follow\FollowOutput;
 use App\Entity\Interface\TimeStampableInterface;
 use App\State\Follow\FollowProcessor;
 use Doctrine\ORM\Mapping as ORM;
@@ -23,7 +23,7 @@ use Doctrine\ORM\Mapping as ORM;
         ),
         new Delete(
             uriTemplate: '/users/{id}/unfollow',
-            output: UnfollowOutput::class,
+            output: FollowOutput::class,
             read: false,
             name: 'unfollow',
             processor: FollowProcessor::class
