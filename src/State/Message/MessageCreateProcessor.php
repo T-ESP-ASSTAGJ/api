@@ -7,8 +7,8 @@ namespace App\State\Message;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
+use App\ApiResource\Message\MessageCreateInput;
 use App\ApiResource\Message\MessageGetOutput;
-use App\ApiResource\MessageCreateInput;
 use App\Entity\Message;
 use App\Entity\User;
 use App\Service\Message\MusicMetadataService;
@@ -69,7 +69,6 @@ final readonly class MessageCreateProcessor implements ProcessorInterface
         $this->em->flush();
 
         return new MessageGetOutput(
-            id: $message->getId(),
             type: $message->getType(),
             content: $message->getContent(),
             trackMetadata: $message->getTrackMetadata(),

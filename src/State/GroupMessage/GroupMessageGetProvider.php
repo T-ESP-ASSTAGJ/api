@@ -9,8 +9,8 @@ use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\GroupMessage\GroupMessageGetOutput;
 use App\Entity\GroupMessage;
 use App\Entity\User;
-use App\Repository\GroupMessageRepository;
 use App\Service\Message\MusicMetadataService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
 /**
@@ -19,9 +19,9 @@ use Symfony\Bundle\SecurityBundle\Security;
 final readonly class GroupMessageGetProvider implements ProviderInterface
 {
     public function __construct(
-        private GroupMessageRepository $groupMessageRepository,
         private Security $security,
         private MusicMetadataService $musicMetadataService,
+        private EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -36,8 +36,9 @@ final readonly class GroupMessageGetProvider implements ProviderInterface
             throw new \InvalidArgumentException('Group message ID is required');
         }
 
-        $groupMessage = $this->groupMessageRepository->find($messageId);
-        if (!$groupMessage instanceof GroupMessage) {
+        /** @var GroupMessage|null $groupMessage */
+        $groupMessage = $this->entityManager->getRepository(GroupMessage::class)->findOneBy(['id' => $messageId]);
+        if (!$groupMessage) {
             throw new \RuntimeException('Group message not found');
         }
 

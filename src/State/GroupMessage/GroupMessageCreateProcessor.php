@@ -7,8 +7,8 @@ namespace App\State\GroupMessage;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
+use App\ApiResource\GroupMessage\GroupMessageCreateInput;
 use App\ApiResource\GroupMessage\GroupMessageGetOutput;
-use App\ApiResource\GroupMessageCreateInput;
 use App\Entity\GroupMessage;
 use App\Entity\User;
 use App\Service\Message\MusicMetadataService;
@@ -48,7 +48,6 @@ final readonly class GroupMessageCreateProcessor implements ProcessorInterface
         }
 
         $groupMessage = new GroupMessage();
-        $groupMessage->setGroupId($data->groupId);
         $groupMessage->setAuthor($user);
         $groupMessage->setType($data->type);
         $groupMessage->setContent($data->content);
