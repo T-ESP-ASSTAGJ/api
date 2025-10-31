@@ -6,7 +6,7 @@ namespace App\State\Message;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\DTO\Message\MessageGetOutput;
+use App\ApiResource\Message\MessageGetOutput;
 use App\Entity\Message;
 use App\Entity\User;
 use App\Repository\MessageRepository;
