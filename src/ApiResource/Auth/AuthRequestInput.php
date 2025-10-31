@@ -21,9 +21,12 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
     ]
 )]
-class AuthRequestInput
+readonly class AuthRequestInput
 {
-    #[Assert\NotBlank]
-    #[Assert\Email]
-    public string $email;
+    public function __construct(
+        #[Assert\NotBlank]
+        #[Assert\Email]
+        public string $email,
+    ) {
+    }
 }

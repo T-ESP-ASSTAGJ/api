@@ -43,13 +43,17 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
     ]
 )]
-class AuthVerificationInput
+readonly class AuthVerificationInput
 {
-    #[Assert\NotBlank]
-    #[Assert\Email]
-    public ?string $email = null;
+    public function __construct(
+        #[Assert\NotBlank]
+        #[Assert\Email]
+        public ?string $email = null,
 
-    #[Assert\NotBlank]
-    #[Assert\Regex('/^[0-9]{6}$/')]
-    public ?string $code = null;
+        #[Assert\NotBlank]
+        #[Assert\Regex('/^[0-9]{6}$/')]
+        public ?string $code = null,
+    ) {
+    }
+
 }

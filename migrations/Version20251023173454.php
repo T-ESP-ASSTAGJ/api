@@ -11,7 +11,7 @@ final class Version20251023173454 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return '';
+        return 'Add group_message table for group chats';
     }
 
     public function up(Schema $schema): void

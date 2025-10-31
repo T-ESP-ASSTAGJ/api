@@ -9,8 +9,8 @@ use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Message\MessageGetOutput;
 use App\Entity\Message;
 use App\Entity\User;
-use App\Repository\MessageRepository;
 use App\Service\Message\MusicMetadataService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
 /**
@@ -19,9 +19,9 @@ use Symfony\Bundle\SecurityBundle\Security;
 final readonly class MessageGetProvider implements ProviderInterface
 {
     public function __construct(
-        private MessageRepository $messageRepository,
         private Security $security,
         private MusicMetadataService $musicMetadataService,
+        private EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -36,8 +36,9 @@ final readonly class MessageGetProvider implements ProviderInterface
             throw new \InvalidArgumentException('Message ID is required');
         }
 
-        $message = $this->messageRepository->find($messageId);
-        if (!$message instanceof Message) {
+        /** @var Message|null $message */
+        $message = $this->entityManager->getRepository(Message::class)->findOneBy(['id' => $messageId]);
+        if (!$message) {
             throw new \RuntimeException('Message not found');
         }
 
@@ -53,7 +54,6 @@ final readonly class MessageGetProvider implements ProviderInterface
         }
 
         return new MessageGetOutput(
-            id: $message->getId(),
             type: $message->getType(),
             content: $message->getContent(),
             trackMetadata: $message->getTrackMetadata(),

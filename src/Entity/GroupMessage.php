@@ -13,7 +13,6 @@ use ApiPlatform\Metadata\Put;
 use App\ApiResource\GroupMessage\GroupMessageCreateInput;
 use App\ApiResource\GroupMessage\GroupMessageGetOutput;
 use App\Entity\Interface\TimeStampableInterface;
-use App\Repository\GroupMessageRepository;
 use App\State\GroupMessage\GroupMessageCreateProcessor;
 use App\State\GroupMessage\GroupMessageGetProvider;
 use Doctrine\ORM\Mapping as ORM;
@@ -38,7 +37,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Delete(output: false),
     ]
 )]
-#[ORM\Entity(repositoryClass: GroupMessageRepository::class)]
+#[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Table(name: 'group_message')]
 class GroupMessage implements TimeStampableInterface
