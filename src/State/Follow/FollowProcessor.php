@@ -6,7 +6,7 @@ namespace App\State\Follow;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\ApiResource\Follow\UnfollowOutput;
+use App\ApiResource\Follow\FollowOutput;
 use App\Entity\Follow as FollowEntity;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * @implements ProcessorInterface<null, FollowEntity|UnfollowOutput>
+ * @implements ProcessorInterface<null, FollowEntity|FollowOutput>
  */
 final readonly class FollowProcessor implements ProcessorInterface
 {
@@ -31,7 +31,7 @@ final readonly class FollowProcessor implements ProcessorInterface
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      */
-    public function process($data, $operation, array $uriVariables = [], array $context = []): FollowEntity|UnfollowOutput
+    public function process($data, $operation, array $uriVariables = [], array $context = []): FollowOutput
     {
         $currentUser = $this->security->getUser();
 
@@ -61,6 +61,8 @@ final readonly class FollowProcessor implements ProcessorInterface
             'followedUser' => $userToFollow,
         ]);
 
+        $output = new FollowOutput();
+
         if ('follow' === $operation->getName()) {
             if ($follow) {
                 throw new BadRequestHttpException('Already following this user.');
@@ -72,8 +74,9 @@ final readonly class FollowProcessor implements ProcessorInterface
 
             $this->em->persist($newFollow);
             $this->em->flush();
+            $output->message = 'Successfully followed the user.';
 
-            return $newFollow;
+            return $output;
         }
 
         if ('unfollow' === $operation->getName()) {
@@ -82,8 +85,6 @@ final readonly class FollowProcessor implements ProcessorInterface
             }
             $this->em->remove($follow);
             $this->em->flush();
-
-            $output = new UnfollowOutput();
             $output->message = 'Successfully unfollowed the user.';
 
             return $output;
