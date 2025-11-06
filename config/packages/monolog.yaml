@@ -23,7 +23,7 @@ when@dev:
                 type: stream
                 path: php://stderr  # Changed from console to stderr for Docker
                 level: debug  # Reduced from debug to avoid noise
-                channels: ["!event", "!doctrine", "!deprecation", '!request']
+                channels: ["!event", "!doctrine", "!deprecation"]
                 formatter: monolog.formatter.line
 
 when@test:
