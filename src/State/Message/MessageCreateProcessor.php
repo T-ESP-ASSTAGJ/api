@@ -9,8 +9,10 @@ use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
 use App\ApiResource\Message\MessageCreateInput;
 use App\ApiResource\Message\MessageGetOutput;
+use App\Entity\Conversation;
 use App\Entity\Message;
 use App\Entity\User;
+use App\Repository\ConversationRepository;
 use App\Service\Message\MusicMetadataService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -26,6 +28,7 @@ final readonly class MessageCreateProcessor implements ProcessorInterface
         private ValidatorInterface $validator,
         private Security $security,
         private MusicMetadataService $musicMetadataService,
+        private ConversationRepository $conversationRepository,
     ) {
     }
 
@@ -47,8 +50,19 @@ final readonly class MessageCreateProcessor implements ProcessorInterface
             throw new \RuntimeException('User must be authenticated');
         }
 
+        // Find the conversation
+        $conversation = $this->conversationRepository->find($data->conversationId);
+        if (!$conversation) {
+            throw new \RuntimeException('Conversation not found');
+        }
+
+        // Check if user is a participant
+        if (!$conversation->getParticipants()->contains($user)) {
+            throw new \RuntimeException('User is not a participant of this conversation');
+        }
+
         $message = new Message();
-        $message->setConversationId($data->conversationId);
+        $message->setConversation($conversation);
         $message->setAuthor($user);
         $message->setType($data->type);
         $message->setContent($data->content);

@@ -52,8 +52,9 @@ class Message implements TimeStampableInterface
     #[ORM\Column(name: 'id', type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'conversation_id', type: 'integer')]
-    private int $conversationId;
+    #[ORM\ManyToOne(targetEntity: Conversation::class, inversedBy: 'messages')]
+    #[ORM\JoinColumn(name: 'conversation_id', referencedColumnName: 'id', nullable: false)]
+    private Conversation $conversation;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'author_id', referencedColumnName: 'id', nullable: false)]
@@ -96,14 +97,14 @@ class Message implements TimeStampableInterface
         return $this->id;
     }
 
-    public function getConversationId(): int
+    public function getConversation(): Conversation
     {
-        return $this->conversationId;
+        return $this->conversation;
     }
 
-    public function setConversationId(int $conversationId): static
+    public function setConversation(Conversation $conversation): static
     {
-        $this->conversationId = $conversationId;
+        $this->conversation = $conversation;
 
         return $this;
     }
