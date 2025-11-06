@@ -9,8 +9,11 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Put;
+use App\ApiResource\User\UserPutInput;
 use App\Entity\Interface\TimeStampableInterface;
 use App\Repository\UserRepository;
+use App\State\User\UserMeProvider;
+use App\State\User\UserPutProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -23,15 +26,19 @@ use Symfony\Component\Validator\Constraints as Assert;
     shortName: 'User',
     operations: [
         new Get(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true]
+            uriTemplate: '/users/me',
+            provider: UserMeProvider::class,
+        ),
+        new Get(
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
         ),
         new GetCollection(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true],
         ),
         new Put(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ, self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
-            denormalizationContext: ['groups' => ['user:write']],
-            security: "is_granted('ROLE_USER') and object == user"
+            uriTemplate: '/users/me',
+            input: UserPutInput::class,
+            processor: UserPutProcessor::class
         ),
         new Delete(
             security: "is_granted('ROLE_USER') and object == user",
@@ -142,7 +149,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
         return $this->username;
     }
 
-    public function setUsername(string $username): static
+    public function setUsername(?string $username): static
     {
         $this->username = $username;
 

@@ -53,6 +53,7 @@ readonly class AuthVerifyProcessor implements ProcessorInterface
             throw new AccessDeniedHttpException('Invalid credentials.');
         }
 
+        /** @var User|null $user */
         $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $data->email]);
 
         try {

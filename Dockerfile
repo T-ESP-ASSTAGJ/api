@@ -59,8 +59,9 @@ ENV FRANKENPHP_WORKER_CONFIG=watch
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
 RUN set -eux; \
-    install-php-extensions xdebug; \
-    rm -f $PHP_INI_DIR/conf.d/docker-php-ext-xdebug.ini
+    install-php-extensions \
+       xdebug \
+    ;
 
 COPY --link frankenphp/conf.d/xdebug.dev.ini $PHP_INI_DIR/app.conf.d/
 
