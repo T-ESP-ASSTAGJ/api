@@ -8,17 +8,7 @@ services:
     restart: unless-stopped
     environment:
       APP_ENV: dev
-      SERVER_NAME: ${SERVER_NAME:-localhost}, php:80
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:${POSTGRES_PORT}/${POSTGRES_DB}?serverVersion=${POSTGRES_VERSION}&charset=${POSTGRES_CHARSET}
-      FRANKENPHP_WORKER_CONFIG: watch
-      MERCURE_EXTRA_DIRECTIVES: demo
-      MERCURE_JWT_SECRET: ${MERCURE_JWT_SECRET}
-      MERCURE_URL: ${CADDY_MERCURE_URL:-http://php/.well-known/mercure}
-      MERCURE_PUBLIC_URL: ${MERCURE_PUBLIC_URL:-https://${SERVER_NAME:-localhost}:${HTTPS_PORT:-443}/.well-known/mercure}
-      MERCURE_PUBLISHER_JWT_KEY: ${MERCURE_JWT_SECRET}
-      MERCURE_SUBSCRIBER_JWT_KEY: ${MERCURE_JWT_SECRET}
-      MERCURE_PUBLISHER_JWT_ALG: ${MERCURE_PUBLISHER_JWT_ALG}
-      MERCURE_SUBSCRIBER_JWT_ALG: ${MERCURE_SUBSCRIBER_JWT_ALG}
       # Spotify Integration
       SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID}
       SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET}
@@ -26,21 +16,17 @@ services:
       SPOTIFY_AUTH_URL: ${SPOTIFY_AUTH_URL}
       SPOTIFY_TOKEN_URL: ${SPOTIFY_TOKEN_URL}
       SPOTIFY_API_URL: ${SPOTIFY_API_URL}
-      XDEBUG_MODE: develop,debug
     volumes:
       - caddy_data:/data:z
       - caddy_config:/config:z
       - .:/app:z
       - ./frankenphp/Caddyfile:/etc/frankenphp/Caddyfile:ro,z
     ports:
-      - "${HTTP_PORT:-80}:80"
-      - "${HTTPS_PORT:-443}:443/tcp"
-      - "${HTTPS_PORT:-443}:443/udp"
+      - ${HTTP_PORT}:80
+      - ${HTTPS_PORT}:443
 
 
 # Mercure is installed as a Caddy module, prevent the Flex recipe from installing another service
-###> symfony/mercure-bundle ###
-###< symfony/mercure-bundle ###
 
 ###> doctrine/doctrine-bundle ###
   database:
@@ -67,8 +53,6 @@ services:
 volumes:
   caddy_data:
   caddy_config:
-###> symfony/mercure-bundle ###
-###< symfony/mercure-bundle ###
 
 ###> doctrine/doctrine-bundle ###
   database_data:
