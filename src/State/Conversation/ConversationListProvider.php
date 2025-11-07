@@ -64,8 +64,8 @@ final readonly class ConversationListProvider implements ProviderInterface
         // Get the other participant (for private conversations)
         $participant = null;
         if ($conversation->getType() === Conversation::TYPE_PRIVATE) {
-            $participants = $conversation->getParticipants();
-            foreach ($participants as $p) {
+            $activeParticipants = $conversation->getActiveParticipants();
+            foreach ($activeParticipants as $p) {
                 if ($p->getId() !== $currentUser->getId()) {
                     $participant = [
                         'id' => $p->getId(),

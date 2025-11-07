@@ -20,17 +20,18 @@ class ConversationRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find all conversations for a specific user, ordered by last message date.
+     * Find all active conversations for a specific user, ordered by last message date.
      *
      * @return Conversation[]
      */
     public function findByUser(User $user): array
     {
         return $this->createQueryBuilder('c')
-            ->innerJoin('c.participants', 'p')
+            ->innerJoin('c.conversationParticipants', 'cp')
             ->leftJoin('c.messages', 'm')
-            ->where('p.id = :userId')
-            ->setParameter('userId', $user->getId())
+            ->where('cp.user = :user')
+            ->andWhere('cp.leftAt IS NULL')
+            ->setParameter('user', $user)
             ->groupBy('c.id')
             ->orderBy('MAX(COALESCE(m.createdAt, c.createdAt))', 'DESC')
             ->getQuery()
@@ -38,44 +39,38 @@ class ConversationRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find a private conversation between two users.
+     * Find a private conversation between two users (both active participants).
      */
     public function findPrivateConversationBetweenUsers(User $user1, User $user2): ?Conversation
     {
         $qb = $this->createQueryBuilder('c');
 
         return $qb
-            ->innerJoin('c.participants', 'p1')
-            ->innerJoin('c.participants', 'p2')
+            ->innerJoin('c.conversationParticipants', 'cp1')
+            ->innerJoin('c.conversationParticipants', 'cp2')
             ->where('c.type = :type')
-            ->andWhere('p1.id = :user1Id')
-            ->andWhere('p2.id = :user2Id')
-            ->andWhere(
-                $qb->expr()->eq(
-                    $qb->expr()->count('c.participants'),
-                    ':participantCount'
-                )
-            )
+            ->andWhere('cp1.user = :user1')
+            ->andWhere('cp1.leftAt IS NULL')
+            ->andWhere('cp2.user = :user2')
+            ->andWhere('cp2.leftAt IS NULL')
             ->setParameter('type', Conversation::TYPE_PRIVATE)
-            ->setParameter('user1Id', $user1->getId())
-            ->setParameter('user2Id', $user2->getId())
-            ->setParameter('participantCount', 2)
-            ->groupBy('c.id')
-            ->having($qb->expr()->eq($qb->expr()->count('c.participants'), ':participantCount'))
+            ->setParameter('user1', $user1)
+            ->setParameter('user2', $user2)
             ->getQuery()
             ->getOneOrNullResult();
     }
 
     /**
-     * Count conversations for a user.
+     * Count active conversations for a user.
      */
     public function countByUser(User $user): int
     {
         return (int) $this->createQueryBuilder('c')
-            ->select('COUNT(c.id)')
-            ->innerJoin('c.participants', 'p')
-            ->where('p.id = :userId')
-            ->setParameter('userId', $user->getId())
+            ->select('COUNT(DISTINCT c.id)')
+            ->innerJoin('c.conversationParticipants', 'cp')
+            ->where('cp.user = :user')
+            ->andWhere('cp.leftAt IS NULL')
+            ->setParameter('user', $user)
             ->getQuery()
             ->getSingleScalarResult();
     }

@@ -7,9 +7,15 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post as ApiPost;
+use App\ApiResource\Conversation\ConversationCreateInput;
+use App\ApiResource\Conversation\ConversationDetailOutput;
 use App\ApiResource\Conversation\ConversationGetOutput;
 use App\Entity\Interface\TimeStampableInterface;
 use App\Repository\ConversationRepository;
+use App\State\Conversation\ConversationCreateProcessor;
+use App\State\Conversation\ConversationGetProvider;
+use App\State\Conversation\ConversationLeaveProcessor;
 use App\State\Conversation\ConversationListProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -19,11 +25,24 @@ use Doctrine\ORM\Mapping as ORM;
     shortName: 'Conversation',
     operations: [
         new Get(
-            output: ConversationGetOutput::class,
+            output: ConversationDetailOutput::class,
+            provider: ConversationGetProvider::class
         ),
         new GetCollection(
             output: ConversationGetOutput::class,
             provider: ConversationListProvider::class
+        ),
+        new ApiPost(
+            uriTemplate: '/conversations',
+            input: ConversationCreateInput::class,
+            output: ConversationDetailOutput::class,
+            processor: ConversationCreateProcessor::class
+        ),
+        new ApiPost(
+            uriTemplate: '/conversations/{id}/leave',
+            input: false,
+            output: false,
+            processor: ConversationLeaveProcessor::class
         ),
     ]
 )]
@@ -45,12 +64,12 @@ class Conversation implements TimeStampableInterface
     #[ORM\Column(name: 'type', type: 'string', length: 20)]
     private string $type = self::TYPE_PRIVATE;
 
-    /** @var Collection<int, User> */
-    #[ORM\ManyToMany(targetEntity: User::class)]
-    #[ORM\JoinTable(name: 'conversation_participant')]
-    #[ORM\JoinColumn(name: 'conversation_id', referencedColumnName: 'id')]
-    #[ORM\InverseJoinColumn(name: 'user_id', referencedColumnName: 'id')]
-    private Collection $participants;
+    #[ORM\Column(name: 'group_name', type: 'string', length: 255, nullable: true)]
+    private ?string $groupName = null;
+
+    /** @var Collection<int, ConversationParticipant> */
+    #[ORM\OneToMany(targetEntity: ConversationParticipant::class, mappedBy: 'conversation', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $conversationParticipants;
 
     /** @var Collection<int, Message> */
     #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'conversation', cascade: ['persist'])]
@@ -59,7 +78,7 @@ class Conversation implements TimeStampableInterface
 
     public function __construct()
     {
-        $this->participants = new ArrayCollection();
+        $this->conversationParticipants = new ArrayCollection();
         $this->messages = new ArrayCollection();
     }
 
@@ -80,26 +99,66 @@ class Conversation implements TimeStampableInterface
         return $this;
     }
 
-    /** @return Collection<int, User> */
-    public function getParticipants(): Collection
+    public function getGroupName(): ?string
     {
-        return $this->participants;
+        return $this->groupName;
     }
 
-    public function addParticipant(User $participant): static
+    public function setGroupName(?string $groupName): static
     {
-        if (!$this->participants->contains($participant)) {
-            $this->participants->add($participant);
+        $this->groupName = $groupName;
+
+        return $this;
+    }
+
+    /** @return Collection<int, ConversationParticipant> */
+    public function getConversationParticipants(): Collection
+    {
+        return $this->conversationParticipants;
+    }
+
+    public function addConversationParticipant(ConversationParticipant $conversationParticipant): static
+    {
+        if (!$this->conversationParticipants->contains($conversationParticipant)) {
+            $this->conversationParticipants->add($conversationParticipant);
+            $conversationParticipant->setConversation($this);
         }
 
         return $this;
     }
 
-    public function removeParticipant(User $participant): static
+    public function removeConversationParticipant(ConversationParticipant $conversationParticipant): static
     {
-        $this->participants->removeElement($participant);
+        $this->conversationParticipants->removeElement($conversationParticipant);
 
         return $this;
+    }
+
+    /**
+     * Get active participants
+     *
+     * @return array<User>
+     */
+    public function getActiveParticipants(): array
+    {
+        return $this->conversationParticipants
+            ->filter(fn (ConversationParticipant $cp) => $cp->isActive())
+            ->map(fn (ConversationParticipant $cp) => $cp->getUser())
+            ->toArray();
+    }
+
+    /**
+     * Check if a user is an active participant.
+     */
+    public function isUserParticipant(User $user): bool
+    {
+        foreach ($this->conversationParticipants as $cp) {
+            if ($cp->getUser()->getId() === $user->getId() && $cp->isActive()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /** @return Collection<int, Message> */
@@ -133,5 +192,19 @@ class Conversation implements TimeStampableInterface
         // TODO: Implement unread message tracking
         // For now, return 0
         return 0;
+    }
+
+    /**
+     * Check if conversation should be deleted (no active participants).
+     */
+    public function shouldBeDeleted(): bool
+    {
+        foreach ($this->conversationParticipants as $cp) {
+            if ($cp->isActive()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
