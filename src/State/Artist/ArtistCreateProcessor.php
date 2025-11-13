@@ -2,27 +2,25 @@
 
 declare(strict_types=1);
 
-namespace App\Processor\Artist;
+namespace App\State\Artist;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
-use App\DTO\Artist\ArtistCreateInput;
-use App\DTO\Artist\ArtistGetOutput;
+use App\ApiResource\Artist\ArtistCreateInput;
 use App\Entity\Artist;
+use App\Entity\ArtistSource;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * @implements ProcessorInterface<ArtistCreateInput, ArtistGetOutput>
+ * @implements ProcessorInterface<ArtistCreateInput, Artist>
  */
 final readonly class ArtistCreateProcessor implements ProcessorInterface
 {
     public function __construct(
         private EntityManagerInterface $em,
         private ValidatorInterface $validator,
-        private ObjectMapperInterface $objectMapper,
     ) {
     }
 
@@ -31,14 +29,21 @@ final readonly class ArtistCreateProcessor implements ProcessorInterface
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *
-     * @return ArtistGetOutput
+     * @return Artist
      */
     public function process(mixed $data, ?Operation $operation = null, array $uriVariables = [], array $context = []): mixed
     {
         if ($data instanceof ArtistCreateInput) {
             $artist = new Artist();
             $artist->setName($data->name);
-            $artist->setMetadata($data->metadata);
+
+            // Création des ArtistSource
+            foreach ($data->artistSources as $sourceDto) {
+                $artistSource = new ArtistSource();
+                $artistSource->setPlatform($sourceDto->platform);
+                $artistSource->setPlatformArtistId($sourceDto->platformArtistId);
+                $artist->addArtistSource($artistSource);
+            }
 
             $violations = $this->validator->validate($artist);
             if ($violations->count() > 0) {
@@ -48,7 +53,7 @@ final readonly class ArtistCreateProcessor implements ProcessorInterface
             $this->em->persist($artist);
             $this->em->flush();
 
-            return $this->objectMapper->map($artist, ArtistGetOutput::class);
+            return $artist;
         }
 
         return $data;
