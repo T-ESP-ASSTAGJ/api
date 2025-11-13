@@ -14,6 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Post(
             uriTemplate: '/auth/spotify/authorize',
             shortName: 'AuthSpotify',
+            input: false,
             output: AuthSpotifyOutput::class,
             processor: AuthSpotifyProcessor::class
         ),
