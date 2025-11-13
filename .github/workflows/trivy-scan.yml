@@ -20,7 +20,7 @@ jobs:
       branch: ${{ github.ref_name }}
       should_push: true
     secrets:
-      GHCR_TOKEN: ${{ secrets.GHCR_PAT }}
+      GHCR_PAT: ${{ secrets.GHCR_PAT }}
       APP_SECRET: ${{ secrets.APP_SECRET }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       MERCURE_JWT_SECRET: ${{ secrets.MERCURE_JWT_SECRET }}
@@ -40,4 +40,4 @@ jobs:
       custom_message: "Project: API | Branch: ${{ github.ref_name }}"
     secrets:
       DISCORD_WEBHOOK_URL: ${{ secrets.PR_EMERGENCY_WEBHOOK_URL }}
-      GHCR_TOKEN: ${{ secrets.GHCR_PAT }}
+      GHCR_PAT: ${{ secrets.GHCR_PAT }}
