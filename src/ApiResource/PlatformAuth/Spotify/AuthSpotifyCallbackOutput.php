@@ -7,16 +7,15 @@ namespace App\ApiResource\PlatformAuth\Spotify;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use App\Entity\Token;
-use App\State\Spotify\AuthSpotifyCallbackProcessor;
+use App\State\Spotify\AuthSpotifyCallbackProvider;
 
 #[ApiResource(
     operations: [
         new Get(
             uriTemplate: '/auth/spotify/callback',
             shortName: 'AuthSpotify',
-            input: AuthSpotifyCallbackInput::class,
             output: AuthSpotifyCallbackOutput::class,
-            processor: AuthSpotifyCallbackProcessor::class
+            provider: AuthSpotifyCallbackProvider::class
         ),
     ],
     provider: null

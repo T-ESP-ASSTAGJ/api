@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace App\State\Spotify;
 
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\PlatformAuth\Spotify\AuthSpotifyOutput;
 use App\Entity\Token;
 use App\Service\Spotify\SpotifyAuthService;
 use Random\RandomException;
 
 /**
- * @implements ProviderInterface<AuthSpotifyOutput>
+ * @implements ProcessorInterface<null, AuthSpotifyOutput>
  */
-final readonly class AuthSpotifyProcessor implements ProviderInterface
+final readonly class AuthSpotifyProcessor implements ProcessorInterface
 {
     public function __construct(
         private SpotifyAuthService $spotifyAuthService,
@@ -27,7 +27,7 @@ final readonly class AuthSpotifyProcessor implements ProviderInterface
      *
      * @throws RandomException
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): AuthSpotifyOutput
+    public function process(mixed $data, ?Operation $operation = null, array $uriVariables = [], array $context = []): AuthSpotifyOutput
     {
         $authUrl = $this->spotifyAuthService->getAuthorizationUrl([
             'user-read-private',

@@ -39,15 +39,12 @@ readonly class SpotifyAuthService
     {
         $state = bin2hex(random_bytes(16));
 
-        $params = [
-            'response_type' => 'code',
-            'client_id' => $this->clientId,
-            'scope' => implode(' ', $scopes),
-            'redirect_uri' => $this->redirectUri,
-            'state' => $state,
-        ];
-
-        return $this->authUrl.'?'.http_build_query($params);
+        return $this->authUrl.
+            '?response_type=code&client_id='.
+            $this->clientId.'&scope='.
+            implode(' ', $scopes).
+            '&redirect_uri='.$this->redirectUri.
+            '?state='.$state;
     }
 
     public function exchangeCodeForToken(string $code, User $user): Token
