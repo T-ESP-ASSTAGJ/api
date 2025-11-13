@@ -9,7 +9,7 @@ on:
 jobs:
   build-image:
     name: Build & Push Docker Image
-    uses: t-esp-asstagj/infra/.github/workflows/docker-build.yml@TEM-71
+    uses: T-ESP-ASSTAGJ/infra/.github/workflows/docker-build.yml@TEM-71
     permissions:
       contents: read
       packages: write
