@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\ApiResource\Post;
 
 use ApiPlatform\Metadata\ApiProperty;
+use App\ApiResource\Track\TrackGetOutput;
 
 class PostGetOutput
 {
@@ -20,31 +21,10 @@ class PostGetOutput
     #[ApiProperty(example: 'Amazing sunset vibes! 🌅 #music #vibes')]
     public ?string $caption;
 
-    /**
-     * @var array{
-     *     title: string,
-     *     artist: string,
-     *     album: string,
-     *     duration: int,
-     *     genre: string,
-     *     platform: string,
-     *     platform_id: string,
-     *     external_url: string,
-     *     isrc: string
-     * }
-     */
-    #[ApiProperty(example: [
-        'title' => 'Blinding Lights',
-        'artist' => 'The Weeknd',
-        'album' => 'After Hours',
-        'duration' => 200,
-        'genre' => 'Pop',
-        'platform' => 'spotify',
-        'platform_id' => '4uLU6hMCjMI75M1A2tKUQC',
-        'external_url' => 'https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC',
-        'isrc' => 'USUG12000193',
-    ])]
-    public array $track;
+    #[ApiProperty(example: 1)]
+    public int $trackId;
+
+    public TrackGetOutput $track;
 
     #[ApiProperty(example: 'https://example.com/photos/sunset-beach.jpg')]
     public ?string $photoUrl;

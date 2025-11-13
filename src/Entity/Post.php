@@ -51,21 +51,12 @@ class Post implements TimeStampableInterface
     #[ORM\Column(name: 'caption', type: 'text', nullable: true)]
     private ?string $caption = null;
 
-    /**
-     * @var array{
-     *     title: string,
-     *     artist: string,
-     *     album: string,
-     *     duration: int,
-     *     genre: string,
-     *     platform: string,
-     *     platform_id: string,
-     *     external_url: string,
-     *     isrc: string
-     * }
-     */
-    #[ORM\Column(name: 'track', type: 'json')]
-    private array $track;
+    #[ORM\Column(name: 'track_id', type: 'integer')]
+    private int $trackId;
+
+    #[ORM\ManyToOne(targetEntity: Track::class)]
+    #[ORM\JoinColumn(name: 'track_id', referencedColumnName: 'id', nullable: false)]
+    private Track $track;
 
     #[ORM\Column(name: 'photo_url', type: 'string', length: 500, nullable: true)]
     private ?string $photoUrl = null;
@@ -114,40 +105,27 @@ class Post implements TimeStampableInterface
         return $this;
     }
 
-    /**
-     * @return array{
-     *     title: string,
-     *     artist: string,
-     *     album: string,
-     *     duration: int,
-     *     genre: string,
-     *     platform: string,
-     *     platform_id: string,
-     *     external_url: string,
-     *     isrc: string
-     * }
-     */
-    public function getTrack(): array
+    public function getTrackId(): int
+    {
+        return $this->trackId;
+    }
+
+    public function setTrackId(int $trackId): static
+    {
+        $this->trackId = $trackId;
+
+        return $this;
+    }
+
+    public function getTrack(): Track
     {
         return $this->track;
     }
 
-    /**
-     * @param array{
-     *     title: string,
-     *     artist: string,
-     *     album: string,
-     *     duration: int,
-     *     genre: string,
-     *     platform: string,
-     *     platform_id: string,
-     *     external_url: string,
-     *     isrc: string
-     * } $track
-     */
-    public function setTrack(array $track): static
+    public function setTrack(Track $track): static
     {
         $this->track = $track;
+        $this->trackId = $track->getId();
 
         return $this;
     }

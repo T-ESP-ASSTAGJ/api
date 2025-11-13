@@ -7,14 +7,11 @@ namespace DoctrineMigrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
-/**
- * Auto-generated Migration: Please modify to your needs!
- */
 final class Version20250912122227 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return '';
+        return 'Create artist table';
     }
 
     public function up(Schema $schema): void
@@ -26,7 +23,6 @@ final class Version20250912122227 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->addSql('CREATE SCHEMA public');
         $this->addSql('DROP TABLE artist');
     }
 }
