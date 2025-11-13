@@ -6,11 +6,10 @@ on:
   workflow_dispatch:
   pull_request:
     branches: [main, staging, TEM-71]
-
 jobs:
   build-image:
     name: Build & Push Docker Image
-    uses: T-ESP-ASSTAGJ/infra/.github/workflows/docker-build.yml@TEM-71
+    uses: t-esp-asstagj/infra/.github/workflows/docker-build.yml@TEM-71
     permissions:
       contents: read
       packages: write
