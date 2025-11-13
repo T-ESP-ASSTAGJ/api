@@ -20,7 +20,7 @@ jobs:
       branch: ${{ github.ref_name }}
       should_push: true
     secrets:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      GH_TOKEN: ${{ secrets.GHCR_PAT }}
       APP_SECRET: ${{ secrets.APP_SECRET }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       MERCURE_JWT_SECRET: ${{ secrets.MERCURE_JWT_SECRET }}
