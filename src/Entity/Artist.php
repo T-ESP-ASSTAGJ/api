@@ -10,28 +10,34 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post as ApiPost;
-use App\DTO\Artist\ArtistCreateInput;
-use App\DTO\Artist\ArtistGetOutput;
-use App\DTO\Artist\ArtistUpdateInput;
+use App\ApiResource\Artist\ArtistCreateInput;
+use App\ApiResource\Artist\ArtistUpdateInput;
 use App\Entity\Interface\TimeStampableInterface;
-use App\Processor\Artist\ArtistCreateProcessor;
-use App\Processor\Artist\ArtistUpdateProcessor;
+use App\State\Artist\ArtistCreateProcessor;
+use App\State\Artist\ArtistUpdateProcessor;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
     shortName: 'Artist',
     operations: [
-        new Get(output: ArtistGetOutput::class),
-        new GetCollection(output: ArtistGetOutput::class),
+        new Get(
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true]
+        ),
+        new GetCollection(
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true]
+        ),
         new ApiPost(
             input: ArtistCreateInput::class,
-            output: ArtistGetOutput::class,
-            processor: ArtistCreateProcessor::class
+            processor: ArtistCreateProcessor::class,
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true]
         ),
         new Patch(
             input: ArtistUpdateInput::class,
-            output: ArtistGetOutput::class,
-            processor: ArtistUpdateProcessor::class
+            processor: ArtistUpdateProcessor::class,
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true]
         ),
         new Delete(output: false),
     ]
@@ -43,19 +49,47 @@ class Artist implements TimeStampableInterface
 {
     use Trait\TimeStampableTrait;
 
+    public const SERIALIZATION_GROUP_READ = 'artist:read';
+    public const SERIALIZATION_GROUP_DETAIL = 'artist:detail';
+    public const SERIALIZATION_GROUP_WRITE = 'artist:write';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id', type: 'integer')]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
     private ?int $id = null;
 
     #[ORM\Column(name: 'name', type: 'string', length: 255)]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+        self::SERIALIZATION_GROUP_WRITE,
+    ])]
     private string $name;
 
     /**
-     * @var array<string, mixed>
+     * @var Collection<int, ArtistSource>
      */
-    #[ORM\Column(name: 'metadata', type: 'json')]
-    private array $metadata = [];
+    #[ORM\OneToMany(targetEntity: ArtistSource::class, mappedBy: 'artist', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[Groups([
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
+    private Collection $artistSources;
+
+    /**
+     * @var Collection<int, Track>
+     */
+    #[ORM\OneToMany(targetEntity: Track::class, mappedBy: 'artist')]
+    private Collection $tracks;
+
+    public function __construct()
+    {
+        $this->artistSources = new ArrayCollection();
+        $this->tracks = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -75,19 +109,55 @@ class Artist implements TimeStampableInterface
     }
 
     /**
-     * @return array<string, mixed>
+     * @return Collection<int, ArtistSource>
      */
-    public function getMetadata(): array
+    public function getArtistSources(): Collection
     {
-        return $this->metadata;
+        return $this->artistSources;
+    }
+
+    public function addArtistSource(ArtistSource $artistSource): static
+    {
+        if (!$this->artistSources->contains($artistSource)) {
+            $this->artistSources->add($artistSource);
+            $artistSource->setArtist($this);
+        }
+
+        return $this;
+    }
+
+    public function removeArtistSource(ArtistSource $artistSource): static
+    {
+        $this->artistSources->removeElement($artistSource);
+
+        return $this;
     }
 
     /**
-     * @param array<string, mixed> $metadata
+     * @return Collection<int, Track>
      */
-    public function setMetadata(array $metadata): static
+    public function getTracks(): Collection
     {
-        $this->metadata = $metadata;
+        return $this->tracks;
+    }
+
+    public function addTrack(Track $track): static
+    {
+        if (!$this->tracks->contains($track)) {
+            $this->tracks->add($track);
+            $track->setArtist($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTrack(Track $track): static
+    {
+        if ($this->tracks->removeElement($track)) {
+            if ($track->getArtist() === $this) {
+                $track->setArtist(null);
+            }
+        }
 
         return $this;
     }

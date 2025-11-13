@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\DTO\Artist;
+namespace App\ApiResource\Artist;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -12,8 +12,9 @@ class ArtistUpdateInput
     public ?string $name = null;
 
     /**
-     * @var array<string, mixed>|null
+     * @var ArtistSourceDto[]|null
      */
     #[Assert\Type('array')]
-    public ?array $metadata = null;
+    #[Assert\Valid]
+    public ?array $artistSources = null;
 }

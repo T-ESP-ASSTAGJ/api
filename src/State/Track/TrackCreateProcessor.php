@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\State\Post;
+namespace App\State\Track;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
-use App\ApiResource\Post\PostCreateInput;
-use App\ApiResource\Post\PostGetOutput;
-use App\Entity\Post;
+use App\ApiResource\Track\TrackCreateInput;
+use App\ApiResource\Track\TrackGetOutput;
+use App\Entity\Artist;
 use App\Entity\Track;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -17,9 +17,9 @@ use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * @implements ProcessorInterface<PostCreateInput, PostGetOutput>
+ * @implements ProcessorInterface<TrackCreateInput, TrackGetOutput>
  */
-final readonly class PostCreateProcessor implements ProcessorInterface
+final readonly class TrackCreateProcessor implements ProcessorInterface
 {
     public function __construct(
         private EntityManagerInterface $em,
@@ -29,37 +29,37 @@ final readonly class PostCreateProcessor implements ProcessorInterface
     }
 
     /**
-     * @param PostCreateInput      $data
+     * @param TrackCreateInput     $data
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *
-     * @return PostGetOutput
+     * @return TrackGetOutput
      */
     public function process(mixed $data, ?Operation $operation = null, array $uriVariables = [], array $context = []): mixed
     {
-        if ($data instanceof PostCreateInput) {
-            $track = $this->em->getRepository(Track::class)->find($data->trackId);
-            if (!$track) {
-                throw new NotFoundHttpException('Track not found');
+        if ($data instanceof TrackCreateInput) {
+            // Vérifier que l'artiste existe
+            $artist = $this->em->getRepository(Artist::class)->find($data->artistId);
+            if (!$artist) {
+                throw new NotFoundHttpException('Artist not found');
             }
 
-            $post = new Post();
-            $post->setUserId($data->userId);
-            $post->setSongPreviewUrl($data->songPreviewUrl);
-            $post->setCaption($data->caption);
-            $post->setTrack($track);
-            $post->setPhotoUrl($data->photoUrl);
-            $post->setLocation($data->location);
+            $track = new Track();
+            $track->setTitle($data->title);
+            $track->setCoverUrl($data->coverUrl);
+            $track->setMetadata($data->metadata);
+            $track->setArtist($artist);
+            $track->setLength($data->length);
 
-            $violations = $this->validator->validate($post);
+            $violations = $this->validator->validate($track);
             if ($violations->count() > 0) {
                 throw new ValidationException($violations);
             }
 
-            $this->em->persist($post);
+            $this->em->persist($track);
             $this->em->flush();
 
-            return $this->objectMapper->map($post, PostGetOutput::class);
+            return $this->objectMapper->map($track, TrackGetOutput::class);
         }
 
         return $data;

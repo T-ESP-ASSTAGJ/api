@@ -1,40 +1,36 @@
 <?php
 
-
 declare(strict_types=1);
 
-namespace App\Processor\Artist;
+namespace App\State\Artist;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
-use App\DTO\Artist\ArtistGetOutput;
-use App\DTO\Artist\ArtistUpdateInput;
+use App\ApiResource\Artist\ArtistUpdateInput;
 use App\Entity\Artist;
+use App\Entity\ArtistSource;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * @implements ProcessorInterface<ArtistUpdateInput, ArtistGetOutput>
+ * @implements ProcessorInterface<ArtistUpdateInput, Artist>
  */
 final readonly class ArtistUpdateProcessor implements ProcessorInterface
 {
     public function __construct(
         private EntityManagerInterface $em,
-        private ValidatorInterface     $validator,
-        private ObjectMapperInterface  $objectMapper,
-    )
-    {
+        private ValidatorInterface $validator,
+    ) {
     }
 
     /**
-     * @param ArtistUpdateInput $data
+     * @param ArtistUpdateInput    $data
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *
-     * @return ArtistGetOutput
+     * @return Artist
      */
     public function process(mixed $data, ?Operation $operation = null, array $uriVariables = [], array $context = []): mixed
     {
@@ -52,12 +48,24 @@ final readonly class ArtistUpdateProcessor implements ProcessorInterface
             }
 
             // Mise à jour uniquement des champs fournis (PATCH)
-            if ($data->name !== null) {
+            if (null !== $data->name) {
                 $artist->setName($data->name);
             }
 
-            if ($data->metadata !== null) {
-                $artist->setMetadata($data->metadata);
+            // Mise à jour des ArtistSource si fournis
+            if (null !== $data->artistSources) {
+                // Supprimer les anciennes sources
+                foreach ($artist->getArtistSources() as $oldSource) {
+                    $artist->removeArtistSource($oldSource);
+                }
+
+                // Ajouter les nouvelles sources
+                foreach ($data->artistSources as $sourceDto) {
+                    $artistSource = new ArtistSource();
+                    $artistSource->setPlatform($sourceDto->platform);
+                    $artistSource->setPlatformArtistId($sourceDto->platformArtistId);
+                    $artist->addArtistSource($artistSource);
+                }
             }
 
             $violations = $this->validator->validate($artist);
@@ -67,7 +75,7 @@ final readonly class ArtistUpdateProcessor implements ProcessorInterface
 
             $this->em->flush();
 
-            return $this->objectMapper->map($artist, ArtistGetOutput::class);
+            return $artist;
         }
 
         return $data;

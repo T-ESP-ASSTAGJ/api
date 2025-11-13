@@ -18,22 +18,9 @@ class PostCreateInput
     #[Assert\Length(max: 1000)]
     public ?string $caption = null;
 
-    /**
-     * @var array{
-     *     title: string,
-     *     artist: string,
-     *     album: string,
-     *     duration: int,
-     *     genre: string,
-     *     platform: string,
-     *     platform_id: string,
-     *     external_url: string,
-     *     isrc: string
-     * }
-     */
     #[Assert\NotBlank]
-    #[Assert\Type('array')]
-    public array $track;
+    #[Assert\Positive]
+    public int $trackId;
 
     #[Assert\Url]
     #[Assert\Length(max: 500)]
