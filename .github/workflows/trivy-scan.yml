@@ -10,7 +10,7 @@ on:
 jobs:
   build-image:
     name: Build & Push Docker Image
-    uses: T-ESP-ASSTAGJ/infra/.github/workflows/docker-build.yml@staging
+    uses: T-ESP-ASSTAGJ/infra/.github/workflows/docker-build.yml@TEM-71
     permissions:
       contents: read
       packages: write
@@ -28,7 +28,7 @@ jobs:
   security-scan:
     name: Security Scan
     needs: build-image
-    uses: T-ESP-ASSTAGJ/infra/.github/workflows/trivy-scan.yml@staging
+    uses: T-ESP-ASSTAGJ/infra/.github/workflows/trivy-scan.yml@TEM-71
     permissions:
       security-events: write
       contents: read
