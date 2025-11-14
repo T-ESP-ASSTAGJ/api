@@ -8,12 +8,14 @@ use App\Entity\Token;
 use App\Entity\User;
 use App\Repository\TokenRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Random\RandomException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 readonly class SpotifyAuthService
 {
+    public const SPOTIFY_TOKEN_URL = 'https://accounts.spotify.com/api/token';
+    public const SPOTIFY_AUTH_URL = 'https://accounts.spotify.com/authorize';
+
     public function __construct(
         private HttpClientInterface $spotifyApiClient,
         private HttpClientInterface $spotifyAuthClient,
@@ -21,37 +23,32 @@ readonly class SpotifyAuthService
         private EntityManagerInterface $entityManager,
         #[Autowire(env: 'SPOTIFY_CLIENT_ID')]
         private string $clientId,
+        #[Autowire(env: 'SPOTIFY_CLIENT_SECRET')]
+        private string $clientSecret,
         #[Autowire(env: 'SPOTIFY_REDIRECT_URI')]
         private string $redirectUri,
-        #[Autowire(env: 'SPOTIFY_AUTH_URL')]
-        private string $authUrl,
         #[Autowire(env: 'SPOTIFY_TOKEN_URL')]
         private string $tokenUrl,
     ) {
     }
 
-    /**
-     * @param array<string> $scopes
-     *
-     * @throws RandomException
-     */
-    public function getAuthorizationUrl(array $scopes = ['user-read-private', 'user-read-email']): string
+    public function getRedirectUri(string $state): string
     {
-        $state = bin2hex(random_bytes(16));
-
-        return $this->authUrl.
-            '?response_type=code&client_id='.
-            $this->clientId.'&scope='.
-            implode(' ', $scopes).
+        return self::SPOTIFY_AUTH_URL.
+            '?response_type=code'.
+            '&client_id='.$this->clientId.
+            '&scope=user-read-email user-read-private playlist-read-private'.
             '&redirect_uri='.$this->redirectUri.
-            '?state='.$state;
+            '&state='.urlencode($state);
     }
 
     public function exchangeCodeForToken(string $code, User $user): Token
     {
         try {
-            $response = $this->spotifyAuthClient->request('POST', $this->tokenUrl, [
+            $response = $this->spotifyAuthClient->request('POST', self::SPOTIFY_TOKEN_URL, [
                 'body' => [
+                    'client_id' => $this->clientId,
+                    'client_secret' => $this->clientSecret,
                     'grant_type' => 'authorization_code',
                     'code' => $code,
                     'redirect_uri' => $this->redirectUri,
@@ -136,7 +133,7 @@ readonly class SpotifyAuthService
     private function getUserProfile(string $accessToken): array
     {
         try {
-            $response = $this->spotifyApiClient->request('GET', '/me', [
+            $response = $this->spotifyApiClient->request('GET', 'me', [
                 'headers' => [
                     'Authorization' => 'Bearer '.$accessToken,
                 ],

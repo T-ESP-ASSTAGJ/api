@@ -8,8 +8,11 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\PlatformAuth\Spotify\AuthSpotifyOutput;
 use App\Entity\Token;
+use App\Entity\User;
 use App\Service\Spotify\SpotifyAuthService;
-use Random\RandomException;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 /**
  * @implements ProcessorInterface<null, AuthSpotifyOutput>
@@ -18,29 +21,29 @@ final readonly class AuthSpotifyProcessor implements ProcessorInterface
 {
     public function __construct(
         private SpotifyAuthService $spotifyAuthService,
+        private JWTTokenManagerInterface $jwtManager,
+        private Security $security,
     ) {
     }
 
-    /**
-     * @param array<string, mixed> $uriVariables
-     * @param array<string, mixed> $context
-     *
-     * @throws RandomException
-     */
     public function process(mixed $data, ?Operation $operation = null, array $uriVariables = [], array $context = []): AuthSpotifyOutput
     {
-        $authUrl = $this->spotifyAuthService->getAuthorizationUrl([
-            'user-read-private',
-            'user-read-email',
-            'playlist-read-private',
-            'playlist-read-collaborative',
-            'user-library-read',
-        ]);
+        /** @var User|null $user */
+        $user = $this->security->getUser();
+
+        if (null === $user) {
+            throw new UnauthorizedHttpException('Bearer', 'Authentication required');
+        }
+
+        $state = $this->jwtManager->create($user);
+
+        $authUrl = $this->spotifyAuthService->getRedirectUri($state);
 
         $output = new AuthSpotifyOutput();
         $output->authorization_url = $authUrl;
         $output->platform = Token::PLATFORM_SPOTIFY;
         $output->message = 'Visit this URL to authorize the application with Spotify';
+        $output->state = $state;
 
         return $output;
     }

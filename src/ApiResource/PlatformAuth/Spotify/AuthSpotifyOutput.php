@@ -12,8 +12,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/auth/spotify/authorize',
-            shortName: 'AuthSpotify',
+            uriTemplate: '/spotify/authorize',
+            shortName: 'Spotify',
             input: false,
             output: AuthSpotifyOutput::class,
             processor: AuthSpotifyProcessor::class
@@ -23,11 +23,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 class AuthSpotifyOutput
 {
     #[Assert\NotBlank]
-    public ?string $authorization_url = null;
+    public string $authorization_url;
 
     #[Assert\NotBlank]
     public string $platform;
 
     #[Assert\NotBlank]
     public string $message;
+
+    #[Assert\NotBlank]
+    public string $state;
 }

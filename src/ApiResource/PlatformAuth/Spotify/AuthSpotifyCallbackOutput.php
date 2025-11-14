@@ -12,8 +12,8 @@ use App\State\Spotify\AuthSpotifyCallbackProvider;
 #[ApiResource(
     operations: [
         new Get(
-            uriTemplate: '/auth/spotify/callback',
-            shortName: 'AuthSpotify',
+            uriTemplate: '/spotify/callback',
+            shortName: 'Spotify',
             output: AuthSpotifyCallbackOutput::class,
             provider: AuthSpotifyCallbackProvider::class
         ),
