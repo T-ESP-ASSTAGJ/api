@@ -24,7 +24,7 @@ services:
         class: Symfony\Contracts\HttpClient\HttpClientInterface
         factory: ['@http_client', 'withOptions']
         arguments:
-            - base_uri: '%env(SPOTIFY_API_URL)%'
+            - base_uri: 'https://api.spotify.com/v1/'
               headers:
                 'Accept': 'application/json'
                 'Content-Type': 'application/json'
@@ -45,8 +45,6 @@ services:
             $entityManager: '@doctrine.orm.entity_manager'
             $clientId: '%env(SPOTIFY_CLIENT_ID)%'
             $redirectUri: '%env(SPOTIFY_REDIRECT_URI)%'
-            $authUrl: '%env(SPOTIFY_AUTH_URL)%'
-            $tokenUrl: '%env(SPOTIFY_TOKEN_URL)%'
 
     App\Service\Spotify\SpotifyService:
         arguments:
@@ -56,4 +54,3 @@ services:
     App\State\Auth\AuthRequestProcessor:
         arguments:
             $environment: '%kernel.environment%'
-
