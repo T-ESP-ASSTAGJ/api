@@ -33,6 +33,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_PAT }}
 
+      - name: Create .env.local with secrets
+        run: |
+          [ -n "${{ secrets.APP_SECRET }}" ] && echo "APP_SECRET=${{ secrets.APP_SECRET }}" >> .env.local
+          [ -n "${{ secrets.DATABASE_URL }}" ] && echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env.local
+          [ -n "${{ secrets.MERCURE_JWT_SECRET }}" ] && echo "MERCURE_JWT_SECRET=${{ secrets.MERCURE_JWT_SECRET }}" >> .env.local
+          echo "MERCURE_URL=https://example.com/.well-known/mercure" >> .env.local
+          echo "MERCURE_PUBLIC_URL=https://example.com/.well-known/mercure" >> .env.local
+          echo "✅ .env.local created (with provided secrets)"
+
       - name: Determine target environment
         id: env
         run: |
