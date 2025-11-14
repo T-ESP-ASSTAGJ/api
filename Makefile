@@ -42,6 +42,8 @@ build_staging:   ## Build staging Docker image
 		--build-arg GIT_COMMIT="$(GIT_COMMIT)" \
 		--build-arg BUILD_DATE="$(BUILD_DATE)" \
 		--build-arg ENVIRONMENT="staging" \
+		--build-arg APP_SECRET="$$APP_SECRET" \
+        --build-arg CADDY_MERCURE_JWT_SECRET="$$CADDY_MERCURE_JWT_SECRET" \
 		--target frankenphp_staging \
 		--tag "$(ECR_REGISTRY)/$(PROJECT_NAME)/$(SERVICE_NAME):staging" \
 		--tag "$(ECR_REGISTRY)/$(PROJECT_NAME)/$(SERVICE_NAME):staging-$(VERSION)" \
@@ -67,6 +69,8 @@ build_production: ## Build production Docker image
 		--build-arg GIT_COMMIT="$(GIT_COMMIT)" \
 		--build-arg BUILD_DATE="$(BUILD_DATE)" \
 		--build-arg ENVIRONMENT="production" \
+		--build-arg APP_SECRET="$$APP_SECRET" \
+        --build-arg CADDY_MERCURE_JWT_SECRET="$$CADDY_MERCURE_JWT_SECRET" \
 		--target frankenphp_prod \
 		--tag "$(ECR_REGISTRY)/$(PROJECT_NAME)/$(SERVICE_NAME):latest" \
 		--tag "$(ECR_REGISTRY)/$(PROJECT_NAME)/$(SERVICE_NAME):$(VERSION)" \
