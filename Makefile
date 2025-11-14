@@ -35,8 +35,8 @@ build_staging:   ## Build staging Docker image
 	@echo "   Version: $(VERSION)"
 	@echo "   Commit: $(shell echo $(GIT_COMMIT) | cut -c1-8)"
 	@echo "   Build Date: $(BUILD_DATE)"
-	@if [ -z "$APP_SECRET" ]; then echo "❌ APP_SECRET environment variable is required"; exit 1; fi
-	@if [ -z "$CADDY_MERCURE_JWT_SECRET" ]; then echo "❌ CADDY_MERCURE_JWT_SECRET environment variable is required"; exit 1; fi
+	@if [ -z "$$APP_SECRET" ]; then echo "❌ APP_SECRET environment variable is required"; exit 1; fi
+	@if [ -z "$$CADDY_MERCURE_JWT_SECRET" ]; then echo "❌ CADDY_MERCURE_JWT_SECRET environment variable is required"; exit 1; fi
 	@docker build \
 		--build-arg VERSION="$(VERSION)" \
 		--build-arg GIT_COMMIT="$(GIT_COMMIT)" \
@@ -60,8 +60,8 @@ build_production: ## Build production Docker image
 	@echo "   Version: $(VERSION)"
 	@echo "   Commit: $(shell echo $(GIT_COMMIT) | cut -c1-8)"
 	@echo "   Build Date: $(BUILD_DATE)"
-	@if [ -z "$APP_SECRET" ]; then echo "❌ APP_SECRET environment variable is required"; exit 1; fi
-	@if [ -z "$CADDY_MERCURE_JWT_SECRET" ]; then echo "❌ CADDY_MERCURE_JWT_SECRET environment variable is required"; exit 1; fi
+	@if [ -z "$$APP_SECRET" ]; then echo "❌ APP_SECRET environment variable is required"; exit 1; fi
+	@if [ -z "$$CADDY_MERCURE_JWT_SECRET" ]; then echo "❌ CADDY_MERCURE_JWT_SECRET environment variable is required"; exit 1; fi
 	@docker build \
 		--build-arg VERSION="$(VERSION)" \
 		--build-arg GIT_COMMIT="$(GIT_COMMIT)" \
@@ -122,6 +122,11 @@ quality:         ## Run all quality tools
 quality: phpcs phpstan unit-test
 
 .PHONY: quality
+
+print-%:         ## Print Makefile variable (usage: make print-VERSION)
+	@echo $($*)
+
+.PHONY: print-%
 
 help:            ## Show this help message
 	@echo ''
