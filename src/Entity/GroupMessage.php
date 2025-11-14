@@ -31,11 +31,19 @@ use Symfony\Component\Validator\Constraints as Assert;
         new ApiPost(
             input: GroupMessageCreateInput::class,
             output: GroupMessageGetOutput::class,
-            processor: GroupMessageCreateProcessor::class
+            processor: GroupMessageCreateProcessor::class,
+            mercure: true
         ),
-        new Put(output: GroupMessageGetOutput::class),
-        new Delete(output: false),
-    ]
+        new Put(
+            output: GroupMessageGetOutput::class,
+            mercure: true
+        ),
+        new Delete(
+            output: false,
+            mercure: true
+        ),
+    ],
+    mercure: true
 )]
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
