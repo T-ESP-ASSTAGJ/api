@@ -61,7 +61,7 @@ jobs:
   security-scan:
     name: Trivy Security Scan
     needs: build-image
-    uses: T-ESP-ASSTAGJ/infra/.github/workflows/trivy-scan.yml@TEM-71
+    uses: T-ESP-ASSTAGJ/infra/.github/workflows/trivy-scan.yml@staging
     permissions:
       security-events: write
       contents: read
