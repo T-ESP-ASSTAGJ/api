@@ -23,6 +23,10 @@ localhost, :80, :443 {
     encode zstd br gzip
 
     vulcain
+    mercure {
+        publisher_jwt {env.MERCURE_JWT_SECRET}
+        subscriber_jwt {env.MERCURE_JWT_SECRET}
+    }
 
     php_server
 }
