@@ -9,7 +9,10 @@ use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\PlatformAuth\Spotify\AuthSpotifyCallbackOutput;
 use App\Entity\User;
 use App\Service\Spotify\SpotifyAuthService;
-use Symfony\Bundle\SecurityBundle\Security;
+use Doctrine\ORM\EntityManagerInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 /**
@@ -19,7 +22,9 @@ final readonly class AuthSpotifyCallbackProvider implements ProviderInterface
 {
     public function __construct(
         private SpotifyAuthService $spotifyAuthService,
-        private Security $security,
+        private JWTEncoderInterface $jwtEncoder,
+        private EntityManagerInterface $entityManager,
+        private RequestStack $requestStack,
     ) {
     }
 
@@ -31,13 +36,31 @@ final readonly class AuthSpotifyCallbackProvider implements ProviderInterface
     {
         $output = new AuthSpotifyCallbackOutput();
 
-        /** @var User|null $user */
-        $user = $this->security->getUser();
-        if (!$user) {
-            throw new UnauthorizedHttpException('Bearer', 'User not authenticated.');
+        $request = $this->requestStack->getMainRequest();
+        if (!$request) {
+            throw new \RuntimeException('Cannot access the main request.');
         }
 
-        $code = $uriVariables['state'];
+        $code = $request->query->get('code');
+        $stateToken = $request->query->get('state');
+
+        if (!$code) {
+            throw new BadRequestHttpException('Missing code parameter from Spotify.');
+        }
+        if (!$stateToken) {
+            throw new BadRequestHttpException('Missing state parameter.');
+        }
+
+        try {
+            $payload = $this->jwtEncoder->decode($stateToken);
+            $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $payload['email']]);
+        } catch (\Exception) {
+            throw new UnauthorizedHttpException('Bearer', 'Invalid state token.');
+        }
+
+        if (!$user) {
+            throw new UnauthorizedHttpException('Bearer', 'User not found.');
+        }
 
         try {
             $token = $this->spotifyAuthService->exchangeCodeForToken($code, $user);
