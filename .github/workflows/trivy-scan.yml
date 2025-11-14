@@ -3,40 +3,49 @@ name: CI/CD Pipeline - Test - test
 on:
   push:
     branches: [main, staging, TEM-71]
-    paths:
-      - 'Dockerfile'
-      - 'docker-compose.yml'
-      - 'composer.json'
-      - 'composer.lock'
   workflow_dispatch:
   pull_request:
     branches: [main, staging, TEM-71]
     paths:
       - 'Dockerfile'
-      - 'docker-compose.yml'
+      - 'compose.yml'
       - 'composer.json'
       - 'composer.lock'
 jobs:
-  build-image:
-    name: Build & Push Docker Image
+  build-staging:
+    name: Build & Push Staging Image
+    if: github.ref_name != 'main'
     uses: T-ESP-ASSTAGJ/infra/.github/workflows/docker-build.yml@TEM-71
     permissions:
       contents: read
       packages: write
     with:
-      image_name: ghcr.io/${{ github.repository_owner }}/jamly-api
-      build_target: frankenphp_staging
-      branch: ${{ github.ref_name }}
-      should_push: true
+      environment: staging
+      working_directory: .
     secrets:
       GHCR_PAT: ${{ secrets.GHCR_PAT }}
       APP_SECRET: ${{ secrets.APP_SECRET }}
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      MERCURE_JWT_SECRET: ${{ secrets.MERCURE_JWT_SECRET }}
+      CADDY_MERCURE_JWT_SECRET: ${{ secrets.MERCURE_JWT_SECRET }}
+
+  build-production:
+    name: Build & Push Production Image
+    if: github.ref_name == 'main'
+    uses: T-ESP-ASSTAGJ/infra/.github/workflows/docker-build.yml@TEM-71
+    permissions:
+      contents: read
+      packages: write
+    with:
+      environment: production
+      working_directory: .
+    secrets:
+      GHCR_PAT: ${{ secrets.GHCR_PAT }}
+      APP_SECRET: ${{ secrets.APP_SECRET }}
+      CADDY_MERCURE_JWT_SECRET: ${{ secrets.MERCURE_JWT_SECRET }}
 
   security-scan:
     name: Security Scan
-    needs: build-image
+    needs: [build-staging, build-production]
+    if: always() && (needs.build-staging.result == 'success' || needs.build-production.result == 'success')
     uses: T-ESP-ASSTAGJ/infra/.github/workflows/trivy-scan.yml@TEM-71
     permissions:
       security-events: write
