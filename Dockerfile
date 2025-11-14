@@ -72,8 +72,6 @@ FROM frankenphp_base AS frankenphp_staging
 ARG VERSION
 ARG GIT_COMMIT
 ARG BUILD_DATE
-ARG APP_SECRET
-ARG CADDY_MERCURE_JWT_SECRET
 
 ENV APP_ENV=staging
 
@@ -104,8 +102,6 @@ RUN rm -Rf frankenphp/
 
 RUN set -eux; \
     mkdir -p var/cache var/log; \
-    echo "APP_SECRET=${APP_SECRET}" > .env.local; \
-    echo "CADDY_MERCURE_JWT_SECRET=${CADDY_MERCURE_JWT_SECRET}" >> .env.local; \
     composer dump-autoload --classmap-authoritative; \
     composer dump-env staging; \
     composer run-script post-install-cmd; \
@@ -119,8 +115,6 @@ FROM frankenphp_base AS frankenphp_prod
 ARG VERSION
 ARG GIT_COMMIT
 ARG BUILD_DATE
-ARG APP_SECRET
-ARG CADDY_MERCURE_JWT_SECRET
 
 ENV APP_ENV=prod
 
@@ -147,8 +141,6 @@ RUN rm -Rf frankenphp/
 
 RUN set -eux; \
     mkdir -p var/cache var/log; \
-    echo "APP_SECRET=${APP_SECRET}" > .env.local; \
-    echo "CADDY_MERCURE_JWT_SECRET=${CADDY_MERCURE_JWT_SECRET}" >> .env.local; \
     composer dump-autoload --classmap-authoritative --no-dev; \
     composer dump-env prod; \
     composer run-script --no-dev post-install-cmd; \

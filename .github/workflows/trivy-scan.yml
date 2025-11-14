@@ -1,4 +1,4 @@
-name: CI/CD Pipeline - Test - test
+name: CI/CD Pipeline
 
 on:
   push:
@@ -8,44 +8,71 @@ on:
     branches: [main, staging, TEM-71]
     paths:
       - 'Dockerfile'
-      - 'compose.yml'
+      - 'docker-compose.yml'
       - 'composer.json'
       - 'composer.lock'
-jobs:
-  build-staging:
-    name: Build & Push Staging Image
-    if: github.ref_name != 'main'
-    uses: T-ESP-ASSTAGJ/infra/.github/workflows/docker-build.yml@TEM-71
-    permissions:
-      contents: read
-      packages: write
-    with:
-      environment: staging
-      working_directory: .
-    secrets:
-      GHCR_PAT: ${{ secrets.GHCR_PAT }}
-      APP_SECRET: ${{ secrets.APP_SECRET }}
-      CADDY_MERCURE_JWT_SECRET: ${{ secrets.MERCURE_JWT_SECRET }}
 
-  build-production:
-    name: Build & Push Production Image
-    if: github.ref_name == 'main'
-    uses: T-ESP-ASSTAGJ/infra/.github/workflows/docker-build.yml@TEM-71
+jobs:
+  build-and-push:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
-    with:
-      environment: production
-      working_directory: .
-    secrets:
-      GHCR_PAT: ${{ secrets.GHCR_PAT }}
-      APP_SECRET: ${{ secrets.APP_SECRET }}
-      CADDY_MERCURE_JWT_SECRET: ${{ secrets.MERCURE_JWT_SECRET }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Important pour git describe
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}
+
+      - name: Determine target environment
+        id: env
+        run: |
+          if [ "${{ github.ref_name }}" == "main" ]; then
+            echo "target=production" >> $GITHUB_OUTPUT
+            echo "make_command=push_production" >> $GITHUB_OUTPUT
+          else
+            echo "target=staging" >> $GITHUB_OUTPUT
+            echo "make_command=push_staging" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and Push via Makefile
+        env:
+          APP_SECRET: ${{ secrets.APP_SECRET }}
+          CADDY_MERCURE_JWT_SECRET: ${{ secrets.MERCURE_JWT_SECRET }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          echo "🚀 Building ${{ steps.env.outputs.target }} image..."
+          make ${{ steps.env.outputs.make_command }}
+
+      - name: Extract image info for next job
+        id: image
+        run: |
+          VERSION=$(git describe --tags --always 2>/dev/null || echo "v0.0.0")
+          
+          if [ "${{ steps.env.outputs.target }}" == "production" ]; then
+            echo "image_url=ghcr.io/t-esp-asstagj/api" >> $GITHUB_OUTPUT
+            echo "image_tag=${VERSION}" >> $GITHUB_OUTPUT
+          else
+            echo "image_url=ghcr.io/t-esp-asstagj/api" >> $GITHUB_OUTPUT
+            echo "image_tag=staging-${VERSION}" >> $GITHUB_OUTPUT
+          fi
+
+    outputs:
+      image_url: ${{ steps.image.outputs.image_url }}
+      image_tag: ${{ steps.image.outputs.image_tag }}
 
   security-scan:
     name: Security Scan
-    needs: [build-staging, build-production]
-    if: always() && (needs.build-staging.result == 'success' || needs.build-production.result == 'success')
+    needs: build-and-push
     uses: T-ESP-ASSTAGJ/infra/.github/workflows/trivy-scan.yml@TEM-71
     permissions:
       security-events: write
@@ -53,8 +80,8 @@ jobs:
       packages: read
       pull-requests: write
     with:
-      image_name: ${{ needs.build-image.outputs.image_url }}
-      image_tag: ${{ needs.build-image.outputs.image_tag }}
+      image_name: ${{ needs.build-and-push.outputs.image_url }}
+      image_tag: ${{ needs.build-and-push.outputs.image_tag }}
       custom_message: "Project: API | Branch: ${{ github.ref_name }}"
     secrets:
       DISCORD_WEBHOOK_URL: ${{ secrets.PR_EMERGENCY_WEBHOOK_URL }}

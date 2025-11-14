@@ -35,15 +35,13 @@ build_staging:   ## Build staging Docker image
 	@echo "   Version: $(VERSION)"
 	@echo "   Commit: $(shell echo $(GIT_COMMIT) | cut -c1-8)"
 	@echo "   Build Date: $(BUILD_DATE)"
-	@if [ -z "$$APP_SECRET" ]; then echo "❌ APP_SECRET environment variable is required"; exit 1; fi
-	@if [ -z "$$CADDY_MERCURE_JWT_SECRET" ]; then echo "❌ CADDY_MERCURE_JWT_SECRET environment variable is required"; exit 1; fi
+	@if [ -z "$APP_SECRET" ]; then echo "❌ APP_SECRET environment variable is required"; exit 1; fi
+	@if [ -z "$CADDY_MERCURE_JWT_SECRET" ]; then echo "❌ CADDY_MERCURE_JWT_SECRET environment variable is required"; exit 1; fi
 	@docker build \
 		--build-arg VERSION="$(VERSION)" \
 		--build-arg GIT_COMMIT="$(GIT_COMMIT)" \
 		--build-arg BUILD_DATE="$(BUILD_DATE)" \
 		--build-arg ENVIRONMENT="staging" \
-		--build-arg APP_SECRET="$$APP_SECRET" \
-        --build-arg CADDY_MERCURE_JWT_SECRET="$$CADDY_MERCURE_JWT_SECRET" \
 		--target frankenphp_staging \
 		--tag "$(ECR_REGISTRY)/$(PROJECT_NAME)/$(SERVICE_NAME):staging" \
 		--tag "$(ECR_REGISTRY)/$(PROJECT_NAME)/$(SERVICE_NAME):staging-$(VERSION)" \
@@ -62,15 +60,13 @@ build_production: ## Build production Docker image
 	@echo "   Version: $(VERSION)"
 	@echo "   Commit: $(shell echo $(GIT_COMMIT) | cut -c1-8)"
 	@echo "   Build Date: $(BUILD_DATE)"
-	@if [ -z "$$APP_SECRET" ]; then echo "❌ APP_SECRET environment variable is required"; exit 1; fi
-	@if [ -z "$$CADDY_MERCURE_JWT_SECRET" ]; then echo "❌ CADDY_MERCURE_JWT_SECRET environment variable is required"; exit 1; fi
+	@if [ -z "$APP_SECRET" ]; then echo "❌ APP_SECRET environment variable is required"; exit 1; fi
+	@if [ -z "$CADDY_MERCURE_JWT_SECRET" ]; then echo "❌ CADDY_MERCURE_JWT_SECRET environment variable is required"; exit 1; fi
 	@docker build \
 		--build-arg VERSION="$(VERSION)" \
 		--build-arg GIT_COMMIT="$(GIT_COMMIT)" \
 		--build-arg BUILD_DATE="$(BUILD_DATE)" \
 		--build-arg ENVIRONMENT="production" \
-		--build-arg APP_SECRET="$$APP_SECRET" \
-        --build-arg CADDY_MERCURE_JWT_SECRET="$$CADDY_MERCURE_JWT_SECRET" \
 		--target frankenphp_prod \
 		--tag "$(ECR_REGISTRY)/$(PROJECT_NAME)/$(SERVICE_NAME):latest" \
 		--tag "$(ECR_REGISTRY)/$(PROJECT_NAME)/$(SERVICE_NAME):$(VERSION)" \
@@ -126,11 +122,6 @@ quality:         ## Run all quality tools
 quality: phpcs phpstan unit-test
 
 .PHONY: quality
-
-print-%:         ## Print Makefile variable (usage: make print-VERSION)
-	@echo $($*)
-
-.PHONY: print-%
 
 help:            ## Show this help message
 	@echo ''
