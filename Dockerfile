@@ -100,7 +100,12 @@ RUN set -eux; \
 COPY --link . ./
 RUN rm -Rf frankenphp/
 
+
 RUN set -eux; \
+    echo "APP_ENV=staging" > .env; \
+    echo "APP_SECRET=\${APP_SECRET}" >> .env; \
+    echo "DATABASE_URL=\${DATABASE_URL}" >> .env; \
+    echo "MERCURE_JWT_SECRET=\${CADDY_MERCURE_JWT_SECRET}" >> .env; \
     mkdir -p var/cache var/log; \
     composer dump-autoload --classmap-authoritative; \
     composer dump-env staging; \
@@ -140,6 +145,10 @@ COPY --link . ./
 RUN rm -Rf frankenphp/
 
 RUN set -eux; \
+    echo "APP_ENV=prod" > .env; \
+    echo "APP_SECRET=\${APP_SECRET}" >> .env; \
+    echo "DATABASE_URL=\${DATABASE_URL}" >> .env; \
+    echo "MERCURE_JWT_SECRET=\${CADDY_MERCURE_JWT_SECRET}" >> .env; \
     mkdir -p var/cache var/log; \
     composer dump-autoload --classmap-authoritative --no-dev; \
     composer dump-env prod; \
