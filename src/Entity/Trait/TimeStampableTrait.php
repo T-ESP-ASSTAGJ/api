@@ -16,8 +16,8 @@ trait TimeStampableTrait
     #[Groups([
         'message:read',
         'message:detail',
-        'group_message:read',
-        'group_message:detail',
+        'conversation:read',
+        'conversation:detail',
         'user:read',
         'user:detail',
         'post:read',
@@ -29,7 +29,7 @@ trait TimeStampableTrait
     #[Gedmo\Timestampable(on: 'update')]
     #[Groups([
         'message:detail',
-        'group_message:detail',
+        'conversation:detail',
         'user:detail',
         'post:detail',
     ])]

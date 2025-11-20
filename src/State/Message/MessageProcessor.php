@@ -10,7 +10,6 @@ use ApiPlatform\Validator\Exception\ValidationException;
 use App\Entity\Message;
 use App\Entity\User;
 use App\Service\Message\MusicMetadataService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -21,7 +20,6 @@ final readonly class MessageProcessor implements ProcessorInterface
 {
     public function __construct(
         private ProcessorInterface $persistProcessor,
-        private EntityManagerInterface $em,
         private ValidatorInterface $validator,
         private Security $security,
         private MusicMetadataService $musicMetadataService,
@@ -41,7 +39,6 @@ final readonly class MessageProcessor implements ProcessorInterface
             return $data;
         }
 
-        // Set author for new messages
         if (null === $data->getId()) {
             $user = $this->security->getUser();
             if (!$user instanceof User) {
@@ -50,7 +47,6 @@ final readonly class MessageProcessor implements ProcessorInterface
             $data->setAuthor($user);
         }
 
-        // Handle music metadata if type is music and track is provided
         if (Message::TYPE_MUSIC === $data->getType() && $data->getTrack()) {
             $trackMetadata = $this->musicMetadataService->getTrackMetadata($data->getTrack());
             $data->setTrackMetadata($trackMetadata);
