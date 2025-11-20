@@ -63,6 +63,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
+        'message:read',
+        'message:detail',
+        'group_message:read',
+        'group_message:detail',
     ])]
     private ?int $id = null;
 
@@ -72,6 +76,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
         self::SERIALIZATION_GROUP_WRITE,
+        'message:read',
+        'message:detail',
+        'group_message:read',
+        'group_message:detail',
     ])]
     private ?string $username = null;
 
@@ -105,6 +113,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
         self::SERIALIZATION_GROUP_WRITE,
+        'message:read',
+        'message:detail',
+        'group_message:read',
+        'group_message:detail',
     ])]
     private ?string $profilePicture = null;
 

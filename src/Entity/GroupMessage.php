@@ -10,32 +10,33 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post as ApiPost;
 use ApiPlatform\Metadata\Put;
-use App\ApiResource\GroupMessage\GroupMessageCreateInput;
-use App\ApiResource\GroupMessage\GroupMessageGetOutput;
 use App\Entity\Interface\TimeStampableInterface;
-use App\State\GroupMessage\GroupMessageCreateProcessor;
 use App\State\GroupMessage\GroupMessageGetProvider;
+use App\State\GroupMessage\GroupMessageProcessor;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     shortName: 'GroupMessage',
     operations: [
         new Get(
-            output: GroupMessageGetOutput::class,
-            provider: GroupMessageGetProvider::class
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
+            provider: GroupMessageGetProvider::class,
         ),
         new GetCollection(
-            output: GroupMessageGetOutput::class
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true],
         ),
         new ApiPost(
-            input: GroupMessageCreateInput::class,
-            output: GroupMessageGetOutput::class,
-            processor: GroupMessageCreateProcessor::class,
+            denormalizationContext: ['groups' => [self::SERIALIZATION_GROUP_WRITE]],
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
+            processor: GroupMessageProcessor::class,
             mercure: true
         ),
         new Put(
-            output: GroupMessageGetOutput::class,
+            denormalizationContext: ['groups' => [self::SERIALIZATION_GROUP_WRITE]],
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
+            processor: GroupMessageProcessor::class,
             mercure: true
         ),
         new Delete(
@@ -52,26 +53,53 @@ class GroupMessage implements TimeStampableInterface
 {
     use Trait\TimeStampableTrait;
 
+    public const SERIALIZATION_GROUP_READ = 'group_message:read';
+    public const SERIALIZATION_GROUP_DETAIL = 'group_message:detail';
+    public const SERIALIZATION_GROUP_WRITE = 'group_message:write';
+
     public const TYPE_TEXT = 'text';
     public const TYPE_MUSIC = 'music';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id', type: 'integer')]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
     private ?int $id = null;
 
     #[ORM\Column(name: 'group_id', type: 'integer')]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+        self::SERIALIZATION_GROUP_WRITE,
+    ])]
     private int $groupId;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'author_id', referencedColumnName: 'id', nullable: false)]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
     private User $author;
 
     #[ORM\Column(name: 'type', type: 'string', length: 20)]
     #[Assert\Choice(choices: [self::TYPE_TEXT, self::TYPE_MUSIC], message: 'Choose a valid message type.')]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+        self::SERIALIZATION_GROUP_WRITE,
+    ])]
     private string $type = self::TYPE_TEXT;
 
     #[ORM\Column(name: 'content', type: 'text', nullable: true)]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+        self::SERIALIZATION_GROUP_WRITE,
+    ])]
     private ?string $content = null;
 
     /**
@@ -82,6 +110,9 @@ class GroupMessage implements TimeStampableInterface
      * }|null
      */
     #[ORM\Column(name: 'track', type: 'json', nullable: true)]
+    #[Groups([
+        self::SERIALIZATION_GROUP_WRITE,
+    ])]
     private ?array $track = null;
 
     /**
@@ -95,6 +126,10 @@ class GroupMessage implements TimeStampableInterface
      * }|null
      */
     #[ORM\Column(name: 'track_metadata', type: 'json', nullable: true)]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
     private ?array $trackMetadata = null;
 
     public function getId(): ?int

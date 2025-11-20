@@ -10,32 +10,33 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post as ApiPost;
 use ApiPlatform\Metadata\Put;
-use App\ApiResource\Message\MessageCreateInput;
-use App\ApiResource\Message\MessageGetOutput;
 use App\Entity\Interface\TimeStampableInterface;
-use App\State\Message\MessageCreateProcessor;
 use App\State\Message\MessageGetProvider;
+use App\State\Message\MessageProcessor;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     shortName: 'Message',
     operations: [
         new Get(
-            output: MessageGetOutput::class,
-            provider: MessageGetProvider::class
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
+            provider: MessageGetProvider::class,
         ),
         new GetCollection(
-            output: MessageGetOutput::class
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true],
         ),
         new ApiPost(
-            input: MessageCreateInput::class,
-            output: MessageGetOutput::class,
-            processor: MessageCreateProcessor::class,
+            denormalizationContext: ['groups' => [self::SERIALIZATION_GROUP_WRITE]],
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
+            processor: MessageProcessor::class,
             mercure: true
         ),
         new Put(
-            output: MessageGetOutput::class,
+            denormalizationContext: ['groups' => [self::SERIALIZATION_GROUP_WRITE]],
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
+            processor: MessageProcessor::class,
             mercure: true
         ),
         new Delete(
@@ -52,26 +53,53 @@ class Message implements TimeStampableInterface
 {
     use Trait\TimeStampableTrait;
 
+    public const SERIALIZATION_GROUP_READ = 'message:read';
+    public const SERIALIZATION_GROUP_DETAIL = 'message:detail';
+    public const SERIALIZATION_GROUP_WRITE = 'message:write';
+
     public const TYPE_TEXT = 'text';
     public const TYPE_MUSIC = 'music';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id', type: 'integer')]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
     private ?int $id = null;
 
     #[ORM\Column(name: 'conversation_id', type: 'integer')]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+        self::SERIALIZATION_GROUP_WRITE,
+    ])]
     private int $conversationId;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'author_id', referencedColumnName: 'id', nullable: false)]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
     private User $author;
 
     #[ORM\Column(name: 'type', type: 'string', length: 20)]
     #[Assert\Choice(choices: [self::TYPE_TEXT, self::TYPE_MUSIC], message: 'Choose a valid message type.')]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+        self::SERIALIZATION_GROUP_WRITE,
+    ])]
     private string $type = self::TYPE_TEXT;
 
     #[ORM\Column(name: 'content', type: 'text', nullable: true)]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+        self::SERIALIZATION_GROUP_WRITE,
+    ])]
     private ?string $content = null;
 
     // TODO: Change to Track Entity when implemented
@@ -83,9 +111,12 @@ class Message implements TimeStampableInterface
      * }|null
      */
     #[ORM\Column(name: 'track', type: 'json', nullable: true)]
+    #[Groups([
+        self::SERIALIZATION_GROUP_WRITE,
+    ])]
     private ?array $track = null;
 
-    // TODO: Remove when Track Entity when implemented
+    // TODO: Remove when Track Entity implemented
     /**
      * @var array{
      *     title: string,
@@ -97,6 +128,10 @@ class Message implements TimeStampableInterface
      * }|null
      */
     #[ORM\Column(name: 'track_metadata', type: 'json', nullable: true)]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
     private ?array $trackMetadata = null;
 
     public function getId(): ?int
