@@ -43,7 +43,6 @@ final readonly class AuthSpotifyProcessor implements ProcessorInterface
         $output->authorization_url = $authUrl;
         $output->platform = Token::PLATFORM_SPOTIFY;
         $output->message = 'Visit this URL to authorize the application with Spotify';
-        $output->state = $state;
 
         return $output;
     }

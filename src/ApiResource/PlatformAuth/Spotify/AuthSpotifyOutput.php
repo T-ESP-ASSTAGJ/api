@@ -30,7 +30,4 @@ class AuthSpotifyOutput
 
     #[Assert\NotBlank]
     public string $message;
-
-    #[Assert\NotBlank]
-    public string $state;
 }
