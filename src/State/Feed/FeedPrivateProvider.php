@@ -10,7 +10,6 @@ use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Post\PostGetOutput;
 use App\Entity\User;
 use App\Repository\PostRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
