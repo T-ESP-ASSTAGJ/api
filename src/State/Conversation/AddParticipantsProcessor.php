@@ -95,7 +95,7 @@ final readonly class AddParticipantsProcessor implements ProcessorInterface
                 continue; 
             }
 
-            // Check if user previously left and needs to be re-added
+            // Check if user previously left and needs to be re-added to the group
             $previousParticipant = null;
             foreach ($conversation->getParticipants() as $participant) {
                 if ($participant->getUser()->getId() === $user->getId() && !$participant->isActive()) {
