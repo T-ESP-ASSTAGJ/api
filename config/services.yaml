@@ -50,6 +50,20 @@ services:
         arguments:
             $spotifyApiClient: '@spotify.api.client'
 
+    # Conversation Processors
+    App\State\Conversation\ConversationCreateProcessor:
+        arguments:
+            $persistProcessor: '@api_platform.doctrine.orm.state.persist_processor'
+
+    # Message Providers/Processors
+    App\State\Message\MessageGetProvider:
+        arguments:
+            $itemProvider: '@api_platform.doctrine.orm.state.item_provider'
+
+    App\State\Message\MessageProcessor:
+        arguments:
+            $persistProcessor: '@api_platform.doctrine.orm.state.persist_processor'
+
     # Auth
     App\State\Auth\AuthRequestProcessor:
         arguments:
