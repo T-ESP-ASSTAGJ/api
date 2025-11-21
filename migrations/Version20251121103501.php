@@ -11,7 +11,7 @@ final class Version20251121103501 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return '';
+        return 'Add role-based conversation system, remove GroupMessage entity';
     }
 
     public function up(Schema $schema): void

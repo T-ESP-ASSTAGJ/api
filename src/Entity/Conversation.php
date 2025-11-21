@@ -9,6 +9,9 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post as ApiPost;
+use App\ApiResource\Conversation\AddParticipantsInput;
+use App\ApiResource\Conversation\ConversationCreateInput;
+use App\ApiResource\Conversation\RemoveParticipantsInput;
 use App\Entity\Interface\TimeStampableInterface;
 use App\Repository\ConversationRepository;
 use App\State\Conversation\AddParticipantsProcessor;
@@ -31,7 +34,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true],
         ),
         new ApiPost(
-            input: \App\ApiResource\Conversation\ConversationCreateInput::class,
+            input: ConversationCreateInput::class,
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
             processor: ConversationCreateProcessor::class,
         ),
@@ -42,13 +45,13 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new ApiPost(
             uriTemplate: '/conversations/{id}/participants',
-            input: \App\ApiResource\Conversation\AddParticipantsInput::class,
+            input: AddParticipantsInput::class,
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
             processor: AddParticipantsProcessor::class,
         ),
         new Delete(
             uriTemplate: '/conversations/{id}/participants',
-            input: \App\ApiResource\Conversation\RemoveParticipantsInput::class,
+            input: RemoveParticipantsInput::class,
             processor: RemoveParticipantsProcessor::class,
         ),
         new Delete(
