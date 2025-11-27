@@ -25,7 +25,6 @@ readonly class AuthRequestProcessor implements ProcessorInterface
     public function __construct(
         private EntityManagerInterface $entityManager,
         private MailerInterface $mailer,
-        private string $environment,
         private LoggerInterface $logger,
     ) {
     }
@@ -69,16 +68,13 @@ readonly class AuthRequestProcessor implements ProcessorInterface
             throw new BadRequestHttpException('Could not process the request.'.$e->getMessage());
         }
 
-        if ('dev' === $this->environment) {
-            $this->logger->debug(sprintf('Verification code for %s is: %s', $data->email, $rawCode));
-        } else {
-            $email = (new Email())
+        $this->logger->debug(sprintf('Verification code for %s is: %s', $data->email, $rawCode));
+        $email = (new Email())
                 ->to($data->email)
                 ->subject('Your verification code')
                 ->text('Your verification code is : '.$rawCode);
 
-            $this->mailer->send($email);
-        }
+        $this->mailer->send($email);
 
         $output = new AuthRequestOutput();
         $output->message = 'If a matching email was found, a code has been sent.';
