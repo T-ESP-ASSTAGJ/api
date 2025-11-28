@@ -23,8 +23,8 @@ trait TimeStampableTrait
         Conversation::SERIALIZATION_GROUP_DETAIL,
         User::SERIALIZATION_GROUP_READ,
         User::SERIALIZATION_GROUP_DETAIL,
-        'post:read',
-        'post:detail',
+        POST::SERIALIZATION_GROUP_READ,
+        POST::SERIALIZATION_GROUP_DETAIL,
     ])]
     private \DateTimeImmutable $createdAt;
 
@@ -34,7 +34,7 @@ trait TimeStampableTrait
         Message::SERIALIZATION_GROUP_DETAIL,
         Conversation::SERIALIZATION_GROUP_DETAIL,
         User::SERIALIZATION_GROUP_DETAIL,
-        'post:detail',
+        POST::SERIALIZATION_GROUP_DETAIL,
     ])]
     private \DateTimeImmutable $updatedAt;
 

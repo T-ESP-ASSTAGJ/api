@@ -13,6 +13,7 @@ use App\Entity\ConversationParticipant;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -23,6 +24,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 final readonly class ConversationCreateProcessor implements ProcessorInterface
 {
     public function __construct(
+        #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
         private ProcessorInterface $persistProcessor,
         private ValidatorInterface $validator,
         private Security $security,

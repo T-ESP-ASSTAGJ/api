@@ -10,6 +10,7 @@ use App\Entity\Message;
 use App\Entity\User;
 use App\Service\Message\MusicMetadataService;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * @implements ProviderInterface<Message>
@@ -17,6 +18,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 final readonly class MessageGetProvider implements ProviderInterface
 {
     public function __construct(
+        #[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')]
         private ProviderInterface $itemProvider,
         private Security $security,
         private MusicMetadataService $musicMetadataService,

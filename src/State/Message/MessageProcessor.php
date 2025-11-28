@@ -11,6 +11,7 @@ use App\Entity\Message;
 use App\Entity\User;
 use App\Service\Message\MusicMetadataService;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -19,6 +20,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 final readonly class MessageProcessor implements ProcessorInterface
 {
     public function __construct(
+        #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
         private ProcessorInterface $persistProcessor,
         private ValidatorInterface $validator,
         private Security $security,
