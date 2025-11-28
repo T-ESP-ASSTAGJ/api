@@ -59,7 +59,7 @@ final readonly class FeedPrivateProvider implements ProviderInterface
             $output->userId = $post->getUserId();
             $output->songPreviewUrl = $post->getSongPreviewUrl();
             $output->caption = $post->getCaption();
-            $output->track = $post->getTrack();
+            // $output->track = $post->getTrack();
             $output->photoUrl = $post->getPhotoUrl();
             $output->location = $post->getLocation();
             $output->createdAt = $post->getCreatedAt();
