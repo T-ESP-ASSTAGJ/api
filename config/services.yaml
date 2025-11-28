@@ -49,8 +49,3 @@ services:
     App\Service\Spotify\SpotifyService:
         arguments:
             $spotifyApiClient: '@spotify.api.client'
-
-    # Auth
-    App\State\Auth\AuthRequestProcessor:
-        arguments:
-            $environment: '%kernel.environment%'
