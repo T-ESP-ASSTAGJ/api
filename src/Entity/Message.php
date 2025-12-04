@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\Put;
 use App\Entity\Interface\TimeStampableInterface;
 use App\State\Message\MessageGetProvider;
 use App\State\Message\MessageProcessor;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -132,6 +133,20 @@ class Message implements TimeStampableInterface
         self::SERIALIZATION_GROUP_DETAIL,
     ])]
     private ?array $trackMetadata = null;
+
+    #[ORM\Column(name: 'is_read', type: 'boolean', options: ['default' => false])]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
+    private bool $isRead = false;
+
+    #[ORM\Column(name: 'read_at', type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
+    private ?\DateTimeImmutable $readAt = null;
 
     public function getId(): ?int
     {
@@ -256,5 +271,37 @@ class Message implements TimeStampableInterface
     public function isMusicMessage(): bool
     {
         return self::TYPE_MUSIC === $this->type;
+    }
+
+    public function isRead(): bool
+    {
+        return $this->isRead;
+    }
+
+    public function setIsRead(bool $isRead): static
+    {
+        $this->isRead = $isRead;
+
+        return $this;
+    }
+
+    public function getReadAt(): ?\DateTimeImmutable
+    {
+        return $this->readAt;
+    }
+
+    public function setReadAt(?\DateTimeImmutable $readAt): static
+    {
+        $this->readAt = $readAt;
+
+        return $this;
+    }
+
+    public function markAsRead(): static
+    {
+        $this->isRead = true;
+        $this->readAt = new \DateTimeImmutable();
+
+        return $this;
     }
 }

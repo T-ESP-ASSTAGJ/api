@@ -17,6 +17,7 @@ use App\Repository\ConversationRepository;
 use App\State\Conversation\AddParticipantsProcessor;
 use App\State\Conversation\ConversationCreateProcessor;
 use App\State\Conversation\ConversationLeaveProcessor;
+use App\State\Conversation\ConversationListProvider;
 use App\State\Conversation\RemoveParticipantsProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -32,6 +33,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new GetCollection(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true],
+            provider: ConversationListProvider::class,
         ),
         new ApiPost(
             input: ConversationCreateInput::class,
@@ -218,5 +220,89 @@ class Conversation implements TimeStampableInterface
         return $this->participants->filter(
             fn (ConversationParticipant $p) => null === $p->getLeftAt()
         );
+    }
+
+    #[Groups([self::SERIALIZATION_GROUP_READ])]
+    public function getType(): string
+    {
+        return $this->isGroup ? 'group' : 'private';
+    }
+
+    /** @return array{id: int, type: string, content: string|null, preview: string, author: array{id: int|null, username: string|null}, created_at: string}|null
+     */
+    #[Groups([self::SERIALIZATION_GROUP_READ])]
+    public function getLastMessage(): ?array
+    {
+        $lastMessage = $this->messages
+            ->filter(fn (Message $m) => null !== $m->getId())
+            ->last();
+
+        if (!$lastMessage instanceof Message) {
+            return null;
+        }
+
+        $preview = $this->getMessagePreview($lastMessage);
+
+        return [
+            'id' => $lastMessage->getId(),
+            'type' => $lastMessage->getType(),
+            'content' => $lastMessage->getContent(),
+            'preview' => $preview,
+            'author' => [
+                'id' => $lastMessage->getAuthor()->getId(),
+                'username' => $lastMessage->getAuthor()->getUsername(),
+            ],
+            'created_at' => $lastMessage->getCreatedAt()->format('c'),
+        ];
+    }
+
+    private function getMessagePreview(Message $message): string
+    {
+        if ($message->isMusicMessage()) {
+            return 'Vous a partagé une musique';
+        }
+
+        return $message->getContent() ?? '';
+    }
+
+    public function getUnreadCountForUser(?User $user): int
+    {
+        if (null === $user) {
+            return 0;
+        }
+
+        return $this->messages->filter(
+            fn (Message $m) => !$m->isRead() && $m->getAuthor()->getId() !== $user->getId()
+        )->count();
+    }
+
+    /**
+     * Transient property to store unread count for serialization.
+     */
+    private ?int $unreadCount = null;
+
+    #[Groups([self::SERIALIZATION_GROUP_READ])]
+    public function getUnreadCount(): int
+    {
+        return $this->unreadCount ?? 0;
+    }
+
+    public function setUnreadCount(int $unreadCount): static
+    {
+        $this->unreadCount = $unreadCount;
+
+        return $this;
+    }
+
+    /** @return array<int, array{id: int|null, username: string|null, profile_picture: string|null}>
+     */
+    #[Groups([self::SERIALIZATION_GROUP_READ])]
+    public function getParticipantsInfo(): array
+    {
+        return $this->getActiveParticipants()->map(fn (ConversationParticipant $participant) => [
+            'id' => $participant->getUser()?->getId(),
+            'username' => $participant->getUser()?->getUsername(),
+            'profile_picture' => $participant->getUser()?->getProfilePicture(),
+        ])->getValues();
     }
 }
