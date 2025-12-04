@@ -6,23 +6,17 @@ namespace App\ApiResource\Post;
 
 use ApiPlatform\Metadata\ApiProperty;
 use App\ApiResource\Track\TrackGetOutput;
+use App\Entity\User;
 
 class PostGetOutput
 {
     #[ApiProperty(example: 1)]
     public int $id;
 
-    #[ApiProperty(example: 42)]
-    public int $userId;
-
-    #[ApiProperty(example: 'https://p.scdn.co/mp3-preview/9af4e9e0b1e9e2e8e3e4e5e6e7e8e9f0')]
-    public ?string $songPreviewUrl;
+    public User $user;
 
     #[ApiProperty(example: 'Amazing sunset vibes! 🌅 #music #vibes')]
     public ?string $caption;
-
-    #[ApiProperty(example: 1)]
-    public int $trackId;
 
     public TrackGetOutput $track;
 
@@ -37,4 +31,19 @@ class PostGetOutput
 
     #[ApiProperty(example: '2025-08-25T15:45:00Z')]
     public ?\DateTimeInterface $updatedAt;
+
+    public static function fromEntity(\App\Entity\Post $post): self
+    {
+        $output = new self();
+        $output->id = $post->getId();
+        $output->user = $post->getUser();
+        $output->caption = $post->getCaption();
+        $output->track = TrackGetOutput::fromEntity($post->getTrack());
+        $output->photoUrl = $post->getPhotoUrl();
+        $output->location = $post->getLocation();
+        $output->createdAt = $post->getCreatedAt();
+        $output->updatedAt = $post->getUpdatedAt();
+
+        return $output;
+    }
 }

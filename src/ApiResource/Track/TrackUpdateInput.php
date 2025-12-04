@@ -22,7 +22,4 @@ class TrackUpdateInput
 
     #[Assert\Positive]
     public ?int $artistId = null;
-
-    #[Assert\Positive]
-    public ?int $length = null;
 }

@@ -11,27 +11,31 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post as ApiPost;
 use App\ApiResource\Track\TrackCreateInput;
-use App\ApiResource\Track\TrackGetOutput;
 use App\ApiResource\Track\TrackUpdateInput;
 use App\Entity\Interface\TimeStampableInterface;
 use App\State\Track\TrackCreateProcessor;
 use App\State\Track\TrackUpdateProcessor;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
     shortName: 'Track',
     operations: [
-        new Get(output: TrackGetOutput::class),
-        new GetCollection(output: TrackGetOutput::class),
+        new Get(
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true]
+        ),
+        new GetCollection(
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true]
+        ),
         new ApiPost(
             input: TrackCreateInput::class,
-            output: TrackGetOutput::class,
-            processor: TrackCreateProcessor::class
+            processor: TrackCreateProcessor::class,
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true]
         ),
         new Patch(
             input: TrackUpdateInput::class,
-            output: TrackGetOutput::class,
-            processor: TrackUpdateProcessor::class
+            processor: TrackUpdateProcessor::class,
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true]
         ),
         new Delete(output: false),
     ]
@@ -43,32 +47,59 @@ class Track implements TimeStampableInterface
 {
     use Trait\TimeStampableTrait;
 
+    public const SERIALIZATION_GROUP_READ = 'track:read';
+    public const SERIALIZATION_GROUP_DETAIL = 'track:detail';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id', type: 'integer')]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+        Post::SERIALIZATION_GROUP_READ,
+        Post::SERIALIZATION_GROUP_DETAIL,
+    ])]
     private ?int $id = null;
 
     #[ORM\Column(name: 'title', type: 'string', length: 255)]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+        Post::SERIALIZATION_GROUP_READ,
+        Post::SERIALIZATION_GROUP_DETAIL,
+    ])]
     private string $title;
 
     #[ORM\Column(name: 'cover_url', type: 'text', nullable: true)]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+        Post::SERIALIZATION_GROUP_READ,
+        Post::SERIALIZATION_GROUP_DETAIL,
+    ])]
     private ?string $coverUrl = null;
 
     /**
      * @var array<string, mixed>
      */
     #[ORM\Column(name: 'metadata', type: 'json')]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+        Post::SERIALIZATION_GROUP_READ,
+        Post::SERIALIZATION_GROUP_DETAIL,
+    ])]
     private array $metadata = [];
 
-    #[ORM\Column(name: 'artist_id', type: 'integer')]
-    private int $artistId;
-
     #[ORM\ManyToOne(targetEntity: Artist::class, inversedBy: 'tracks')]
-    #[ORM\JoinColumn(name: 'artist_id', referencedColumnName: 'id', nullable: true)]
-    private ?Artist $artist = null;
-
-    #[ORM\Column(name: 'length', type: 'integer')]
-    private int $length;
+    #[ORM\JoinColumn(name: 'artist_id', referencedColumnName: 'id', nullable: false)]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+        Post::SERIALIZATION_GROUP_READ,
+        Post::SERIALIZATION_GROUP_DETAIL,
+    ])]
+    private Artist $artist;
 
     public function getId(): ?int
     {
@@ -117,39 +148,14 @@ class Track implements TimeStampableInterface
         return $this;
     }
 
-    public function getArtistId(): int
-    {
-        return $this->artistId;
-    }
-
-    public function setArtistId(int $artistId): static
-    {
-        $this->artistId = $artistId;
-
-        return $this;
-    }
-
-    public function getArtist(): ?Artist
+    public function getArtist(): Artist
     {
         return $this->artist;
     }
 
-    public function setArtist(?Artist $artist): static
+    public function setArtist(Artist $artist): static
     {
         $this->artist = $artist;
-        $this->artistId = $artist?->getId();
-
-        return $this;
-    }
-
-    public function getLength(): int
-    {
-        return $this->length;
-    }
-
-    public function setLength(int $length): static
-    {
-        $this->length = $length;
 
         return $this;
     }

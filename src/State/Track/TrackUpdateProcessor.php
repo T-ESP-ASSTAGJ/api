@@ -7,24 +7,21 @@ namespace App\State\Track;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
-use App\ApiResource\Track\TrackGetOutput;
 use App\ApiResource\Track\TrackUpdateInput;
 use App\Entity\Artist;
 use App\Entity\Track;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * @implements ProcessorInterface<TrackUpdateInput, TrackGetOutput>
+ * @implements ProcessorInterface<TrackUpdateInput, Track>
  */
 final readonly class TrackUpdateProcessor implements ProcessorInterface
 {
     public function __construct(
         private EntityManagerInterface $em,
         private ValidatorInterface $validator,
-        private ObjectMapperInterface $objectMapper,
     ) {
     }
 
@@ -33,7 +30,7 @@ final readonly class TrackUpdateProcessor implements ProcessorInterface
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *
-     * @return TrackGetOutput
+     * @return Track
      */
     public function process(mixed $data, ?Operation $operation = null, array $uriVariables = [], array $context = []): mixed
     {
@@ -50,7 +47,6 @@ final readonly class TrackUpdateProcessor implements ProcessorInterface
                 throw new NotFoundHttpException('Track not found');
             }
 
-            // Mise à jour uniquement des champs fournis (PATCH)
             if (null !== $data->title) {
                 $track->setTitle($data->title);
             }
@@ -71,10 +67,6 @@ final readonly class TrackUpdateProcessor implements ProcessorInterface
                 $track->setArtist($artist);
             }
 
-            if (null !== $data->length) {
-                $track->setLength($data->length);
-            }
-
             $violations = $this->validator->validate($track);
             if ($violations->count() > 0) {
                 throw new ValidationException($violations);
@@ -82,7 +74,7 @@ final readonly class TrackUpdateProcessor implements ProcessorInterface
 
             $this->em->flush();
 
-            return $this->objectMapper->map($track, TrackGetOutput::class);
+            return $track;
         }
 
         return $data;
