@@ -30,8 +30,8 @@ class ConversationParticipant
     #[ORM\Column(name: 'role', type: 'string', length: 20, options: ['default' => self::ROLE_MEMBER])]
     private string $role = self::ROLE_MEMBER;
 
-    #[ORM\Column(name: 'joined_at', type: Types::DATETIME_IMMUTABLE)]
-    private \DateTimeImmutable $joinedAt;
+    #[ORM\Column(name: 'joined_at', type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $joinedAt = null;
 
     #[ORM\Column(name: 'left_at', type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $leftAt = null;
@@ -70,12 +70,12 @@ class ConversationParticipant
         return $this;
     }
 
-    public function getJoinedAt(): \DateTimeImmutable
+    public function getJoinedAt(): ?\DateTimeImmutable
     {
         return $this->joinedAt;
     }
 
-    public function setJoinedAt(\DateTimeImmutable $joinedAt): static
+    public function setJoinedAt(?\DateTimeImmutable $joinedAt): static
     {
         $this->joinedAt = $joinedAt;
 
