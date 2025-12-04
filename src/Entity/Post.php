@@ -11,22 +11,28 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post as ApiPost;
 use ApiPlatform\Metadata\Put;
 use App\ApiResource\Post\PostCreateInput;
-use App\ApiResource\Post\PostGetOutput;
 use App\Entity\Interface\TimeStampableInterface;
 use App\State\Post\PostCreateProcessor;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
     shortName: 'Post',
     operations: [
-        new Get(output: PostGetOutput::class),
-        new GetCollection(output: PostGetOutput::class),
+        new Get(
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL, User::SERIALIZATION_GROUP_READ, Artist::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true]
+        ),
+        new GetCollection(
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ, User::SERIALIZATION_GROUP_READ, Artist::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true]
+        ),
         new ApiPost(
             input: PostCreateInput::class,
-            output: PostGetOutput::class,
-            processor: PostCreateProcessor::class
+            processor: PostCreateProcessor::class,
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL, User::SERIALIZATION_GROUP_READ, Artist::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true]
         ),
-        new Put(output: PostGetOutput::class),
+        new Put(
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL, User::SERIALIZATION_GROUP_READ, Artist::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true]
+        ),
         new Delete(output: false),
     ]
 )]
@@ -43,28 +49,47 @@ class Post implements TimeStampableInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id', type: 'integer')]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'user_id', type: 'integer')]
-    private int $userId;
-
-    #[ORM\Column(name: 'song_preview_url', type: 'string', length: 500, nullable: true)]
-    private ?string $songPreviewUrl = null;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
+    private User $user;
 
     #[ORM\Column(name: 'caption', type: 'text', nullable: true)]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
     private ?string $caption = null;
-
-    #[ORM\Column(name: 'track_id', type: 'integer')]
-    private int $trackId;
 
     #[ORM\ManyToOne(targetEntity: Track::class)]
     #[ORM\JoinColumn(name: 'track_id', referencedColumnName: 'id', nullable: false)]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
     private Track $track;
 
     #[ORM\Column(name: 'photo_url', type: 'string', length: 500, nullable: true)]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
     private ?string $photoUrl = null;
 
     #[ORM\Column(name: 'location', type: 'string', length: 255, nullable: true)]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
     private ?string $location = null;
 
     public function getId(): ?int
@@ -72,26 +97,14 @@ class Post implements TimeStampableInterface
         return $this->id;
     }
 
-    public function getUserId(): int
+    public function getUser(): User
     {
-        return $this->userId;
+        return $this->user;
     }
 
-    public function setUserId(int $userId): static
+    public function setUser(User $user): static
     {
-        $this->userId = $userId;
-
-        return $this;
-    }
-
-    public function getSongPreviewUrl(): ?string
-    {
-        return $this->songPreviewUrl;
-    }
-
-    public function setSongPreviewUrl(?string $songPreviewUrl): static
-    {
-        $this->songPreviewUrl = $songPreviewUrl;
+        $this->user = $user;
 
         return $this;
     }
@@ -108,18 +121,6 @@ class Post implements TimeStampableInterface
         return $this;
     }
 
-    public function getTrackId(): int
-    {
-        return $this->trackId;
-    }
-
-    public function setTrackId(int $trackId): static
-    {
-        $this->trackId = $trackId;
-
-        return $this;
-    }
-
     public function getTrack(): Track
     {
         return $this->track;
@@ -128,7 +129,6 @@ class Post implements TimeStampableInterface
     public function setTrack(Track $track): static
     {
         $this->track = $track;
-        $this->trackId = $track->getId();
 
         return $this;
     }

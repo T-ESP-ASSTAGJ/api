@@ -8,23 +8,21 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
 use App\ApiResource\Post\PostCreateInput;
-use App\ApiResource\Post\PostGetOutput;
 use App\Entity\Post;
 use App\Entity\Track;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * @implements ProcessorInterface<PostCreateInput, PostGetOutput>
+ * @implements ProcessorInterface<PostCreateInput, Post>
  */
 final readonly class PostCreateProcessor implements ProcessorInterface
 {
     public function __construct(
         private EntityManagerInterface $em,
         private ValidatorInterface $validator,
-        private ObjectMapperInterface $objectMapper,
     ) {
     }
 
@@ -33,19 +31,23 @@ final readonly class PostCreateProcessor implements ProcessorInterface
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *
-     * @return PostGetOutput
+     * @return Post
      */
     public function process(mixed $data, ?Operation $operation = null, array $uriVariables = [], array $context = []): mixed
     {
         if ($data instanceof PostCreateInput) {
+            $user = $this->em->getRepository(User::class)->find($data->userId);
+            if (!$user) {
+                throw new NotFoundHttpException('User not found');
+            }
+
             $track = $this->em->getRepository(Track::class)->find($data->trackId);
             if (!$track) {
                 throw new NotFoundHttpException('Track not found');
             }
 
             $post = new Post();
-            $post->setUserId($data->userId);
-            $post->setSongPreviewUrl($data->songPreviewUrl);
+            $post->setUser($user);
             $post->setCaption($data->caption);
             $post->setTrack($track);
             $post->setPhotoUrl($data->photoUrl);
@@ -59,7 +61,7 @@ final readonly class PostCreateProcessor implements ProcessorInterface
             $this->em->persist($post);
             $this->em->flush();
 
-            return $this->objectMapper->map($post, PostGetOutput::class);
+            return $post;
         }
 
         return $data;

@@ -59,6 +59,10 @@ class Artist implements TimeStampableInterface
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
+        Track::SERIALIZATION_GROUP_READ,
+        Track::SERIALIZATION_GROUP_DETAIL,
+        Post::SERIALIZATION_GROUP_READ,
+        Post::SERIALIZATION_GROUP_DETAIL,
     ])]
     private ?int $id = null;
 
@@ -67,6 +71,10 @@ class Artist implements TimeStampableInterface
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
         self::SERIALIZATION_GROUP_WRITE,
+        Track::SERIALIZATION_GROUP_READ,
+        Track::SERIALIZATION_GROUP_DETAIL,
+        Post::SERIALIZATION_GROUP_READ,
+        Post::SERIALIZATION_GROUP_DETAIL,
     ])]
     private string $name;
 
