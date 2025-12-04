@@ -6,22 +6,22 @@ namespace App\State\Message;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\ApiResource\Message\MessageGetOutput;
 use App\Entity\Message;
 use App\Entity\User;
 use App\Service\Message\MusicMetadataService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
- * @implements ProviderInterface<MessageGetOutput>
+ * @implements ProviderInterface<Message>
  */
 final readonly class MessageGetProvider implements ProviderInterface
 {
     public function __construct(
+        #[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')]
+        private ProviderInterface $itemProvider,
         private Security $security,
         private MusicMetadataService $musicMetadataService,
-        private EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -29,22 +29,18 @@ final readonly class MessageGetProvider implements ProviderInterface
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): MessageGetOutput
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $messageId = $uriVariables['id'] ?? null;
-        if (!$messageId) {
-            throw new \InvalidArgumentException('Message ID is required');
-        }
+        $message = $this->itemProvider->provide($operation, $uriVariables, $context);
 
-        /** @var Message|null $message */
-        $message = $this->entityManager->getRepository(Message::class)->findOneBy(['id' => $messageId]);
-        if (!$message) {
-            throw new \RuntimeException('Message not found');
+        if (!$message instanceof Message) {
+            return $message;
         }
 
         /** @var User|null $user */
         $user = $this->security->getUser();
 
+        // Refresh track metadata based on current user
         if ($message->isMusicMessage() && $message->getTrack()) {
             $trackMetadata = $this->musicMetadataService->getTrackMetadata(
                 $message->getTrack(),
@@ -53,15 +49,6 @@ final readonly class MessageGetProvider implements ProviderInterface
             $message->setTrackMetadata($trackMetadata);
         }
 
-        return new MessageGetOutput(
-            type: $message->getType(),
-            content: $message->getContent(),
-            trackMetadata: $message->getTrackMetadata(),
-            author: [
-                'id' => $message->getAuthor()->getId(),
-                'username' => $message->getAuthor()->getUsername(),
-            ],
-            createdAt: $message->getCreatedAt()->format('c')
-        );
+        return $message;
     }
 }
