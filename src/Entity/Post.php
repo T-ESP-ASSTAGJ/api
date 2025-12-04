@@ -37,6 +37,9 @@ class Post implements TimeStampableInterface
 {
     use Trait\TimeStampableTrait;
 
+    public const SERIALIZATION_GROUP_READ = 'post:read';
+    public const SERIALIZATION_GROUP_DETAIL = 'post:detail';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id', type: 'integer')]

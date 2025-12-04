@@ -6,6 +6,7 @@ namespace App\Entity\Trait;
 
 use App\Entity\Conversation;
 use App\Entity\Message;
+use App\Entity\Post as POST;
 use App\Entity\User;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
