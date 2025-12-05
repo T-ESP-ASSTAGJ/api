@@ -38,13 +38,6 @@ final readonly class ConversationListProvider implements ProviderInterface
             throw new UnauthorizedHttpException('Bearer', 'Authentication required');
         }
 
-        $conversations = $this->conversationRepository->findByUser($user);
-
-        // Enrich each conversation with unread count for current user
-        foreach ($conversations as $conversation) {
-            $conversation->setUnreadCount($conversation->getUnreadCountForUser($user));
-        }
-
-        return $conversations;
+        return $this->conversationRepository->findByUserWithUnreadCount($user);
     }
 }
