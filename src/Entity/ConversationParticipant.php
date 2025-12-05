@@ -36,6 +36,9 @@ class ConversationParticipant
     #[ORM\Column(name: 'left_at', type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $leftAt = null;
 
+    #[ORM\Column(name: 'unread_count', type: 'integer', options: ['default' => 0])]
+    private int $unreadCount = 0;
+
     public function __construct()
     {
         $this->joinedAt = new \DateTimeImmutable();
@@ -133,6 +136,32 @@ class ConversationParticipant
     public function demoteToMember(): static
     {
         $this->role = self::ROLE_MEMBER;
+
+        return $this;
+    }
+
+    public function getUnreadCount(): int
+    {
+        return $this->unreadCount;
+    }
+
+    public function setUnreadCount(int $unreadCount): static
+    {
+        $this->unreadCount = $unreadCount;
+
+        return $this;
+    }
+
+    public function incrementUnreadCount(): static
+    {
+        ++$this->unreadCount;
+
+        return $this;
+    }
+
+    public function resetUnreadCount(): static
+    {
+        $this->unreadCount = 0;
 
         return $this;
     }
