@@ -6,6 +6,7 @@
 - `sudo docker exec -it jamly-api bin/console m:mig` (Crée un fichier de migration)
 - `sudo docker exec -it jamly-api bin/console d:m:m` (Jouer les migrations) "prev" pour rollback
 - `sudo docker exec -it jamly-api bin/console debug:router` (Affiche les routes)
+- `sudo docker exec -it jamly-api bin/console d:f:l` (Run les factories)
 
 ## SWAGGER
 

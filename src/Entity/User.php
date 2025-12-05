@@ -27,6 +27,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Get(
             uriTemplate: '/users/me',
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
             provider: UserMeProvider::class,
         ),
         new Get(

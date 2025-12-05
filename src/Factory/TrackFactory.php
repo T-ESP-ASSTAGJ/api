@@ -4,24 +4,22 @@ declare(strict_types=1);
 
 namespace App\Factory;
 
-use App\Entity\Post;
+use App\Entity\Track;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
- * @extends PersistentObjectFactory<Post>
+ * @extends PersistentObjectFactory<Track>
  */
-final class PostFactory extends PersistentObjectFactory
+final class TrackFactory extends PersistentObjectFactory
 {
     #[\Override]
     public static function class(): string
     {
-        return Post::class;
+        return Track::class;
     }
 
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
-     *
-     * @todo add your default values here
      *
      * @return array<string, mixed>
      */
@@ -29,11 +27,13 @@ final class PostFactory extends PersistentObjectFactory
     protected function defaults(): array
     {
         return [
-            'user' => UserFactory::random(),
-            'track' => TrackFactory::new(),
-            'location' => self::faker()->country(),
-            'photoUrl' => 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=1200&auto=format&fit=crop',
-            'caption' => self::faker()->realText(200),
+            'title' => self::faker()->sentence(3),
+            'coverUrl' => self::faker()->boolean(30) ? self::faker()->imageUrl(640, 480, 'music') : null,
+            'metadata' => [
+                'duration' => self::faker()->numberBetween(60, 600),
+                'genre' => self::faker()->randomElement(['Pop', 'Rock', 'Jazz', 'Classical']),
+            ],
+            'artist' => ArtistFactory::new(),
         ];
     }
 
@@ -44,7 +44,7 @@ final class PostFactory extends PersistentObjectFactory
     protected function initialize(): static
     {
         return $this
-            // ->afterInstantiate(function(Post $post): void {})
-        ;
+            // ->afterInstantiate(function(User $user): void {})
+            ;
     }
 }

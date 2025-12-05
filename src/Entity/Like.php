@@ -6,36 +6,35 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Post as ApiPost;
-use ApiPlatform\Metadata\Put;
-use App\ApiResource\Post\PostCreateInput;
-use App\ApiResource\Post\PostGetOutput;
+use ApiPlatform\Metadata\Post;
+use App\ApiResource\Like\LikeCreateInput;
 use App\Entity\Enum\LikeableTypeEnum;
 use App\Entity\Interface\TimeStampableInterface;
-use App\Entity\Type\LikeableTypeEnumType;
-use App\State\Post\PostCreateProcessor;
+use App\State\Like\LikeProcessor;
+use Symfony\Component\Validator\Constraints as Assert;
 
 use Doctrine\ORM\Mapping as ORM;
 
 #[ApiResource(
-    shortName: 'Post',
+    shortName: 'Like',
     operations: [
-        new Get(output: PostGetOutput::class),
-        new GetCollection(output: PostGetOutput::class),
-        new ApiPost(
-            input: PostCreateInput::class,
-            output: PostGetOutput::class,
-            processor: PostCreateProcessor::class
+        new Post(
+            uriTemplate: '/likes',
+            status: 204,
+            input: LikeCreateInput::class,
+            output: false,
+            processor: LikeProcessor::class
         ),
-        new Put(output: PostGetOutput::class),
-        new Delete(output: false),
+        new Delete(
+            uriTemplate: '/likes/{id}',
+            output: false,
+            processor: LikeProcessor::class,
+        ),
     ]
 )]
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
-#[ORM\Table(name: 'post')]
+#[ORM\Table(name: '`like`')]
 #[ORM\UniqueConstraint(name: 'like_unique', columns: ['user_id', 'entity_id', 'entity_class'])]
 class Like implements TimeStampableInterface
 {
@@ -45,30 +44,31 @@ class Like implements TimeStampableInterface
     public const SERIALIZATION_GROUP_DETAIL = 'like:detail';
     public const SERIALIZATION_GROUP_WRITE = 'like:write';
 
-    #[ORM\Column(name: 'user_id', type: 'integer')]
-    private int $userId;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-    #[ORM\Column(name: 'entity_id', type: 'integer')]
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
+    private User $user;
+
+    #[ORM\Column(name: 'entity_id', type: 'integer', nullable: false)]
     private int $entityId;
 
 
-    #[ORM\Id]
-    #[ORM\Column(
-        name: 'entity_class',
-        type: LikeableTypeEnumType::NAME,
-        length: 50,
-        enumType: LikeableTypeEnum::class
-    )]
-    private string $entityClass;
+    #[Assert\Choice(callback: [LikeableTypeEnum::class, 'values'])]
+    #[ORM\Column(name: 'entity_class', type: 'string', length: 50, nullable: false, enumType: LikeableTypeEnum::class)]
+    private LikeableTypeEnum $entityClass;
 
-    public function getUserId(): int
+    public function getUserId(): User
     {
-        return $this->userId;
+        return $this->user;
     }
 
-    public function setUserId(int $userId): static
+    public function setUser(User $user): static
     {
-        $this->userId = $userId;
+        $this->user = $user;
 
         return $this;
     }
@@ -85,12 +85,12 @@ class Like implements TimeStampableInterface
         return $this;
     }
 
-    public function getEntityClass(): string
+    public function getEntityClass(): LikeableTypeEnum
     {
         return $this->entityClass;
     }
 
-    public function setEntityClass(string $entityClass): static
+    public function setEntityClass(LikeableTypeEnum $entityClass): static
     {
         $this->entityClass = $entityClass;
 
