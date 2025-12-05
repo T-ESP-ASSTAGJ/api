@@ -45,6 +45,6 @@ final class TrackFactory extends PersistentObjectFactory
     {
         return $this
             // ->afterInstantiate(function(User $user): void {})
-            ;
+        ;
     }
 }

@@ -17,11 +17,12 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * @implements ProcessorInterface<LikeCreateInput,>
+ * @implements ProcessorInterface<LikeCreateInput, void>
  */
 final readonly class LikeProcessor implements ProcessorInterface
 {
     public function __construct(
+        /** @var ProcessorInterface<Like, void> */
         #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
         private ProcessorInterface $persistProcessor,
         private EntityManagerInterface $em,
@@ -46,7 +47,7 @@ final readonly class LikeProcessor implements ProcessorInterface
             throw new NotFoundHttpException(sprintf('Likeable Entity %s with id %d not found.', $entityClass, $data->entityId));
         }
 
-        /** @var $user User */
+        /** @var User $user */
         $user = $this->security->getUser();
 
         $like = new Like();

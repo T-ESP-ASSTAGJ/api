@@ -11,9 +11,8 @@ use App\ApiResource\Like\LikeCreateInput;
 use App\Entity\Enum\LikeableTypeEnum;
 use App\Entity\Interface\TimeStampableInterface;
 use App\State\Like\LikeProcessor;
-use Symfony\Component\Validator\Constraints as Assert;
-
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     shortName: 'Like',
@@ -55,7 +54,6 @@ class Like implements TimeStampableInterface
 
     #[ORM\Column(name: 'entity_id', type: 'integer', nullable: false)]
     private int $entityId;
-
 
     #[Assert\Choice(callback: [LikeableTypeEnum::class, 'values'])]
     #[ORM\Column(name: 'entity_class', type: 'string', length: 50, nullable: false, enumType: LikeableTypeEnum::class)]

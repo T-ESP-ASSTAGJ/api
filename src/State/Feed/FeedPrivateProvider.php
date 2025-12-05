@@ -30,9 +30,9 @@ final readonly class FeedPrivateProvider implements ProviderInterface
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *
-     * @return iterable<PostGetOutput>
+     * @return array<PostGetOutput>
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): iterable
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
         $currentUser = $this->security->getUser();
 
@@ -41,7 +41,7 @@ final readonly class FeedPrivateProvider implements ProviderInterface
         }
 
         $followedUsers = $currentUser->getFollowed();
-        $followedUserIds = array_filter(array_map(fn ($user) => $user['id'], $followedUsers));
+        $followedUserIds = array_filter(array_map(static fn ($user) => $user['id'], $followedUsers));
 
         if (empty($followedUserIds)) {
             return [];
@@ -52,22 +52,21 @@ final readonly class FeedPrivateProvider implements ProviderInterface
 
         $posts = $this->postRepository->getFollowedPaginatedPosts($followedUserIds, $offset, $limit);
 
-        $feedOutputs = [];
+        $feedOutput = [];
         foreach ($posts as $post) {
             $output = new PostGetOutput();
             $output->id = $post->getId();
-            $output->userId = $post->getUserId();
-            $output->songPreviewUrl = $post->getSongPreviewUrl();
+            $output->user = $post->getUser();
             $output->caption = $post->getCaption();
-            // $output->track = $post->getTrack();
+            $output->track = $post->getTrack();
             $output->photoUrl = $post->getPhotoUrl();
             $output->location = $post->getLocation();
             $output->createdAt = $post->getCreatedAt();
             $output->updatedAt = $post->getUpdatedAt();
 
-            $feedOutputs[] = $output;
+            $feedOutput[] = $output;
         }
 
-        return $feedOutputs;
+        return $feedOutput;
     }
 }
