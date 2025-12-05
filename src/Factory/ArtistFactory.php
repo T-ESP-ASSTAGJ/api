@@ -39,6 +39,6 @@ final class ArtistFactory extends PersistentObjectFactory
     {
         return $this
             // ->afterInstantiate(function(User $user): void {})
-            ;
+        ;
     }
 }

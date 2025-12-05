@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 final readonly class MessageGetProvider implements ProviderInterface
 {
     public function __construct(
+        /** @var ProviderInterface<Message> */
         #[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')]
         private ProviderInterface $itemProvider,
         private Security $security,

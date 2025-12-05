@@ -20,6 +20,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 final readonly class MessageProcessor implements ProcessorInterface
 {
     public function __construct(
+        /** @var ProcessorInterface<Message, Message> */
         #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
         private ProcessorInterface $persistProcessor,
         private ValidatorInterface $validator,

@@ -36,7 +36,7 @@ class ArtistSource implements TimeStampableInterface
     #[Groups([
         Artist::SERIALIZATION_GROUP_READ,
         Artist::SERIALIZATION_GROUP_DETAIL,
-        Artist::SERIALIZATION_GROUP_WRITE
+        Artist::SERIALIZATION_GROUP_WRITE,
     ])]
     private string $platform;
 

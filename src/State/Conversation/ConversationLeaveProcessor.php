@@ -64,14 +64,14 @@ final readonly class ConversationLeaveProcessor implements ProcessorInterface
 
             return new JsonResponse([
                 'message' => 'Vous avez quitté le groupe. Le groupe a été supprimé car vous étiez le dernier membre.',
-                'left_at' => $participant->getLeftAt()->format('c'),
+                'left_at' => $participant->getLeftAt()?->format('c'),
                 'conversation_deleted' => true,
             ]);
         }
 
         return new JsonResponse([
-            'message' => 'Vous avez quitté ' . ($data->isGroup() ? 'le groupe' : 'la conversation'),
-            'left_at' => $participant->getLeftAt()->format('c'),
+            'message' => 'Vous avez quitté '.($data->isGroup() ? 'le groupe' : 'la conversation'),
+            'left_at' => $participant->getLeftAt()?->format('c'),
         ]);
     }
 }

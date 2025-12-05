@@ -32,9 +32,9 @@ final readonly class AddParticipantsProcessor implements ProcessorInterface
     }
 
     /**
-     * @param AddParticipantsInput     $data
-     * @param array<string, mixed>     $uriVariables
-     * @param array<string, mixed>     $context
+     * @param AddParticipantsInput $data
+     * @param array<string, mixed> $uriVariables
+     * @param array<string, mixed> $context
      *
      * @return Conversation
      */
@@ -92,7 +92,7 @@ final readonly class AddParticipantsProcessor implements ProcessorInterface
             }
 
             if ($existingParticipant) {
-                continue; 
+                continue;
             }
 
             // Check if user previously left and needs to be re-added to the group

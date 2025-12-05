@@ -27,9 +27,9 @@ final readonly class FeedPublicProvider implements ProviderInterface
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *
-     * @return iterable<PostGetOutput>
+     * @return array<PostGetOutput>
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): iterable
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
         $offset = $this->pagination->getOffset($operation, $context);
         $limit = $this->pagination->getLimit($operation, $context);
@@ -40,10 +40,9 @@ final readonly class FeedPublicProvider implements ProviderInterface
         foreach ($posts as $post) {
             $output = new PostGetOutput();
             $output->id = $post->getId();
-            $output->userId = $post->getUserId();
-            $output->songPreviewUrl = $post->getSongPreviewUrl();
+            $output->user = $post->getUser();
             $output->caption = $post->getCaption();
-            // $output->track = $post->getTrack();
+            $output->track = $post->getTrack();
             $output->photoUrl = $post->getPhotoUrl();
             $output->location = $post->getLocation();
             $output->createdAt = $post->getCreatedAt();
