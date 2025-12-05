@@ -26,9 +26,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ, User::SERIALIZATION_GROUP_READ, Artist::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true]
         ),
         new ApiPost(
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL, User::SERIALIZATION_GROUP_READ, Artist::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true],
             input: PostCreateInput::class,
-            processor: PostCreateProcessor::class,
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL, User::SERIALIZATION_GROUP_READ, Artist::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true]
+            processor: PostCreateProcessor::class
         ),
         new Put(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL, User::SERIALIZATION_GROUP_READ, Artist::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true]

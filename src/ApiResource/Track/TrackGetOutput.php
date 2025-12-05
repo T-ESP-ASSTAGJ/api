@@ -27,11 +27,8 @@ class TrackGetOutput
         'album' => 'After Hours',
         'duration' => 200,
         'genre' => 'Pop',
-        'platform' => 'spotify',
-        'platformId' => '4uLU6hMCjMI75M1A2tKUQC',
-        'externalUrl' => 'https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC',
         'isrc' => 'USUG12000193',
-        'previewUrl' => 'https://p.scdn.co/mp3-preview/9af4e9e0b1e9e2e8e3e4e5e6e7e8e9f0',
+        'releaseDate' => '2020-03-20',
     ])]
     public array $metadata;
 
