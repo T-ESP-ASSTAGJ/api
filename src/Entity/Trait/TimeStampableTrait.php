@@ -6,7 +6,6 @@ namespace App\Entity\Trait;
 
 use App\Entity\Conversation;
 use App\Entity\Message;
-use App\Entity\Post as POST;
 use App\Entity\User;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -24,8 +23,6 @@ trait TimeStampableTrait
         Conversation::SERIALIZATION_GROUP_DETAIL,
         User::SERIALIZATION_GROUP_READ,
         User::SERIALIZATION_GROUP_DETAIL,
-        POST::SERIALIZATION_GROUP_READ,
-        POST::SERIALIZATION_GROUP_DETAIL,
     ])]
     private \DateTimeImmutable $createdAt;
 
@@ -35,7 +32,6 @@ trait TimeStampableTrait
         Message::SERIALIZATION_GROUP_DETAIL,
         Conversation::SERIALIZATION_GROUP_DETAIL,
         User::SERIALIZATION_GROUP_DETAIL,
-        POST::SERIALIZATION_GROUP_DETAIL,
     ])]
     private \DateTimeImmutable $updatedAt;
 

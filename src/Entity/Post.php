@@ -60,6 +60,7 @@ class Post implements TimeStampableInterface
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
+        User::SERIALIZATION_GROUP_READ,
     ])]
     private User $user;
 

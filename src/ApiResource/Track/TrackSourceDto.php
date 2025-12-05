@@ -34,6 +34,9 @@ class TrackSourceDto
     ])]
     public array $metadata = [];
 
+        /**
+        * @param array<string, mixed> $metadata
+        */
     public function __construct(string $platform = '', string $platformTrackId = '', array $metadata = [])
     {
         $this->platform = $platform;
