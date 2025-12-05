@@ -18,3 +18,5 @@ api_platform:
                 type: header
     defaults:
         pagination_items_per_page: 20
+        normalization_context:
+            skip_null_values: false

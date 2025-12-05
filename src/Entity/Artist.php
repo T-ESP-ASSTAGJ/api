@@ -30,14 +30,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true]
         ),
         new ApiPost(
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
             input: ArtistCreateInput::class,
-            processor: ArtistCreateProcessor::class,
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true]
+            processor: ArtistCreateProcessor::class
         ),
         new Patch(
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
             input: ArtistUpdateInput::class,
-            processor: ArtistUpdateProcessor::class,
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true]
+            processor: ArtistUpdateProcessor::class
         ),
         new Delete(output: false),
     ]
@@ -159,14 +159,8 @@ class Artist implements TimeStampableInterface
         return $this;
     }
 
-    public function removeTrack(Track $track): static
+    public function removeTrack(Track $track): bool
     {
-        if ($this->tracks->removeElement($track)) {
-            if ($track->getArtist() === $this) {
-                $track->setArtist(null);
-            }
-        }
-
-        return $this;
+        return $this->tracks->removeElement($track);
     }
 }
