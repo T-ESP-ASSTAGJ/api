@@ -9,11 +9,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class PostCreateInput
 {
-    #[Assert\NotBlank]
-    #[Assert\Positive]
-    #[ApiProperty(example: 1)]
-    public int $userId;
-
     #[Assert\Length(max: 1000)]
     #[ApiProperty(example: 'Amazing sunset vibes! 🌅 #music #vibes')]
     public ?string $caption = null;
