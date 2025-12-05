@@ -27,8 +27,6 @@ readonly class SpotifyAuthService
         private string $clientSecret,
         #[Autowire(env: 'SPOTIFY_REDIRECT_URI')]
         private string $redirectUri,
-        #[Autowire(env: 'SPOTIFY_TOKEN_URL')]
-        private string $tokenUrl,
     ) {
     }
 
@@ -100,7 +98,7 @@ readonly class SpotifyAuthService
         }
 
         try {
-            $response = $this->spotifyAuthClient->request('POST', $this->tokenUrl, [
+            $response = $this->spotifyAuthClient->request('POST', self::SPOTIFY_TOKEN_URL, [
                 'body' => [
                     'grant_type' => 'refresh_token',
                     'refresh_token' => $token->getRefreshToken(),

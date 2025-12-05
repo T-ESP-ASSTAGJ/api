@@ -20,7 +20,6 @@ use App\State\Feed\FeedPublicProvider;
                 summary: 'Get Public Feed',
                 description: 'Returns the latest posts from all users'
             ),
-            paginationEnabled: true,
             normalizationContext: ['groups' => [Post::SERIALIZATION_GROUP_READ]],
             provider: FeedPublicProvider::class
         ),
@@ -30,7 +29,6 @@ use App\State\Feed\FeedPublicProvider;
                 summary: 'Get Private Feed',
                 description: 'Returns posts from followed users only'
             ),
-            paginationEnabled: true,
             normalizationContext: ['groups' => [Post::SERIALIZATION_GROUP_READ]],
             provider: FeedPrivateProvider::class
         ),
