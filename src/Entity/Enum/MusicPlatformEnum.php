@@ -10,6 +10,9 @@ enum MusicPlatformEnum: string
     case Deezer = 'deezer';
     case SoundCloud = 'soundcloud';
 
+    /**
+     * @return string[]
+     */
     public static function values(): array
     {
         return array_column(self::cases(), 'value');

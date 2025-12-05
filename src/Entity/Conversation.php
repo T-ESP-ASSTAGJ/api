@@ -34,19 +34,19 @@ use Symfony\Component\Validator\Constraints as Assert;
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true],
         ),
         new ApiPost(
-            input: ConversationCreateInput::class,
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
+            input: ConversationCreateInput::class,
             processor: ConversationCreateProcessor::class,
         ),
         new ApiPost(
             uriTemplate: '/conversations/{id}/leave',
-            processor: ConversationLeaveProcessor::class,
             output: false,
+            processor: ConversationLeaveProcessor::class,
         ),
         new ApiPost(
             uriTemplate: '/conversations/{id}/participants',
-            input: AddParticipantsInput::class,
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
+            input: AddParticipantsInput::class,
             processor: AddParticipantsProcessor::class,
         ),
         new Delete(
@@ -195,11 +195,11 @@ class Conversation implements TimeStampableInterface
     public function getParticipantsList(): array
     {
         return $this->participants->map(fn (ConversationParticipant $participant) => [
-            'user_id' => $participant->getUser()?->getId(),
-            'username' => $participant->getUser()?->getUsername(),
-            'profile_picture' => $participant->getUser()?->getProfilePicture(),
+            'user_id' => $participant->getUser()->getId(),
+            'username' => $participant->getUser()->getUsername(),
+            'profile_picture' => $participant->getUser()->getProfilePicture(),
             'role' => $participant->getRole(),
-            'joined_at' => $participant->getJoinedAt()->format('c'),
+            'joined_at' => $participant->getJoinedAt()?->format('c'),
             'left_at' => $participant->getLeftAt()?->format('c'),
         ])->toArray();
     }

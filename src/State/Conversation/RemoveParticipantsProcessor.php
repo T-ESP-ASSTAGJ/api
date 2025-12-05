@@ -30,9 +30,9 @@ final readonly class RemoveParticipantsProcessor implements ProcessorInterface
     }
 
     /**
-     * @param RemoveParticipantsInput  $data
-     * @param array<string, mixed>     $uriVariables
-     * @param array<string, mixed>     $context
+     * @param RemoveParticipantsInput $data
+     * @param array<string, mixed>    $uriVariables
+     * @param array<string, mixed>    $context
      *
      * @return Conversation|JsonResponse
      */
@@ -90,7 +90,7 @@ final readonly class RemoveParticipantsProcessor implements ProcessorInterface
             }
 
             if (!$participantToRemove) {
-                continue; 
+                continue;
             }
 
             $participantToRemove->leave();

@@ -28,16 +28,16 @@ use Symfony\Component\Validator\Constraints as Assert;
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true],
         ),
         new ApiPost(
-            denormalizationContext: ['groups' => [self::SERIALIZATION_GROUP_WRITE]],
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
-            processor: MessageProcessor::class,
-            mercure: true
+            denormalizationContext: ['groups' => [self::SERIALIZATION_GROUP_WRITE]],
+            mercure: true,
+            processor: MessageProcessor::class
         ),
         new Put(
-            denormalizationContext: ['groups' => [self::SERIALIZATION_GROUP_WRITE]],
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
-            processor: MessageProcessor::class,
-            mercure: true
+            denormalizationContext: ['groups' => [self::SERIALIZATION_GROUP_WRITE]],
+            mercure: true,
+            processor: MessageProcessor::class
         ),
         new Delete(
             output: false,
@@ -154,9 +154,9 @@ class Message implements TimeStampableInterface
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
     ])]
-    public function getConversationId(): ?int
+    public function getConversationId(): int
     {
-        return $this->conversation?->getId();
+        return $this->conversation->getId();
     }
 
     public function getAuthor(): User

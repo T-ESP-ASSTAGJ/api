@@ -19,11 +19,12 @@ use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * @implements ProcessorInterface<ConversationCreateInput|Conversation, Conversation>
+ * @implements ProcessorInterface<ConversationCreateInput, Conversation>
  */
 final readonly class ConversationCreateProcessor implements ProcessorInterface
 {
     public function __construct(
+        /** @var ProcessorInterface<Conversation, Conversation> */
         #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
         private ProcessorInterface $persistProcessor,
         private ValidatorInterface $validator,
@@ -33,18 +34,12 @@ final readonly class ConversationCreateProcessor implements ProcessorInterface
     }
 
     /**
-     * @param ConversationCreateInput|Conversation $data
-     * @param array<string, mixed>                 $uriVariables
-     * @param array<string, mixed>                 $context
-     *
-     * @return Conversation
+     * @param ConversationCreateInput $data
+     * @param array<string, mixed>    $uriVariables
+     * @param array<string, mixed>    $context
      */
-    public function process(mixed $data, ?Operation $operation = null, array $uriVariables = [], array $context = []): mixed
+    public function process($data, ?Operation $operation = null, array $uriVariables = [], array $context = []): Conversation
     {
-        if (!$data instanceof ConversationCreateInput) {
-            return $data;
-        }
-
         $conversation = new Conversation();
         $conversation->setIsGroup($data->isGroup);
         $conversation->setGroupName($data->groupName);
