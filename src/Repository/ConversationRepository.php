@@ -35,4 +35,33 @@ class ConversationRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Find conversations with unread count for a specific user.
+     *
+     * @return array<Conversation>
+     */
+    public function findByUserWithUnreadCount(User $user): array
+    {
+        $conversations = $this->createQueryBuilder('c')
+            ->innerJoin('c.participants', 'p')
+            ->where('p.user = :user')
+            ->andWhere('p.leftAt IS NULL')
+            ->setParameter('user', $user)
+            ->orderBy('c.updatedAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+
+        // Set unread count from the participant
+        foreach ($conversations as $conversation) {
+            foreach ($conversation->getParticipants() as $participant) {
+                if ($participant->getUser()->getId() === $user->getId() && null === $participant->getLeftAt()) {
+                    $conversation->setUnreadCount($participant->getUnreadCount());
+                    break;
+                }
+            }
+        }
+
+        return $conversations;
+    }
 }

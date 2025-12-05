@@ -18,6 +18,7 @@ use App\State\Conversation\AddParticipantsProcessor;
 use App\State\Conversation\ConversationCreateProcessor;
 use App\State\Conversation\ConversationLeaveProcessor;
 use App\State\Conversation\ConversationListProvider;
+use App\State\Conversation\ConversationMarkAsReadProcessor;
 use App\State\Conversation\RemoveParticipantsProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -43,6 +44,11 @@ use Symfony\Component\Validator\Constraints as Assert;
         new ApiPost(
             uriTemplate: '/conversations/{id}/leave',
             processor: ConversationLeaveProcessor::class,
+            output: false,
+        ),
+        new ApiPost(
+            uriTemplate: '/conversations/{id}/read',
+            processor: ConversationMarkAsReadProcessor::class,
             output: false,
         ),
         new ApiPost(
@@ -265,20 +271,6 @@ class Conversation implements TimeStampableInterface
         return $message->getContent() ?? '';
     }
 
-    public function getUnreadCountForUser(?User $user): int
-    {
-        if (null === $user) {
-            return 0;
-        }
-
-        return $this->messages->filter(
-            fn (Message $m) => !$m->isRead() && $m->getAuthor()->getId() !== $user->getId()
-        )->count();
-    }
-
-    /**
-     * Transient property to store unread count for serialization.
-     */
     private ?int $unreadCount = null;
 
     #[Groups([self::SERIALIZATION_GROUP_READ])]
