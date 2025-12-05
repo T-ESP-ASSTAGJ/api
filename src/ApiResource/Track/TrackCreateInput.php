@@ -26,12 +26,8 @@ class TrackCreateInput
         'album' => 'After Hours',
         'duration' => 200,
         'genre' => 'Pop',
-        'platform' => 'spotify',
-        'platformId' => '4uLU6hMCjMI75M1A2tKUQC',
-        'externalUrl' => 'https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC',
         'isrc' => 'USUG12000193',
-        'previewUrl' => 'https://p.scdn.co/mp3-preview/9af4e9e0b1e9e2e8e3e4e5e6e7e8e9f0',
-        'releaseDate' => '01/11/2000'
+        'releaseDate' => '2020-03-20',
     ])]
     public array $metadata = [];
 
@@ -39,4 +35,23 @@ class TrackCreateInput
     #[Assert\Positive]
     #[ApiProperty(example: 1)]
     public int $artistId;
+
+    /**
+     * @var TrackSourceDto[]
+     */
+    #[Assert\Type('array')]
+    #[Assert\Valid]
+    #[ApiProperty(example: [
+        [
+            'platform' => 'spotify',
+            'platformTrackId' => '4uLU6hMCjMI75M1A2tKUQC',
+            'metadata' => [
+                'popularity' => 85,
+                'rank' => 1,
+                'explicit' => false,
+                'preview_url' => 'https://p.scdn.co/mp3-preview/xxx',
+            ],
+        ],
+    ])]
+    public array $trackSources = [];
 }

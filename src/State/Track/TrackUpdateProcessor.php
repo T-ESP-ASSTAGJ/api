@@ -10,6 +10,7 @@ use ApiPlatform\Validator\Exception\ValidationException;
 use App\ApiResource\Track\TrackUpdateInput;
 use App\Entity\Artist;
 use App\Entity\Track;
+use App\Entity\TrackSource;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -65,6 +66,23 @@ final readonly class TrackUpdateProcessor implements ProcessorInterface
                     throw new NotFoundHttpException('Artist not found');
                 }
                 $track->setArtist($artist);
+            }
+
+            // Mise à jour des TrackSource si fournis
+            if (null !== $data->trackSources) {
+                // Supprimer les anciennes sources
+                foreach ($track->getTrackSources() as $oldSource) {
+                    $track->removeTrackSource($oldSource);
+                }
+
+                // Ajouter les nouvelles sources
+                foreach ($data->trackSources as $sourceDto) {
+                    $trackSource = new TrackSource();
+                    $trackSource->setPlatform($sourceDto->platform);
+                    $trackSource->setPlatformTrackId($sourceDto->platformTrackId);
+                    $trackSource->setMetadata($sourceDto->metadata);
+                    $track->addTrackSource($trackSource);
+                }
             }
 
             $violations = $this->validator->validate($track);

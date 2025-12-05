@@ -15,6 +15,8 @@ use App\ApiResource\Track\TrackUpdateInput;
 use App\Entity\Interface\TimeStampableInterface;
 use App\State\Track\TrackCreateProcessor;
 use App\State\Track\TrackUpdateProcessor;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -28,14 +30,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true]
         ),
         new ApiPost(
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
             input: TrackCreateInput::class,
-            processor: TrackCreateProcessor::class,
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true]
+            processor: TrackCreateProcessor::class
         ),
         new Patch(
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
             input: TrackUpdateInput::class,
-            processor: TrackUpdateProcessor::class,
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true]
+            processor: TrackUpdateProcessor::class
         ),
         new Delete(output: false),
     ]
@@ -101,6 +103,20 @@ class Track implements TimeStampableInterface
     ])]
     private Artist $artist;
 
+    /**
+     * @var Collection<int, TrackSource>
+     */
+    #[ORM\OneToMany(targetEntity: TrackSource::class, mappedBy: 'track', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[Groups([
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
+    private Collection $trackSources;
+
+    public function __construct()
+    {
+        $this->trackSources = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -156,6 +172,31 @@ class Track implements TimeStampableInterface
     public function setArtist(Artist $artist): static
     {
         $this->artist = $artist;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, TrackSource>
+     */
+    public function getTrackSources(): Collection
+    {
+        return $this->trackSources;
+    }
+
+    public function addTrackSource(TrackSource $trackSource): static
+    {
+        if (!$this->trackSources->contains($trackSource)) {
+            $this->trackSources->add($trackSource);
+            $trackSource->setTrack($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTrackSource(TrackSource $trackSource): static
+    {
+        $this->trackSources->removeElement($trackSource);
 
         return $this;
     }
