@@ -12,6 +12,7 @@ use App\Entity\Enum\LikeableTypeEnum;
 use App\Entity\Interface\TimeStampableInterface;
 use App\State\Like\LikeProcessor;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
@@ -48,18 +49,21 @@ class Like implements TimeStampableInterface
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
+    #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
     private User $user;
 
+    #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
     #[ORM\Column(name: 'entity_id', type: 'integer', nullable: false)]
     private int $entityId;
 
+    #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
     #[Assert\Choice(callback: [LikeableTypeEnum::class, 'values'])]
     #[ORM\Column(name: 'entity_class', type: 'string', length: 50, nullable: false, enumType: LikeableTypeEnum::class)]
     private LikeableTypeEnum $entityClass;
 
-    public function getUserId(): User
+    public function getUser(): User
     {
         return $this->user;
     }
