@@ -12,6 +12,9 @@ use ApiPlatform\Metadata\Put;
 use App\ApiResource\User\UserPutInput;
 use App\Entity\Interface\TimeStampableInterface;
 use App\Repository\UserRepository;
+use App\State\User\UserFollowersProvider;
+use App\State\User\UserFollowingProvider;
+use App\State\User\UserLikesProvider;
 use App\State\User\UserMeProvider;
 use App\State\User\UserPutProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -20,6 +23,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
@@ -29,6 +33,19 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: '/users/me',
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
             provider: UserMeProvider::class,
+        ),
+        new GetCollection(
+            uriTemplate: '/users/{id}/followers',
+            provider: UserFollowersProvider::class,
+        ),
+        new GetCollection(
+            uriTemplate: '/users/{id}/following',
+            provider: UserFollowingProvider::class,
+        ),
+        new GetCollection(
+            uriTemplate: '/users/{id}/likes',
+            normalizationContext: ['groups' => [Like::SERIALIZATION_GROUP_DETAIL]],
+            provider: UserLikesProvider::class,
         ),
         new Get(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
@@ -64,6 +81,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
+        Follow::SERIALIZATION_GROUP_DETAIL,
+        Like::SERIALIZATION_GROUP_DETAIL,
         Message::SERIALIZATION_GROUP_READ,
         Message::SERIALIZATION_GROUP_DETAIL,
         Post::SERIALIZATION_GROUP_READ,
@@ -77,6 +96,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
         self::SERIALIZATION_GROUP_WRITE,
+        Follow::SERIALIZATION_GROUP_DETAIL,
+        Like::SERIALIZATION_GROUP_DETAIL,
         Message::SERIALIZATION_GROUP_READ,
         Message::SERIALIZATION_GROUP_DETAIL,
         Post::SERIALIZATION_GROUP_READ,
@@ -114,6 +135,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
         self::SERIALIZATION_GROUP_WRITE,
+        Follow::SERIALIZATION_GROUP_DETAIL,
+        Like::SERIALIZATION_GROUP_DETAIL,
         Message::SERIALIZATION_GROUP_READ,
         Message::SERIALIZATION_GROUP_DETAIL,
         Post::SERIALIZATION_GROUP_READ,
@@ -138,11 +161,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     #[ORM\Column(name: 'needs_profile', type: 'boolean', options: ['default' => true])]
     private bool $needsProfile = true;
 
-    /** @var Collection<int, Follow> */
+    // List of users THIS USER follows
+    /** @var Collection<Follow> */
+    #[Ignore]
     #[ORM\OneToMany(targetEntity: Follow::class, mappedBy: 'follower')]
     private Collection $following;
 
-    /** @var Collection<int, Follow> */
+    // List of users WHO FOLLOW this user
+    /** @var Collection<Follow> */
+    #[Ignore]
     #[ORM\OneToMany(targetEntity: Follow::class, mappedBy: 'followedUser')]
     private Collection $followers;
 
@@ -284,23 +311,37 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
         return $this;
     }
 
+    #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
+    public function getFollowingCount(): int
+    {
+        return $this->following->count();
+    }
+
+    #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
+    public function getFollowersCount(): int
+    {
+        return $this->followers->count();
+    }
+
     /** @return array<int, array{id: int|null, username: string|null}> */
     #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
-    public function getFollowed(): array
+    public function getFollowing(): array
     {
         return $this->following->map(fn (Follow $follow) => [
             'id' => $follow->getFollowedUser()?->getId(),
             'username' => $follow->getFollowedUser()?->getUsername(),
+            'profilePicture' => $follow->getFollowedUser()?->getProfilePicture(),
         ])->toArray();
     }
 
     /** @return array<int, array{id: int|null, username: string|null}> */
     #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
-    public function getFollower(): array
+    public function getFollowers(): array
     {
         return $this->followers->map(fn (Follow $follow) => [
             'id' => $follow->getFollower()?->getId(),
             'username' => $follow->getFollower()?->getUsername(),
+            'profilePicture' => $follow->getFollower()?->getProfilePicture(),
         ])->toArray();
     }
 
