@@ -68,6 +68,8 @@ final readonly class AuthSpotifyCallbackProvider implements ProviderInterface
             $output->success = true;
             $output->expires_at = $token->getExpiresAt()->format('c');
             $output->message = 'Spotify authorization completed successfully';
+            $output->token = $token->getAccessToken();
+            $output->refresh_token = $token->getRefreshToken();
         } catch (\Exception $e) {
             $output->success = false;
             $output->error = 'Failed to complete Spotify authorization';

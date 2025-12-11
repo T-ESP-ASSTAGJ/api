@@ -34,6 +34,7 @@ final class PostFactory extends PersistentObjectFactory
             'location' => self::faker()->country(),
             'photoUrl' => 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=1200&auto=format&fit=crop',
             'caption' => self::faker()->realText(200),
+            'comment_count' => 0,
         ];
     }
 
