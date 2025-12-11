@@ -28,7 +28,7 @@ final class TrackFactory extends PersistentObjectFactory
     {
         return [
             'title' => self::faker()->sentence(3),
-            'coverUrl' => self::faker()->boolean(30) ? self::faker()->imageUrl(640, 480, 'music') : null,
+            'coverUrl' => 'https://www.placeholderimage.eu/api/nature/id/1/260/260',
             'metadata' => [
                 'duration' => self::faker()->numberBetween(60, 600),
                 'genre' => self::faker()->randomElement(['Pop', 'Rock', 'Jazz', 'Classical']),
