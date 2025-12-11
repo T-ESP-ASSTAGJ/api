@@ -27,8 +27,8 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new Delete(
             uriTemplate: '/likes/{id}',
+            security: "object.getUser() == user",
             output: false,
-            processor: LikeProcessor::class,
         ),
     ]
 )]
@@ -41,27 +41,33 @@ class Like implements TimeStampableInterface
     use Trait\TimeStampableTrait;
 
     public const SERIALIZATION_GROUP_READ = 'like:read';
-    public const SERIALIZATION_GROUP_DETAIL = 'like:detail';
-    public const SERIALIZATION_GROUP_WRITE = 'like:write';
 
+    #[Groups([self::SERIALIZATION_GROUP_READ])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
+    #[Groups([self::SERIALIZATION_GROUP_READ])]
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
     private User $user;
 
-    #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
     #[ORM\Column(name: 'entity_id', type: 'integer', nullable: false)]
     private int $entityId;
 
-    #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
+    #[Groups([self::SERIALIZATION_GROUP_READ])]
     #[Assert\Choice(callback: [LikeableTypeEnum::class, 'values'])]
     #[ORM\Column(name: 'entity_class', type: 'string', length: 50, nullable: false, enumType: LikeableTypeEnum::class)]
     private LikeableTypeEnum $entityClass;
+
+    #[Groups([self::SERIALIZATION_GROUP_READ])]
+    private ?object $likedEntity = null;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
     public function getUser(): User
     {
@@ -87,9 +93,9 @@ class Like implements TimeStampableInterface
         return $this;
     }
 
-    public function getEntityClass(): LikeableTypeEnum
+    public function getEntityClass(): string
     {
-        return $this->entityClass;
+        return $this->entityClass->value;
     }
 
     public function setEntityClass(LikeableTypeEnum $entityClass): static
@@ -97,5 +103,15 @@ class Like implements TimeStampableInterface
         $this->entityClass = $entityClass;
 
         return $this;
+    }
+
+    public function getLikedEntity(): ?object
+    {
+        return $this->likedEntity;
+    }
+
+    public function setLikedEntity(?object $likedEntity): void
+    {
+        $this->likedEntity = $likedEntity;
     }
 }

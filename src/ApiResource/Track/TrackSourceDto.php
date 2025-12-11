@@ -30,7 +30,7 @@ class TrackSourceDto
         'popularity' => 85,
         'rank' => 1,
         'explicit' => false,
-        'preview_url' => 'https://p.scdn.co/mp3-preview/xxx',
+        'previewUrl' => 'https://p.scdn.co/mp3-preview/xxx',
     ])]
     public array $metadata = [];
 
