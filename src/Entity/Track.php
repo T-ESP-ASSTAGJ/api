@@ -58,7 +58,6 @@ class Track implements TimeStampableInterface
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
-        Post::SERIALIZATION_GROUP_READ,
         Post::SERIALIZATION_GROUP_DETAIL,
     ])]
     private ?int $id = null;
@@ -67,7 +66,6 @@ class Track implements TimeStampableInterface
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
-        Post::SERIALIZATION_GROUP_READ,
         Post::SERIALIZATION_GROUP_DETAIL,
     ])]
     private string $title;
@@ -76,7 +74,6 @@ class Track implements TimeStampableInterface
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
-        Post::SERIALIZATION_GROUP_READ,
         Post::SERIALIZATION_GROUP_DETAIL,
     ])]
     private ?string $coverUrl = null;
@@ -88,7 +85,6 @@ class Track implements TimeStampableInterface
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
-        Post::SERIALIZATION_GROUP_READ,
         Post::SERIALIZATION_GROUP_DETAIL,
     ])]
     private array $metadata = [];
@@ -98,7 +94,6 @@ class Track implements TimeStampableInterface
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
-        Post::SERIALIZATION_GROUP_READ,
         Post::SERIALIZATION_GROUP_DETAIL,
     ])]
     private Artist $artist;

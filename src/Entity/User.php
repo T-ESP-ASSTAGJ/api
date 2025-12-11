@@ -44,7 +44,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new GetCollection(
             uriTemplate: '/users/{id}/likes',
-            normalizationContext: ['groups' => [Like::SERIALIZATION_GROUP_DETAIL]],
+            normalizationContext: ['groups' => [Like::SERIALIZATION_GROUP_READ, Post::SERIALIZATION_GROUP_READ]],
             provider: UserLikesProvider::class,
         ),
         new Get(
@@ -82,7 +82,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
         Follow::SERIALIZATION_GROUP_DETAIL,
-        Like::SERIALIZATION_GROUP_DETAIL,
         Message::SERIALIZATION_GROUP_READ,
         Message::SERIALIZATION_GROUP_DETAIL,
         Post::SERIALIZATION_GROUP_READ,
@@ -97,7 +96,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
         self::SERIALIZATION_GROUP_DETAIL,
         self::SERIALIZATION_GROUP_WRITE,
         Follow::SERIALIZATION_GROUP_DETAIL,
-        Like::SERIALIZATION_GROUP_DETAIL,
         Message::SERIALIZATION_GROUP_READ,
         Message::SERIALIZATION_GROUP_DETAIL,
         Post::SERIALIZATION_GROUP_READ,
@@ -136,7 +134,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
         self::SERIALIZATION_GROUP_DETAIL,
         self::SERIALIZATION_GROUP_WRITE,
         Follow::SERIALIZATION_GROUP_DETAIL,
-        Like::SERIALIZATION_GROUP_DETAIL,
         Message::SERIALIZATION_GROUP_READ,
         Message::SERIALIZATION_GROUP_DETAIL,
         Post::SERIALIZATION_GROUP_READ,
@@ -172,6 +169,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     #[Ignore]
     #[ORM\OneToMany(targetEntity: Follow::class, mappedBy: 'followedUser')]
     private Collection $followers;
+
+    #[ORM\OneToMany(targetEntity: Like::class, mappedBy: 'user')]
+    private Collection $likes;
 
     public function __construct()
     {

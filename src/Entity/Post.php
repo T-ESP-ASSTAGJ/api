@@ -95,7 +95,6 @@ class Post implements TimeStampableInterface
     #[ORM\ManyToOne(targetEntity: Track::class)]
     #[ORM\JoinColumn(name: 'track_id', referencedColumnName: 'id', nullable: false)]
     #[Groups([
-        self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
     ])]
     private Track $track;

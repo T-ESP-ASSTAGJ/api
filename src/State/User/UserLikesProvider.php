@@ -6,17 +6,14 @@ namespace App\State\User;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
+use App\Entity\Enum\LikeableTypeEnum;
 use App\Entity\Like;
 use App\Entity\User;
-use App\Repository\LikeRepository;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 /**
- * @implements ProviderInterface<User>
+ * @implements ProviderInterface<array>
  */
 final readonly class UserLikesProvider implements ProviderInterface
 {
@@ -26,23 +23,51 @@ final readonly class UserLikesProvider implements ProviderInterface
     }
 
     /**
+     * @param Operation $operation
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *
-     * @return array<array<string, mixed>>  <-- Note the change in return type
+     * @return array
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
-        /** @var User|null $user */
-        $user = $this->entityManager->getRepository(User::class)->findOneBy(['id' => $uriVariables['id']]);
+        $user = $this->entityManager->getRepository(User::class)->find($uriVariables['id']);
 
-        if (null === $user) {
+        if (!$user) {
             throw new NotFoundHttpException('User not found');
         }
 
-        /** @var LikeRepository $likeRepository */
-        $likeRepository = $this->entityManager->getRepository(Like::class);
+        $likes = $this->entityManager->getRepository(Like::class)->findBy(['user' => $user]);
 
-        return $likeRepository->findByUser($user);
+        if (empty($likes)) {
+            return [];
+        }
+
+        // Array ['Post' => [1, 3], 'Comment' => [2, 4]]
+        $map = [];
+        foreach ($likes as $like) {
+            $entityClass = LikeableTypeEnum::from($like->getEntityClass())->toEntityClass();
+            $map[$entityClass][] = $like->getEntityId();
+        }
+
+        $fetchedEntities = [];
+        foreach ($map as $className => $ids) {
+            $results = $this->entityManager->getRepository($className)->findBy(['id' => $ids]);
+
+            foreach ($results as $entity) {
+                $fetchedEntities[$className][$entity->getId()] = $entity;
+            }
+        }
+
+        foreach ($likes as $like) {
+            $class = LikeableTypeEnum::from($like->getEntityClass())->toEntityClass();
+            $id = $like->getEntityId();
+
+            if (isset($fetchedEntities[$class][$id])) {
+                $like->setLikedEntity($fetchedEntities[$class][$id]);
+            }
+        }
+
+        return $likes;
     }
 }

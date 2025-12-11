@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\Trait;
 
 use App\Entity\Conversation;
+use App\Entity\Like;
 use App\Entity\Message;
 use App\Entity\User;
 use Doctrine\DBAL\Types\Types;
@@ -23,6 +24,7 @@ trait TimeStampableTrait
         Conversation::SERIALIZATION_GROUP_DETAIL,
         User::SERIALIZATION_GROUP_READ,
         User::SERIALIZATION_GROUP_DETAIL,
+        Like::SERIALIZATION_GROUP_READ,
     ])]
     private \DateTimeImmutable $createdAt;
 
