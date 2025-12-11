@@ -6,17 +6,15 @@ namespace App\State\User;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
+use App\ApiResource\User\UserLikesOutput;
 use App\Entity\Like;
 use App\Entity\User;
 use App\Repository\LikeRepository;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 /**
- * @implements ProviderInterface<User>
+ * @implements ProviderInterface<array>
  */
 final readonly class UserLikesProvider implements ProviderInterface
 {
@@ -26,10 +24,11 @@ final readonly class UserLikesProvider implements ProviderInterface
     }
 
     /**
+     * @param Operation $operation
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *
-     * @return array<array<string, mixed>>  <-- Note the change in return type
+     * @return array
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {

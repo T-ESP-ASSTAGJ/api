@@ -44,7 +44,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new GetCollection(
             uriTemplate: '/users/{id}/likes',
-            normalizationContext: ['groups' => [Like::SERIALIZATION_GROUP_DETAIL]],
+            normalizationContext: [Like::SERIALIZATION_GROUP_READ, Post::SERIALIZATION_GROUP_READ],
             provider: UserLikesProvider::class,
         ),
         new Get(
@@ -172,6 +172,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     #[Ignore]
     #[ORM\OneToMany(targetEntity: Follow::class, mappedBy: 'followedUser')]
     private Collection $followers;
+
+    #[ORM\OneToMany(targetEntity: Like::class, mappedBy: 'user')]
+    private Collection $likes;
 
     public function __construct()
     {

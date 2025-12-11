@@ -44,21 +44,21 @@ class Like implements TimeStampableInterface
     public const SERIALIZATION_GROUP_DETAIL = 'like:detail';
     public const SERIALIZATION_GROUP_WRITE = 'like:write';
 
+    #[Groups([self::SERIALIZATION_GROUP_READ])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
     private User $user;
 
-    #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
+    #[Groups([self::SERIALIZATION_GROUP_READ])]
     #[ORM\Column(name: 'entity_id', type: 'integer', nullable: false)]
     private int $entityId;
 
-    #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
+    #[Groups([self::SERIALIZATION_GROUP_READ])]
     #[Assert\Choice(callback: [LikeableTypeEnum::class, 'values'])]
     #[ORM\Column(name: 'entity_class', type: 'string', length: 50, nullable: false, enumType: LikeableTypeEnum::class)]
     private LikeableTypeEnum $entityClass;
@@ -87,9 +87,9 @@ class Like implements TimeStampableInterface
         return $this;
     }
 
-    public function getEntityClass(): LikeableTypeEnum
+    public function getEntityClass(): string
     {
-        return $this->entityClass;
+        return LikeableTypeEnum::from($this->entityClass->value)->toEntityClass();
     }
 
     public function setEntityClass(LikeableTypeEnum $entityClass): static
