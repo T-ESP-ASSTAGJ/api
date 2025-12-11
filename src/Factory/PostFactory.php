@@ -40,6 +40,7 @@ final class PostFactory extends PersistentObjectFactory
                 'https://fastly.picsum.photos/id/570/200/200.jpg?hmac=fgqmD9u8TqyXJG9fhqV-EbhIUXYwTIxfsPiNfaD28_Y',
             ]),
             'caption' => self::faker()->realText(200),
+            'comment_count' => 0,
         ];
     }
 
