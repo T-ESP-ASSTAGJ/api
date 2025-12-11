@@ -28,17 +28,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ, User::SERIALIZATION_GROUP_READ, Artist::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true]
         ),
         new ApiPost(
-            security: "is_granted('ROLE_USER')",
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL, User::SERIALIZATION_GROUP_READ, Artist::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true],
             input: PostCreateInput::class,
             processor: PostCreateProcessor::class
         ),
         new Put(
-            security: "is_granted('ROLE_USER') and object.getUser() == user",
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL, User::SERIALIZATION_GROUP_READ, Artist::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true]
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL, User::SERIALIZATION_GROUP_READ, Artist::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true],
+            security: "object.getUser() == user"
         ),
         new Delete(
-            security: "is_granted('ROLE_USER') and object.getUser() == user",
+            security: "object.getUser() == user",
             output: false
         ),
     ]
