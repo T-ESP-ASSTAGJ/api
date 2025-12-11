@@ -66,9 +66,6 @@ final readonly class CommentCreateProcessor implements ProcessorInterface
                 throw new ValidationException($violations);
             }
 
-            // Incrémenter le compteur de commentaires
-            $post->incrementCommentsCount();
-
             $this->em->persist($comment);
             $this->em->flush();
 
