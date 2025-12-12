@@ -32,7 +32,13 @@ final class PostFactory extends PersistentObjectFactory
             'user' => UserFactory::random(),
             'track' => TrackFactory::new(),
             'location' => self::faker()->country(),
-            'photoUrl' => 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=1200&auto=format&fit=crop',
+            'photoUrl' => self::faker()->randomElement([
+                'https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=1200&auto=format&fit=crop',
+                'https://fastly.picsum.photos/id/47/200/200.jpg?hmac=dF66rvzPwuJCh4L7IjS6I0D5xrpPvqhAjbE7FstnEnY',
+                'https://fastly.picsum.photos/id/485/200/200.jpg?hmac=7ho6uS1u-Lmj8IR2V6-nJaiAVicTYT7bNcnzCMRwEG4',
+                'https://fastly.picsum.photos/id/1075/200/200.jpg?hmac=a9PcCsXBonPZ7LCLyWX6dHM1XGbcojML0qhnq-Ee4a4',
+                'https://fastly.picsum.photos/id/570/200/200.jpg?hmac=fgqmD9u8TqyXJG9fhqV-EbhIUXYwTIxfsPiNfaD28_Y',
+            ]),
             'caption' => self::faker()->realText(200),
         ];
     }
