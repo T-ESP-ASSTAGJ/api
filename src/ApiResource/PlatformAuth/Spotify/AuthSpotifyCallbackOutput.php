@@ -28,4 +28,6 @@ class AuthSpotifyCallbackOutput
     public ?string $message = null;
     public ?string $error = null;
     public ?string $details = null;
+    public ?string $token = null;
+    public ?string $refresh_token = null;
 }

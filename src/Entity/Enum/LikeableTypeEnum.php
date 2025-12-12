@@ -4,20 +4,21 @@ declare(strict_types=1);
 
 namespace App\Entity\Enum;
 
+use App\Entity\Comment;
 use App\Entity\Message;
 use App\Entity\Post;
 
 enum LikeableTypeEnum: string
 {
     case Post = 'post';
-    //    case Comment = 'comment';
+    case Comment = 'comment';
     case Message = 'message';
 
     public function toEntityClass(): string
     {
         return match ($this) {
             self::Post => Post::class,
-            //            self::Comment => Comment::class,
+            self::Comment => Comment::class,
             self::Message => Message::class,
         };
     }

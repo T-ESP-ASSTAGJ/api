@@ -13,6 +13,8 @@ use ApiPlatform\Metadata\Put;
 use App\ApiResource\Post\PostCreateInput;
 use App\Entity\Interface\TimeStampableInterface;
 use App\State\Post\PostCreateProcessor;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -31,9 +33,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
             processor: PostCreateProcessor::class
         ),
         new Put(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL, User::SERIALIZATION_GROUP_READ, Artist::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true]
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL, User::SERIALIZATION_GROUP_READ, Artist::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true],
+            security: "object.getUser() == user"
         ),
-        new Delete(output: false),
+        new Delete(
+            security: "object.getUser() == user",
+            output: false
+        ),
     ]
 )]
 #[ORM\Entity]
@@ -60,7 +66,6 @@ class Post implements TimeStampableInterface
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
-        User::SERIALIZATION_GROUP_READ,
     ])]
     private User $user;
 
@@ -92,6 +97,24 @@ class Post implements TimeStampableInterface
         self::SERIALIZATION_GROUP_DETAIL,
     ])]
     private ?string $location = null;
+
+    #[ORM\Column(name: 'comments_count', type: 'integer', options: ['default' => 0])]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
+    private int $commentsCount = 0;
+
+    /**
+     * @var Collection<int, Comment>
+     */
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'post', cascade: ['remove'], orphanRemoval: true)]
+    private Collection $comments;
+
+    public function __construct()
+    {
+        $this->comments = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -154,6 +177,59 @@ class Post implements TimeStampableInterface
     public function setLocation(?string $location): static
     {
         $this->location = $location;
+
+        return $this;
+    }
+
+    public function getCommentsCount(): int
+    {
+        return $this->commentsCount;
+    }
+
+    public function setCommentsCount(int $commentsCount): static
+    {
+        $this->commentsCount = $commentsCount;
+
+        return $this;
+    }
+
+    public function incrementCommentsCount(): static
+    {
+        ++$this->commentsCount;
+
+        return $this;
+    }
+
+    public function decrementCommentsCount(): static
+    {
+        if ($this->commentsCount > 0) {
+            --$this->commentsCount;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Comment>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): static
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setPost($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): static
+    {
+        $this->comments->removeElement($comment);
 
         return $this;
     }
