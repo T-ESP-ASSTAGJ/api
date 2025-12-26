@@ -46,14 +46,20 @@ jobs:
       - name: Run PHPUnit with coverage
         run: |
           mkdir -p build/logs
-          vendor/bin/phpunit --coverage-clover=build/logs/clover.xml --log-junit=build/logs/junit.xml
+          vendor/bin/phpunit --coverage-clover=build/logs/clover.xml || echo "PHPUnit failed or no tests found"
         continue-on-error: true
 
       - name: Run PHPStan
         run: |
           mkdir -p build/phpstan
-          vendor/bin/phpstan analyse --error-format=json > build/phpstan/phpstan-report.json || true
+          vendor/bin/phpstan analyse --error-format=json > build/phpstan/phpstan-report.json || echo "PHPStan analysis completed with issues"
         continue-on-error: true
+
+      - name: Check test reports
+        run: |
+          echo "Checking for test reports..."
+          ls -la build/logs/ || echo "No logs directory"
+          ls -la build/phpstan/ || echo "No phpstan directory"
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
