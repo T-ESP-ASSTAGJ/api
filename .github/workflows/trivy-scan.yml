@@ -13,81 +13,32 @@ on:
       - 'composer.lock'
 
 jobs:
+  # Docker Build & Push Job
   build-and-push:
     name: Build & Push Docker Image
-    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+    uses: ./.github/workflows/docker-build-push.yml
+    with:
+      environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+    secrets:
+      APP_SECRET: ${{ secrets.APP_SECRET }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      MERCURE_JWT_SECRET: ${{ secrets.MERCURE_JWT_SECRET }}
+      GHCR_PAT: ${{ secrets.GHCR_PAT }}
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Important pour git describe
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_PAT }}
-
-      - name: Create .env.local with secrets
-        run: |
-          [ -n "${{ secrets.APP_SECRET }}" ] && echo "APP_SECRET=${{ secrets.APP_SECRET }}" >> .env.local
-          [ -n "${{ secrets.DATABASE_URL }}" ] && echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env.local
-          [ -n "${{ secrets.MERCURE_JWT_SECRET }}" ] && echo "MERCURE_JWT_SECRET=${{ secrets.MERCURE_JWT_SECRET }}" >> .env.local
-          echo "MERCURE_URL=https://example.com/.well-known/mercure" >> .env.local
-          echo "MERCURE_PUBLIC_URL=https://example.com/.well-known/mercure" >> .env.local
-          echo "✅ .env.local created (with provided secrets)"
-
-      - name: Determine target environment
-        id: env
-        run: |
-          if [ "${{ github.ref_name }}" == "main" ]; then
-            echo "target=production" >> $GITHUB_OUTPUT
-            echo "make_command=push_production" >> $GITHUB_OUTPUT
-          else
-            echo "target=staging" >> $GITHUB_OUTPUT
-            echo "make_command=push_staging" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Build and Push via Makefile
-        env:
-          APP_SECRET: ${{ secrets.APP_SECRET }}
-          CADDY_MERCURE_JWT_SECRET: ${{ secrets.MERCURE_JWT_SECRET }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: |
-          echo "🚀 Building ${{ steps.env.outputs.target }} image..."
-          make ${{ steps.env.outputs.make_command }}
-
-      - name: Extract image info for next job
-        id: image
-        run: |
-          VERSION=$(git describe --tags --always 2>/dev/null || echo "v0.0.0")
-          
-          if [ "${{ steps.env.outputs.target }}" == "production" ]; then
-            echo "image_url=ghcr.io/t-esp-asstagj/api" >> $GITHUB_OUTPUT
-            echo "image_tag=${VERSION}" >> $GITHUB_OUTPUT
-          else
-            echo "image_url=ghcr.io/t-esp-asstagj/api" >> $GITHUB_OUTPUT
-            echo "image_tag=staging-${VERSION}" >> $GITHUB_OUTPUT
-          fi
-
-    outputs:
-      image_url: ${{ steps.image.outputs.image_url }}
-      image_tag: ${{ steps.image.outputs.image_tag }}
-
-  security-scan:
-    name: Security Scan
+  # Trivy Security Scan - runs on push to staging/main only
+  trivy-security-scan:
+    name: Trivy Security Scan
     needs: build-and-push
-    uses: T-ESP-ASSTAGJ/infra/.github/workflows/trivy-scan.yml@staging
+    if: github.event_name == 'push' && (github.ref_name == 'staging' || github.ref_name == 'main')
     permissions:
       security-events: write
       contents: read
       packages: read
       pull-requests: write
+    uses: T-ESP-ASSTAGJ/infra/.github/workflows/trivy-scan.yml@staging
     with:
       image_name: ${{ needs.build-and-push.outputs.image_url }}
       image_tag: ${{ needs.build-and-push.outputs.image_tag }}

@@ -1,0 +1,78 @@
+name: SonarCloud Analysis
+
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+    branches: [main, staging]
+  workflow_dispatch:
+
+jobs:
+  sonarcloud:
+    name: SonarCloud Code Analysis
+    if: github.event_name == 'pull_request' || github.ref_name == 'staging' || github.ref_name == 'main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for better blame information
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: xdebug
+          extensions: intl, opcache, zip, pdo_pgsql
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Run PHPUnit with coverage
+        run: |
+          mkdir -p build/logs
+          vendor/bin/phpunit --coverage-clover=build/logs/clover.xml || echo "PHPUnit failed or no tests found"
+        continue-on-error: true
+
+      - name: Run PHPStan
+        run: |
+          mkdir -p build/phpstan
+          vendor/bin/phpstan analyse --error-format=json > build/phpstan/phpstan-report.json || echo "PHPStan analysis completed with issues"
+        continue-on-error: true
+
+      - name: Check test reports
+        run: |
+          echo "Checking for test reports..."
+          ls -la build/logs/ || echo "No logs directory"
+          ls -la build/phpstan/ || echo "No phpstan directory"
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-reports
+          path: |
+            build/logs/
+            build/phpstan/
+          retention-days: 30
