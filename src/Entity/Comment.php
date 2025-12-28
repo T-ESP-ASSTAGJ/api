@@ -109,6 +109,9 @@ class Comment implements LikeableInterface, TimeStampableInterface
     public function setPost(Post $post): static
     {
         $this->post = $post;
+        if (!$post->getComments()->contains($this)) {
+            $post->getComments()->add($this);
+        }
 
         return $this;
     }
@@ -135,5 +138,22 @@ class Comment implements LikeableInterface, TimeStampableInterface
         $this->content = $content;
 
         return $this;
+    }
+
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function updatePostCommentsCount(): static
+    {
+        $this->getPost()->updateCommentsCount();
+
+        return $this;
+    }
+
+    #[ORM\PreRemove]
+    public function onPreRemove(): void
+    {
+        $post = $this->getPost();
+        $post->getComments()->removeElement($this);
+        $post->updateCommentsCount();
     }
 }

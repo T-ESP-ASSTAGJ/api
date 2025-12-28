@@ -203,11 +203,7 @@ class Post implements LikeableInterface, TimeStampableInterface
         return $this;
     }
 
-    public function getCommentsCount(): int
-    {
-        return $this->commentsCount;
-    }
-
+    #[ORM\PrePersist]
     public function updateCommentsCount(): static
     {
         $this->commentsCount = count($this->comments);
@@ -221,22 +217,5 @@ class Post implements LikeableInterface, TimeStampableInterface
     public function getComments(): Collection
     {
         return $this->comments;
-    }
-
-    public function addComment(Comment $comment): static
-    {
-        if (!$this->comments->contains($comment)) {
-            $this->comments->add($comment);
-            $comment->setPost($this);
-        }
-
-        return $this;
-    }
-
-    public function removeComment(Comment $comment): static
-    {
-        $this->comments->removeElement($comment);
-
-        return $this;
     }
 }
