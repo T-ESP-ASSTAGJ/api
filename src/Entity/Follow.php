@@ -36,8 +36,6 @@ class Follow implements TimeStampableInterface
 {
     use Trait\TimeStampableTrait;
 
-    public const SERIALIZATION_GROUP_DETAIL = 'follow:detail';
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id', type: 'integer')]
