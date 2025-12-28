@@ -84,7 +84,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
-        Follow::SERIALIZATION_GROUP_DETAIL,
         Message::SERIALIZATION_GROUP_READ,
         Message::SERIALIZATION_GROUP_DETAIL,
         Post::SERIALIZATION_GROUP_READ,
@@ -98,7 +97,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
         self::SERIALIZATION_GROUP_WRITE,
-        Follow::SERIALIZATION_GROUP_DETAIL,
         Message::SERIALIZATION_GROUP_READ,
         Message::SERIALIZATION_GROUP_DETAIL,
         Post::SERIALIZATION_GROUP_READ,
@@ -134,7 +132,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
         self::SERIALIZATION_GROUP_WRITE,
-        Follow::SERIALIZATION_GROUP_DETAIL,
         Message::SERIALIZATION_GROUP_READ,
         Message::SERIALIZATION_GROUP_DETAIL,
         Post::SERIALIZATION_GROUP_READ,
@@ -331,26 +328,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
         return $this->likes->count();
     }
 
-    /** @return array<int, array{id: int|null, username: string|null}> */
+    /** @return ArrayCollection|Collection */
     #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
-    public function getFollowing(): array
+    public function getFollowing(): ArrayCollection|Collection
     {
-        return $this->following->map(fn (Follow $follow) => [
-            'id' => $follow->getFollowedUser()?->getId(),
-            'username' => $follow->getFollowedUser()?->getUsername(),
-            'profilePicture' => $follow->getFollowedUser()?->getProfilePicture(),
-        ])->toArray();
+        return $this->following;
     }
 
-    /** @return array<int, array{id: int|null, username: string|null}> */
+    /** @return ArrayCollection|Collection */
     #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
-    public function getFollowers(): array
+    public function getFollowers(): ArrayCollection|Collection
     {
-        return $this->followers->map(fn (Follow $follow) => [
-            'id' => $follow->getFollower()?->getId(),
-            'username' => $follow->getFollower()?->getUsername(),
-            'profilePicture' => $follow->getFollower()?->getProfilePicture(),
-        ])->toArray();
+        return $this->followers;
     }
 
     #[ORM\PrePersist]
