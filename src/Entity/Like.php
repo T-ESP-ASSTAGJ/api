@@ -27,7 +27,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new Delete(
             uriTemplate: '/likes/{id}',
-            security: "object.getUser() == user",
+            security: 'object.getUser() == user',
             output: false,
         ),
     ]

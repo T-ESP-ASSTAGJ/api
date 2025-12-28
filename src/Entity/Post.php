@@ -48,12 +48,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
             normalizationContext: ['groups' => [
                 self::SERIALIZATION_GROUP_DETAIL,
                 User::SERIALIZATION_GROUP_READ,
-                Artist::SERIALIZATION_GROUP_READ
+                Artist::SERIALIZATION_GROUP_READ,
             ]],
-            security: "object.getUser() == user",
+            security: 'object.getUser() == user',
         ),
         new Delete(
-            security: "object.getUser() == user",
+            security: 'object.getUser() == user',
             output: false
         ),
     ]

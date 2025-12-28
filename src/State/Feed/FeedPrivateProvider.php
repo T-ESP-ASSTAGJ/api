@@ -40,7 +40,7 @@ final readonly class FeedPrivateProvider implements ProviderInterface
             throw new \RuntimeException('Authentication required');
         }
 
-        $followedUsers = $currentUser->getFollowed();
+        $followedUsers = $currentUser->getFollowing();
         $followedUserIds = array_filter(array_map(static fn ($user) => $user['id'], $followedUsers));
 
         if (empty($followedUserIds)) {

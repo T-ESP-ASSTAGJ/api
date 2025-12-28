@@ -29,12 +29,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new GetCollection(
             uriTemplate: '/posts/{postId}/comments',
             uriVariables: ['postId' => new Link(toProperty: 'post', fromClass: Post::class)],
+            order: ['createdAt' => 'DESC'],
             normalizationContext: [
                 'groups' => [
                     self::SERIALIZATION_GROUP_READ,
                     User::SERIALIZATION_GROUP_READ,
-                ]
-            ]
+                ],
+            ],
         ),
         new ApiPost(
             uriTemplate: '/posts/{postId}/comments',

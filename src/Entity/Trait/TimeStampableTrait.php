@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity\Trait;
 
+use App\Entity\Comment;
 use App\Entity\Conversation;
 use App\Entity\Like;
 use App\Entity\Message;
@@ -18,21 +19,19 @@ trait TimeStampableTrait
     #[ORM\Column(name: 'created_at', type: Types::DATETIME_IMMUTABLE)]
     #[Gedmo\Timestampable(on: 'create')]
     #[Groups([
-        Message::SERIALIZATION_GROUP_READ,
-        Message::SERIALIZATION_GROUP_DETAIL,
-        Conversation::SERIALIZATION_GROUP_READ,
+        Comment::SERIALIZATION_GROUP_READ,
         Conversation::SERIALIZATION_GROUP_DETAIL,
-        User::SERIALIZATION_GROUP_READ,
-        User::SERIALIZATION_GROUP_DETAIL,
         Like::SERIALIZATION_GROUP_READ,
+        Message::SERIALIZATION_GROUP_DETAIL,
+        User::SERIALIZATION_GROUP_DETAIL,
     ])]
     private \DateTimeImmutable $createdAt;
 
     #[ORM\Column(name: 'updated_at', type: Types::DATETIME_IMMUTABLE)]
     #[Gedmo\Timestampable(on: 'update')]
     #[Groups([
-        Message::SERIALIZATION_GROUP_DETAIL,
         Conversation::SERIALIZATION_GROUP_DETAIL,
+        Message::SERIALIZATION_GROUP_DETAIL,
         User::SERIALIZATION_GROUP_DETAIL,
     ])]
     private \DateTimeImmutable $updatedAt;

@@ -25,7 +25,7 @@ final readonly class ConversationMarkAsReadProcessor implements ProcessorInterfa
     }
 
     /**
-     * @param Conversation $data
+     * @param Conversation         $data
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      */

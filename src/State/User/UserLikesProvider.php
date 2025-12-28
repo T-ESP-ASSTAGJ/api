@@ -13,7 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * @implements ProviderInterface<array>
+ * @implements ProviderInterface<Like>
  */
 final readonly class UserLikesProvider implements ProviderInterface
 {
@@ -23,11 +23,10 @@ final readonly class UserLikesProvider implements ProviderInterface
     }
 
     /**
-     * @param Operation $operation
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *
-     * @return array
+     * @return array<Like>
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
