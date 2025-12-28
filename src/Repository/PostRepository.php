@@ -37,7 +37,7 @@ class PostRepository extends ServiceEntityRepository
     public function getFollowedPaginatedPosts(array $followedUserIds, int $offset, int $limit): array
     {
         $queryBuilder = $this->createQueryBuilder('p')
-            ->where('p.userId IN (:followedUserIds)')
+            ->where('p.user IN (:followedUserIds)')
             ->setParameter('followedUserIds', $followedUserIds)
             ->orderBy('p.createdAt', 'DESC')
             ->setFirstResult($offset)

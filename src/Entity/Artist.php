@@ -24,18 +24,18 @@ use Symfony\Component\Serializer\Annotation\Groups;
     shortName: 'Artist',
     operations: [
         new Get(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true]
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]]
         ),
         new GetCollection(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true]
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ]]
         ),
         new ApiPost(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
             input: ArtistCreateInput::class,
             processor: ArtistCreateProcessor::class
         ),
         new Patch(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
             input: ArtistUpdateInput::class,
             processor: ArtistUpdateProcessor::class
         ),

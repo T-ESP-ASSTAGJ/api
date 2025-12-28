@@ -22,19 +22,35 @@ use Symfony\Component\Serializer\Annotation\Groups;
     shortName: 'Post',
     operations: [
         new Get(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL, User::SERIALIZATION_GROUP_READ, Artist::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true]
+            normalizationContext: ['groups' => [
+                self::SERIALIZATION_GROUP_DETAIL,
+                User::SERIALIZATION_GROUP_READ,
+                Artist::SERIALIZATION_GROUP_READ,
+            ]]
         ),
         new GetCollection(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ, User::SERIALIZATION_GROUP_READ, Artist::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true]
+            normalizationContext: ['groups' => [
+                self::SERIALIZATION_GROUP_READ,
+                User::SERIALIZATION_GROUP_READ,
+                Artist::SERIALIZATION_GROUP_READ,
+            ]]
         ),
         new ApiPost(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL, User::SERIALIZATION_GROUP_READ, Artist::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true],
+            normalizationContext: ['groups' => [
+                self::SERIALIZATION_GROUP_DETAIL,
+                User::SERIALIZATION_GROUP_READ,
+                Artist::SERIALIZATION_GROUP_READ,
+            ]],
             input: PostCreateInput::class,
             processor: PostCreateProcessor::class
         ),
         new Put(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL, User::SERIALIZATION_GROUP_READ, Artist::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true],
-            security: "object.getUser() == user"
+            normalizationContext: ['groups' => [
+                self::SERIALIZATION_GROUP_DETAIL,
+                User::SERIALIZATION_GROUP_READ,
+                Artist::SERIALIZATION_GROUP_READ
+            ]],
+            security: "object.getUser() == user",
         ),
         new Delete(
             security: "object.getUser() == user",
@@ -186,25 +202,9 @@ class Post implements TimeStampableInterface
         return $this->commentsCount;
     }
 
-    public function setCommentsCount(int $commentsCount): static
+    public function updateCommentsCount(): static
     {
-        $this->commentsCount = $commentsCount;
-
-        return $this;
-    }
-
-    public function incrementCommentsCount(): static
-    {
-        ++$this->commentsCount;
-
-        return $this;
-    }
-
-    public function decrementCommentsCount(): static
-    {
-        if ($this->commentsCount > 0) {
-            --$this->commentsCount;
-        }
+        $this->commentsCount = count($this->comments);
 
         return $this;
     }

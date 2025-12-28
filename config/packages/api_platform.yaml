@@ -21,3 +21,4 @@ api_platform:
         pagination_enabled: true
         normalization_context:
             skip_null_values: false
+            enable_max_depth: true

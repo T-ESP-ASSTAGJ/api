@@ -77,7 +77,6 @@ readonly class SpotifyService
             ]);
 
             $data = $response->toArray();
-            dump($data);
 
             return $this->objectMapper->map((object) $data, TrackDTO::class);
         } catch (\Throwable $e) {
