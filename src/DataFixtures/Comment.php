@@ -4,22 +4,24 @@ declare(strict_types=1);
 
 namespace App\DataFixtures;
 
-use App\Factory\PostFactory;
+use App\Entity\Comment as EntityComment;
+use App\Factory\CommentFactory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class Post extends Fixture implements DependentFixtureInterface
+class Comment extends Fixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
-        PostFactory::createMany(10);
+        CommentFactory::createMany(150);
     }
 
     public function getDependencies(): array
     {
         return [
             User::class,
+            Post::class,
         ];
     }
 }
