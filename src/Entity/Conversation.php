@@ -30,14 +30,14 @@ use Symfony\Component\Validator\Constraints as Assert;
     shortName: 'Conversation',
     operations: [
         new Get(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
         ),
         new GetCollection(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true],
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ]],
             provider: ConversationListProvider::class,
         ),
         new ApiPost(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
             input: ConversationCreateInput::class,
             processor: ConversationCreateProcessor::class,
         ),
@@ -53,7 +53,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new ApiPost(
             uriTemplate: '/conversations/{id}/participants',
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
             input: AddParticipantsInput::class,
             processor: AddParticipantsProcessor::class,
         ),

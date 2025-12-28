@@ -22,20 +22,20 @@ use Symfony\Component\Validator\Constraints as Assert;
     shortName: 'Message',
     operations: [
         new Get(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
             provider: MessageGetProvider::class,
         ),
         new GetCollection(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true],
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ]],
         ),
         new ApiPost(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
             denormalizationContext: ['groups' => [self::SERIALIZATION_GROUP_WRITE]],
             mercure: true,
             processor: MessageProcessor::class
         ),
         new Put(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
             denormalizationContext: ['groups' => [self::SERIALIZATION_GROUP_WRITE]],
             mercure: true,
             processor: MessageProcessor::class

@@ -24,18 +24,18 @@ use Symfony\Component\Serializer\Annotation\Groups;
     shortName: 'Track',
     operations: [
         new Get(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true]
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]]
         ),
         new GetCollection(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true]
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ]]
         ),
         new ApiPost(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
             input: TrackCreateInput::class,
             processor: TrackCreateProcessor::class
         ),
         new Patch(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
             input: TrackUpdateInput::class,
             processor: TrackUpdateProcessor::class
         ),

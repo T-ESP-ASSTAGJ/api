@@ -31,10 +31,10 @@ use Symfony\Component\Validator\Constraints as Assert;
             provider: UserMeProvider::class,
         ),
         new Get(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL], 'enable_max_depth' => true],
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
         ),
         new GetCollection(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true],
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ]],
         ),
         new Put(
             uriTemplate: '/users/me',

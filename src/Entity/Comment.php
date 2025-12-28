@@ -10,7 +10,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post as ApiPost;
-use ApiPlatform\OpenApi\Model\Operation;
 use App\ApiResource\Comment\CommentCreateInput;
 use App\Entity\Interface\TimeStampableInterface;
 use App\State\Comment\CommentCreateProcessor;
@@ -21,32 +20,31 @@ use Symfony\Component\Serializer\Annotation\Groups;
     shortName: 'Comment',
     operations: [
         new Get(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL, User::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true]
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL, User::SERIALIZATION_GROUP_READ]]
         ),
         new Delete(
             security: "is_granted('ROLE_USER') and object.getUser() == user",
             output: false
         ),
-    ]
-)]
-#[ApiResource(
-    shortName: 'Comment',
-    uriTemplate: '/posts/{postId}/comments',
-    operations: [
         new GetCollection(
-            openapi: new Operation(tags: ['Post']),
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ, User::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true]
+            uriTemplate: '/posts/{postId}/comments',
+            uriVariables: ['postId' => new Link(toProperty: 'post', fromClass: Post::class)],
+            normalizationContext: [
+                'groups' => [
+                    self::SERIALIZATION_GROUP_READ,
+                    User::SERIALIZATION_GROUP_READ,
+                ]
+            ]
         ),
         new ApiPost(
-            openapi: new Operation(tags: ['Post']),
+            uriTemplate: '/posts/{postId}/comments',
+            uriVariables: ['postId' => new Link(toProperty: 'post', fromClass: Post::class)],
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL, User::SERIALIZATION_GROUP_READ]],
             security: "is_granted('ROLE_USER')",
             input: CommentCreateInput::class,
-            processor: CommentCreateProcessor::class,
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL, User::SERIALIZATION_GROUP_READ], 'enable_max_depth' => true]
+            read: false,
+            processor: CommentCreateProcessor::class
         ),
-    ],
-    uriVariables: [
-        'postId' => new Link(toProperty: 'post', fromClass: Post::class),
     ]
 )]
 #[ORM\Entity]
