@@ -48,8 +48,8 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new ApiPost(
             uriTemplate: '/conversations/{id}/read',
-            processor: ConversationMarkAsReadProcessor::class,
             output: false,
+            processor: ConversationMarkAsReadProcessor::class,
         ),
         new ApiPost(
             uriTemplate: '/conversations/{id}/participants',
@@ -292,9 +292,9 @@ class Conversation implements TimeStampableInterface
     public function getParticipantsInfo(): array
     {
         return $this->getActiveParticipants()->map(fn (ConversationParticipant $participant) => [
-            'id' => $participant->getUser()?->getId(),
-            'username' => $participant->getUser()?->getUsername(),
-            'profile_picture' => $participant->getUser()?->getProfilePicture(),
+            'id' => $participant->getUser()->getId(),
+            'username' => $participant->getUser()->getUsername(),
+            'profile_picture' => $participant->getUser()->getProfilePicture(),
         ])->getValues();
     }
 }

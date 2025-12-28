@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -64,6 +66,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
     ],
 )]
+#[ApiFilter(SearchFilter::class, properties: ['username' => 'ipartial'])]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Table(name: '`user`')]
@@ -106,7 +109,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     #[ORM\Column(name: 'email', type: 'string', length: 180, unique: true)]
     #[Assert\Email]
     #[Groups([
-        self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
     ])]
     private string $email;
@@ -116,7 +118,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
      */
     #[ORM\Column(name: 'roles', type: 'json')]
     #[Groups([
-        self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
     ])]
     private array $roles = [];
@@ -143,7 +144,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
 
     #[ORM\Column(name: 'bio', type: 'string', length: 255, nullable: true)]
     #[Groups([
-        self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
         self::SERIALIZATION_GROUP_WRITE,
     ])]
@@ -159,17 +159,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     private bool $needsProfile = true;
 
     // List of users THIS USER follows
-    /** @var Collection<Follow> */
+    /** @var Collection<int, Follow> */
     #[Ignore]
     #[ORM\OneToMany(targetEntity: Follow::class, mappedBy: 'follower')]
     private Collection $following;
 
     // List of users WHO FOLLOW this user
-    /** @var Collection<Follow> */
+    /** @var Collection<int, Follow> */
     #[Ignore]
     #[ORM\OneToMany(targetEntity: Follow::class, mappedBy: 'followedUser')]
     private Collection $followers;
 
+    /** @var Collection<int, Like> */
     #[ORM\OneToMany(targetEntity: Like::class, mappedBy: 'user')]
     private Collection $likes;
 
@@ -177,6 +178,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     {
         $this->following = new ArrayCollection();
         $this->followers = new ArrayCollection();
+        $this->likes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -321,6 +323,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     public function getFollowersCount(): int
     {
         return $this->followers->count();
+    }
+
+    #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
+    public function getLikesCount(): int
+    {
+        return $this->likes->count();
     }
 
     /** @return array<int, array{id: int|null, username: string|null}> */
