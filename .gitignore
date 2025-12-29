@@ -1,4 +1,5 @@
 # Env and IDE
+.env
 .env.local
 .env.*.local
 /.idea

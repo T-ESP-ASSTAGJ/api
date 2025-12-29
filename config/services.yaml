@@ -49,3 +49,39 @@ services:
     App\Service\Spotify\SpotifyService:
         arguments:
             $spotifyApiClient: '@spotify.api.client'
+
+    # Auth
+    App\State\Auth\AuthRequestProcessor:
+        arguments:
+            $environment: '%kernel.environment%'
+
+    ###### SOUNDCLOUD #####
+
+    soundcloud.api.client:
+        class: Symfony\Contracts\HttpClient\HttpClientInterface
+        factory: [ '@http_client', 'withOptions' ]
+        arguments:
+            - base_uri: 'https://api.soundcloud.com/'
+              headers:
+                  'Accept': 'application/json'
+
+    soundcloud.auth.client:
+        class: Symfony\Contracts\HttpClient\HttpClientInterface
+        factory: [ '@http_client', 'withOptions' ]
+        arguments:
+            - headers:
+                  'Content-Type': 'application/x-www-form-urlencoded'
+                  'Accept': 'application/json'
+
+    App\Service\SoundCloud\SoundCloudAuthService:
+        arguments:
+            $soundcloudApiClient: '@soundcloud.api.client'
+            $soundcloudAuthClient: '@soundcloud.auth.client'
+            $entityManager: '@doctrine.orm.entity_manager'
+            $clientId: '%env(SOUNDCLOUD_CLIENT_ID)%'
+            $clientSecret: '%env(SOUNDCLOUD_CLIENT_SECRET)%'
+            $redirectUri: '%env(SOUNDCLOUD_REDIRECT_URI)%'
+
+    App\Service\SoundCloud\SoundCloudService:
+        arguments:
+            $soundcloudApiClient: '@soundcloud.api.client'
