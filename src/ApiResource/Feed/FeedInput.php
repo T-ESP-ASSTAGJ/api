@@ -20,7 +20,7 @@ use App\State\Feed\FeedPublicProvider;
                 summary: 'Get Public Feed',
                 description: 'Returns the latest posts from all users'
             ),
-            normalizationContext: ['groups' => [Post::SERIALIZATION_GROUP_READ]],
+            normalizationContext: ['groups' => [Post::SERIALIZATION_GROUP_READ, Post::LIKE_SERIALIZATION_GROUP_READ]],
             provider: FeedPublicProvider::class
         ),
         new GetCollection(
@@ -29,7 +29,7 @@ use App\State\Feed\FeedPublicProvider;
                 summary: 'Get Private Feed',
                 description: 'Returns posts from followed users only'
             ),
-            normalizationContext: ['groups' => [Post::SERIALIZATION_GROUP_READ]],
+            normalizationContext: ['groups' => [Post::SERIALIZATION_GROUP_READ, Post::LIKE_SERIALIZATION_GROUP_READ]],
             provider: FeedPrivateProvider::class
         ),
     ],

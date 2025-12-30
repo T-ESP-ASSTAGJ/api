@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Put;
+use App\ApiResource\User\UserFollowOutput;
 use App\ApiResource\User\UserPutInput;
 use App\Entity\Interface\TimeStampableInterface;
 use App\Repository\UserRepository;
@@ -47,6 +48,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new GetCollection(
             uriTemplate: '/users/{id}/likes',
             normalizationContext: ['groups' => [Like::SERIALIZATION_GROUP_READ, Post::SERIALIZATION_GROUP_READ]],
+            output: UserFollowOutput::class,
             provider: UserLikesProvider::class,
         ),
         new Get(
@@ -322,22 +324,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
         return $this->followers->count();
     }
 
+    /** @return Collection<int, Follow> */
     #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
-    public function getLikesCount(): int
-    {
-        return $this->likes->count();
-    }
-
-    /** @return ArrayCollection|Collection */
-    #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
-    public function getFollowing(): ArrayCollection|Collection
+    public function getFollowing(): Collection
     {
         return $this->following;
     }
 
-    /** @return ArrayCollection|Collection */
+    /** @return Collection<int, Follow> */
     #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
-    public function getFollowers(): ArrayCollection|Collection
+    public function getFollowers(): Collection
     {
         return $this->followers;
     }

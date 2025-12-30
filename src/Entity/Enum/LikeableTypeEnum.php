@@ -10,17 +10,13 @@ use App\Entity\Post;
 
 enum LikeableTypeEnum: string
 {
-    case Post = 'post';
-    case Comment = 'comment';
-    case Message = 'message';
+    case Post = Post::class;
+    case Comment = Comment::class;
+    case Message = Message::class;
 
     public function toEntityClass(): string
     {
-        return match ($this) {
-            self::Post => Post::class,
-            self::Comment => Comment::class,
-            self::Message => Message::class,
-        };
+        return $this->value;
     }
 
     /**

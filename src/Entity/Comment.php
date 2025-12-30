@@ -11,8 +11,10 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post as ApiPost;
 use App\ApiResource\Comment\CommentCreateInput;
+use App\Entity\Interface\LikeableInterface;
 use App\Entity\Interface\TimeStampableInterface;
 use App\State\Comment\CommentCreateProcessor;
+use App\State\IsLikedProvider;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -20,7 +22,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
     shortName: 'Comment',
     operations: [
         new Get(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL, User::SERIALIZATION_GROUP_READ]]
+            normalizationContext: ['groups' => [
+                self::SERIALIZATION_GROUP_DETAIL,
+                User::SERIALIZATION_GROUP_READ,
+                self::LIKE_SERIALIZATION_GROUP_READ,
+            ]],
+            provider: IsLikedProvider::class
         ),
         new Delete(
             security: "is_granted('ROLE_USER') and object.getUser() == user",
@@ -34,8 +41,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 'groups' => [
                     self::SERIALIZATION_GROUP_READ,
                     User::SERIALIZATION_GROUP_READ,
+                    self::LIKE_SERIALIZATION_GROUP_READ,
                 ],
             ],
+            provider: IsLikedProvider::class
         ),
         new ApiPost(
             uriTemplate: '/posts/{postId}/comments',
@@ -51,8 +60,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Table(name: 'comment')]
-class Comment implements TimeStampableInterface
+class Comment implements LikeableInterface, TimeStampableInterface
 {
+    use Trait\LikeableTrait;
     use Trait\TimeStampableTrait;
 
     public const SERIALIZATION_GROUP_READ = 'comment:read';

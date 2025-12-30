@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Entity\Enum\LikeableTypeEnum;
 use App\Entity\Like;
+use App\Entity\Post;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -26,7 +27,7 @@ final readonly class UserLikesProvider implements ProviderInterface
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *
-     * @return array<Like>
+     * @return Like[]
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
@@ -36,34 +37,27 @@ final readonly class UserLikesProvider implements ProviderInterface
             throw new NotFoundHttpException('User not found');
         }
 
-        $likes = $this->entityManager->getRepository(Like::class)->findBy(['user' => $user]);
+        /** @var Like[] $likes */
+        $likes = $this->entityManager->getRepository(Like::class)->findBy([
+            'user' => $uriVariables['id'],
+            'entityClass' => LikeableTypeEnum::Post,
+        ]);
 
         if (empty($likes)) {
             return [];
         }
 
-        // Array ['Post' => [1, 3], 'Comment' => [2, 4]]
-        $map = [];
-        foreach ($likes as $like) {
-            $entityClass = LikeableTypeEnum::from($like->getEntityClass())->toEntityClass();
-            $map[$entityClass][] = $like->getEntityId();
-        }
+        $postIds = array_map(static fn (Like $like) => $like->getEntityId(), $likes);
 
-        $fetchedEntities = [];
-        foreach ($map as $className => $ids) {
-            $results = $this->entityManager->getRepository($className)->findBy(['id' => $ids]);
-
-            foreach ($results as $entity) {
-                $fetchedEntities[$className][$entity->getId()] = $entity;
-            }
+        $posts = $this->entityManager->getRepository(Post::class)->findBy(['id' => $postIds]);
+        $postsById = [];
+        foreach ($posts as $post) {
+            $postsById[$post->getId()] = $post;
         }
 
         foreach ($likes as $like) {
-            $class = LikeableTypeEnum::from($like->getEntityClass())->toEntityClass();
-            $id = $like->getEntityId();
-
-            if (isset($fetchedEntities[$class][$id])) {
-                $like->setLikedEntity($fetchedEntities[$class][$id]);
+            if (isset($postsById[$like->getEntityId()])) {
+                $like->setLikedEntity($postsById[$like->getEntityId()]);
             }
         }
 
