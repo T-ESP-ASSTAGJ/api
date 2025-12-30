@@ -99,6 +99,7 @@
         "captainhook/captainhook-phar": "^5.25",
         "doctrine/doctrine-fixtures-bundle": "^4.3",
         "friendsofphp/php-cs-fixer": "^3.84",
+        "mmo/faker-images": "^0.9.1",
         "phpstan/phpstan": "^2.1",
         "phpstan/phpstan-doctrine": "^2.0",
         "phpstan/phpstan-symfony": "^2.0",

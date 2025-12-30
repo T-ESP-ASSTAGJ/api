@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Factory;
 
 use App\Entity\User;
+use Faker\Factory;
+use Mmo\Faker\PicsumProvider;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
@@ -12,15 +14,6 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
  */
 final class UserFactory extends PersistentObjectFactory
 {
-    /**
-     * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
-     *
-     * @todo inject services if required
-     */
-    public function __construct()
-    {
-    }
-
     #[\Override]
     public static function class(): string
     {
@@ -37,13 +30,16 @@ final class UserFactory extends PersistentObjectFactory
     #[\Override]
     protected function defaults(): array
     {
+        $faker = Factory::create();
+        $faker->addProvider(new PicsumProvider($faker));
+
         return [
             'email' => self::faker()->email(),
             'isVerified' => self::faker()->boolean(),
             'needsProfile' => self::faker()->boolean(),
             'username' => self::faker()->userName(),
             'bio' => self::faker()->realText(200),
-            'profile_picture' => 'https://avatar.iran.liara.run/public/47',
+            'profile_picture' => $faker->picsumStaticRandomUrl(1920, 1080),
             'phone_number' => self::faker()->unique()->phoneNumber(),
             'roles' => [],
         ];
