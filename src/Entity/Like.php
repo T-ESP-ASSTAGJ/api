@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Post;
 use App\ApiResource\Like\LikeCreateInput;
 use App\Entity\Enum\LikeableTypeEnum;
+use App\Entity\Interface\LikeableInterface;
 use App\Entity\Interface\TimeStampableInterface;
 use App\State\Like\LikeProcessor;
 use Doctrine\ORM\Event\PostPersistEventArgs;
@@ -138,5 +139,11 @@ class Like implements TimeStampableInterface
             ->setParameter('diff', $diff)
             ->setParameter('id', $this->entityId)
             ->execute();
+
+        // If entity is currently loaded in memory, refresh it or update the value
+        $entity = $objectManager->getUnitOfWork()->tryGetById($this->entityId, $className);
+        if ($entity instanceof LikeableInterface) {
+            $entity->setLikesCount($entity->getLikesCount() + $diff);
+        }
     }
 }
