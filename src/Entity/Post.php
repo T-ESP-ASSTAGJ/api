@@ -103,6 +103,7 @@ class Post implements LikeableInterface, TimeStampableInterface
     #[ORM\JoinColumn(name: 'track_id', referencedColumnName: 'id', nullable: false)]
     #[Groups([
         self::SERIALIZATION_GROUP_DETAIL,
+        self::SERIALIZATION_GROUP_READ,
     ])]
     private Track $track;
 
