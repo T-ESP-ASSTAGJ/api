@@ -6,19 +6,20 @@ namespace App\State\User;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\Entity\Follow;
+use App\ApiResource\User\UserFollowOutput;
 use App\Entity\User;
+use App\Repository\FollowRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 /**
- * @implements ProviderInterface<array>
+ * @implements ProviderInterface<UserFollowOutput>
  */
 final readonly class UserFollowersProvider implements ProviderInterface
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
+        private FollowRepository $followRepository,
     ) {
     }
 
@@ -26,7 +27,7 @@ final readonly class UserFollowersProvider implements ProviderInterface
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *
-     * @return array<array{id: int|null, username: string|null, profilePicture: string|null}>
+     * @return UserFollowOutput[]
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
@@ -36,13 +37,6 @@ final readonly class UserFollowersProvider implements ProviderInterface
             throw new UnauthorizedHttpException('Bearer', 'Authentication required');
         }
 
-        $qb = $this->entityManager->createQueryBuilder();
-        $qb->select('follower.id', 'follower.username', 'follower.profilePicture')
-            ->from(Follow::class, 'f')
-            ->join('f.follower', 'follower')
-            ->where('f.followedUser = :userId')
-            ->setParameter('userId', $uriVariables['id']);
-
-        return $qb->getQuery()->getResult();
+        return $this->followRepository->findFollowers((int) $uriVariables['id']);
     }
 }

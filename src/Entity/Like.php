@@ -11,6 +11,8 @@ use App\ApiResource\Like\LikeCreateInput;
 use App\Entity\Enum\LikeableTypeEnum;
 use App\Entity\Interface\TimeStampableInterface;
 use App\State\Like\LikeProcessor;
+use Doctrine\ORM\Event\PostPersistEventArgs;
+use Doctrine\ORM\Event\PostRemoveEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -58,7 +60,7 @@ class Like implements TimeStampableInterface
 
     #[Groups([self::SERIALIZATION_GROUP_READ])]
     #[Assert\Choice(callback: [LikeableTypeEnum::class, 'values'])]
-    #[ORM\Column(name: 'entity_class', type: 'string', length: 50, nullable: false, enumType: LikeableTypeEnum::class)]
+    #[ORM\Column(name: 'entity_class', type: 'string', length: 255, nullable: false, enumType: LikeableTypeEnum::class)]
     private LikeableTypeEnum $entityClass;
 
     #[Groups([self::SERIALIZATION_GROUP_READ])]
@@ -113,5 +115,28 @@ class Like implements TimeStampableInterface
     public function setLikedEntity(?object $likedEntity): void
     {
         $this->likedEntity = $likedEntity;
+    }
+
+    #[ORM\PostPersist]
+    public function incrementLikesCount(PostPersistEventArgs $event): void
+    {
+        $this->updateLikesCount($event, 1);
+    }
+
+    #[ORM\PostRemove]
+    public function decrementLikesCount(PostRemoveEventArgs $event): void
+    {
+        $this->updateLikesCount($event, -1);
+    }
+
+    private function updateLikesCount(PostPersistEventArgs|PostRemoveEventArgs $event, int $diff): void
+    {
+        $objectManager = $event->getObjectManager();
+        $className = $this->entityClass->value;
+
+        $objectManager->createQuery(sprintf('UPDATE %s e SET e.likesCount = e.likesCount + :diff WHERE e.id = :id', $className))
+            ->setParameter('diff', $diff)
+            ->setParameter('id', $this->entityId)
+            ->execute();
     }
 }

@@ -9,6 +9,7 @@ use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\ProviderInterface;
 use App\Entity\Post;
 use App\Entity\User;
+use App\Repository\FollowRepository;
 use App\Repository\PostRepository;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -23,6 +24,7 @@ final readonly class FeedPrivateProvider implements ProviderInterface
         #[Autowire(service: 'api_platform.pagination')]
         private Pagination $pagination,
         private PostRepository $postRepository,
+        private FollowRepository $followRepository,
     ) {
     }
 
@@ -40,8 +42,8 @@ final readonly class FeedPrivateProvider implements ProviderInterface
             throw new \RuntimeException('Authentication required');
         }
 
-        $followedUsers = $currentUser->getFollowing();
-        $followedUserIds = array_filter(array_map(static fn ($user) => $user['id'], $followedUsers));
+        $followedUsers = $this->followRepository->findFollowers($currentUser->getId());
+        $followedUserIds = array_filter(array_map(static fn ($user) => $user->id, $followedUsers));
 
         if (empty($followedUserIds)) {
             return [];

@@ -11,7 +11,9 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post as ApiPost;
 use ApiPlatform\Metadata\Put;
 use App\ApiResource\Post\PostCreateInput;
+use App\Entity\Interface\LikeableInterface;
 use App\Entity\Interface\TimeStampableInterface;
+use App\State\IsLikedProvider;
 use App\State\Post\PostCreateProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -26,14 +28,18 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 self::SERIALIZATION_GROUP_DETAIL,
                 User::SERIALIZATION_GROUP_READ,
                 Artist::SERIALIZATION_GROUP_READ,
-            ]]
+                self::LIKE_SERIALIZATION_GROUP_READ,
+            ]],
+            provider: IsLikedProvider::class
         ),
         new GetCollection(
             normalizationContext: ['groups' => [
                 self::SERIALIZATION_GROUP_READ,
                 User::SERIALIZATION_GROUP_READ,
                 Artist::SERIALIZATION_GROUP_READ,
-            ]]
+                self::LIKE_SERIALIZATION_GROUP_READ,
+            ]],
+            provider: IsLikedProvider::class
         ),
         new ApiPost(
             normalizationContext: ['groups' => [
@@ -61,8 +67,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Table(name: 'post')]
-class Post implements TimeStampableInterface
+class Post implements LikeableInterface, TimeStampableInterface
 {
+    use Trait\LikeableTrait;
     use Trait\TimeStampableTrait;
 
     public const SERIALIZATION_GROUP_READ = 'post:read';
