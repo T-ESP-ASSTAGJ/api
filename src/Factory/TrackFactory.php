@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Factory;
 
 use App\Entity\Track;
+use Faker\Factory;
+use Mmo\Faker\PicsumProvider;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
@@ -26,15 +28,12 @@ final class TrackFactory extends PersistentObjectFactory
     #[\Override]
     protected function defaults(): array
     {
+        $faker = Factory::create();
+        $faker->addProvider(new PicsumProvider($faker));
+
         return [
             'title' => self::faker()->sentence(3),
-            'coverUrl' => self::faker()->randomElement([
-                'https://fastly.picsum.photos/id/203/200/200.jpg?hmac=fydyJjsULq7iMwTTIg_m6g_PQQ1paJrufNsEiqbJRsg',
-                'https://fastly.picsum.photos/id/340/200/200.jpg?hmac=8wghWAHHnmRpcl_sZApJLzQLqryeZqjaGMZo2wlZS3M',
-                'https://fastly.picsum.photos/id/635/200/200.jpg?hmac=Vm8Tavc31Qax01634w3MOPpNCCfasJG8wnBamSi87T4',
-                'https://fastly.picsum.photos/id/979/200/200.jpg?hmac=WcPMB8O2ujsPsQzJm14ISP-kXmQ59P6G82VPGNwql4I',
-                'https://fastly.picsum.photos/id/90/200/200.jpg?hmac=zltjAmHceKvUbRnvGycGPocNMsLFu-jiTwBEcre1_pU',
-            ]),
+            'coverUrl' => $faker->picsumStaticRandomUrl(1920, 1080),
             'metadata' => [
                 'duration' => self::faker()->numberBetween(60, 600),
                 'genre' => self::faker()->randomElement(['Pop', 'Rock', 'Jazz', 'Classical']),
