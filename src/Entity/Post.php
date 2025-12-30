@@ -203,10 +203,14 @@ class Post implements LikeableInterface, TimeStampableInterface
         return $this;
     }
 
-    #[ORM\PrePersist]
-    public function updateCommentsCount(): static
+    public function getCommentsCount(): int
     {
-        $this->commentsCount = count($this->comments);
+        return $this->commentsCount;
+    }
+
+    public function setCommentsCount(int $commentsCount): static
+    {
+        $this->commentsCount = $commentsCount;
 
         return $this;
     }

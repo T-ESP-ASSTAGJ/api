@@ -15,6 +15,8 @@ use App\Entity\Interface\LikeableInterface;
 use App\Entity\Interface\TimeStampableInterface;
 use App\State\Comment\CommentCreateProcessor;
 use App\State\IsLikedProvider;
+use Doctrine\ORM\Event\PostPersistEventArgs;
+use Doctrine\ORM\Event\PostRemoveEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -140,20 +142,26 @@ class Comment implements LikeableInterface, TimeStampableInterface
         return $this;
     }
 
-    #[ORM\PrePersist]
-    #[ORM\PreUpdate]
-    public function updatePostCommentsCount(): static
+    #[ORM\PostPersist]
+    public function incrementCommentsCount(PostPersistEventArgs $event): void
     {
-        $this->getPost()->updateCommentsCount();
-
-        return $this;
+        $this->updateCommentsCount($event, 1);
     }
 
-    #[ORM\PreRemove]
-    public function onPreRemove(): void
+    #[ORM\PostRemove]
+    public function decrementCommentsCount(PostRemoveEventArgs $event): void
+    {
+        $this->updateCommentsCount($event, -1);
+    }
+
+    private function updateCommentsCount(PostPersistEventArgs|PostRemoveEventArgs $event, int $diff): void
     {
         $post = $this->getPost();
-        $post->getComments()->removeElement($this);
-        $post->updateCommentsCount();
+        $event->getObjectManager()->createQuery('UPDATE App\Entity\Post p SET p.commentsCount = p.commentsCount + :diff WHERE p.id = :id')
+            ->setParameter('diff', $diff)
+            ->setParameter('id', $post->getId())
+            ->execute();
+
+        $post->setCommentsCount($post->getCommentsCount() + $diff);
     }
 }
