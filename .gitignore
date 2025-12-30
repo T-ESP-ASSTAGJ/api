@@ -23,6 +23,7 @@ compose.override.yaml
 ###> phpunit/phpunit ###
 /phpunit.xml
 /.phpunit.cache/
+/coverage
 ###< phpunit/phpunit ###
 
 ###> friendsofphp/php-cs-fixer ###
