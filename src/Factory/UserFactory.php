@@ -39,6 +39,7 @@ final class UserFactory extends PersistentObjectFactory
             'needsProfile' => self::faker()->boolean(),
             'username' => self::faker()->userName(),
             'bio' => self::faker()->realText(200),
+            // @phpstan-ignore method.notFound
             'profile_picture' => $faker->picsumStaticRandomUrl(1920, 1080),
             'phone_number' => self::faker()->unique()->phoneNumber(),
             'roles' => [],

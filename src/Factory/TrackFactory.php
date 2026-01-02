@@ -33,6 +33,7 @@ final class TrackFactory extends PersistentObjectFactory
 
         return [
             'title' => self::faker()->sentence(3),
+            // @phpstan-ignore method.notFound
             'coverUrl' => $faker->picsumStaticRandomUrl(1920, 1080),
             'metadata' => [
                 'duration' => self::faker()->numberBetween(60, 600),
