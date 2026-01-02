@@ -37,6 +37,7 @@ final class PostFactory extends PersistentObjectFactory
             'user' => UserFactory::random(),
             'track' => TrackFactory::new(),
             'location' => self::faker()->country(),
+            // @phpstan-ignore method.notFound
             'photoUrl' => $faker->picsumStaticRandomUrl(1920, 1080),
             'caption' => self::faker()->realText(200),
         ];

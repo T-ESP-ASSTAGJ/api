@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Post;
 use App\ApiResource\Like\LikeCreateInput;
 use App\Entity\Enum\LikeableTypeEnum;
 use App\Entity\Interface\LikeableInterface;
 use App\Entity\Interface\TimeStampableInterface;
-use App\State\Like\LikeProcessor;
+use App\State\Like\LikeCreateProcessor;
+use App\State\Like\LikeDeleteProcessor;
 use Doctrine\ORM\Event\PostPersistEventArgs;
 use Doctrine\ORM\Event\PostRemoveEventArgs;
 use Doctrine\ORM\Mapping as ORM;
@@ -26,12 +26,14 @@ use Symfony\Component\Validator\Constraints as Assert;
             status: 204,
             input: LikeCreateInput::class,
             output: false,
-            processor: LikeProcessor::class
+            processor: LikeCreateProcessor::class
         ),
-        new Delete(
-            uriTemplate: '/likes/{id}',
-            security: 'object.getUser() == user',
+        new Post(
+            uriTemplate: '/likes/delete',
+            status: 204,
+            input: LikeCreateInput::class,
             output: false,
+            processor: LikeDeleteProcessor::class
         ),
     ]
 )]

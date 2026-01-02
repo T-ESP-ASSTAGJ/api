@@ -11,6 +11,7 @@ use App\Entity\Post;
 use App\Entity\User;
 use App\Repository\FollowRepository;
 use App\Repository\PostRepository;
+use App\Service\isLikedEnricher;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -25,6 +26,7 @@ final readonly class FeedPrivateProvider implements ProviderInterface
         private Pagination $pagination,
         private PostRepository $postRepository,
         private FollowRepository $followRepository,
+        private isLikedEnricher $isLikedEnricher,
     ) {
     }
 
@@ -52,6 +54,9 @@ final readonly class FeedPrivateProvider implements ProviderInterface
         $offset = $this->pagination->getOffset($operation, $context);
         $limit = $this->pagination->getLimit($operation, $context);
 
-        return $this->postRepository->getFollowedPaginatedPosts($followedUserIds, $offset, $limit);
+        $data = $this->postRepository->getFollowedPaginatedPosts($followedUserIds, $offset, $limit);
+        $this->isLikedEnricher->enrich($data, Post::class);
+
+        return $data;
     }
 }

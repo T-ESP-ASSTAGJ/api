@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 /**
  * @implements ProcessorInterface<LikeCreateInput, void>
  */
-final readonly class LikeProcessor implements ProcessorInterface
+final readonly class LikeCreateProcessor implements ProcessorInterface
 {
     public function __construct(
         /** @var ProcessorInterface<Like, void> */

@@ -9,6 +9,7 @@ use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\ProviderInterface;
 use App\Entity\Post;
 use App\Repository\PostRepository;
+use App\Service\isLikedEnricher;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
@@ -20,6 +21,7 @@ final readonly class FeedPublicProvider implements ProviderInterface
         #[Autowire(service: 'api_platform.pagination')]
         private Pagination $pagination,
         private PostRepository $postRepository,
+        private isLikedEnricher $isLikedEnricher,
     ) {
     }
 
@@ -34,6 +36,10 @@ final readonly class FeedPublicProvider implements ProviderInterface
         $offset = $this->pagination->getOffset($operation, $context);
         $limit = $this->pagination->getLimit($operation, $context);
 
-        return $this->postRepository->getPaginatedPosts($offset, $limit);
+        $data = $this->postRepository->getPaginatedPosts($offset, $limit);
+
+        $this->isLikedEnricher->enrich($data, Post::class);
+
+        return $data;
     }
 }

@@ -17,7 +17,7 @@ use App\Entity\Interface\TimeStampableInterface;
 use App\Repository\UserRepository;
 use App\State\User\UserFollowersProvider;
 use App\State\User\UserFollowingProvider;
-use App\State\User\UserLikesProvider;
+use App\State\User\UserLikedPostProvider;
 use App\State\User\UserMeProvider;
 use App\State\User\UserPutProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -49,7 +49,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: '/users/{id}/likes',
             normalizationContext: ['groups' => [Like::SERIALIZATION_GROUP_READ, Post::SERIALIZATION_GROUP_READ]],
             output: UserFollowOutput::class,
-            provider: UserLikesProvider::class,
+            provider: UserLikedPostProvider::class,
         ),
         new Get(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
