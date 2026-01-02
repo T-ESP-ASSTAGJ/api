@@ -9,6 +9,9 @@ use ApiPlatform\Metadata\Get;
 use App\Entity\Token;
 use App\State\Spotify\AuthSpotifyCallbackProvider;
 
+/**
+ * @codeCoverageIgnore
+ */
 #[ApiResource(
     operations: [
         new Get(

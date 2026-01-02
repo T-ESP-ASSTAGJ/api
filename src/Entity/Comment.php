@@ -142,18 +142,27 @@ class Comment implements LikeableInterface, TimeStampableInterface
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     #[ORM\PostPersist]
     public function incrementCommentsCount(PostPersistEventArgs $event): void
     {
         $this->updateCommentsCount($event, 1);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     #[ORM\PostRemove]
     public function decrementCommentsCount(PostRemoveEventArgs $event): void
     {
         $this->updateCommentsCount($event, -1);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     private function updateCommentsCount(PostPersistEventArgs|PostRemoveEventArgs $event, int $diff): void
     {
         $post = $this->getPost();
