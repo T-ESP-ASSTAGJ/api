@@ -1,0 +1,27 @@
+name: Sync Staging from Main
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  sync-staging:
+    runs-on: ubuntu-latest
+    name: Sync staging branch from main
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.AUTO_DEPLOY_TOKEN }}
+
+      - name: Sync main to staging
+        uses: tukasz/direct-merge-action@master
+        with:
+          GITHUB_TOKEN: ${{ secrets.AUTO_DEPLOY_TOKEN }}
+          source-branch: main
+          target-branch: staging
+          commit-message: "🔄 Auto-sync staging from main [skip ci]"

@@ -1,0 +1,47 @@
+name: Manual Sync Branches
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_branch:
+        description: 'Source branch to merge from'
+        required: true
+        type: choice
+        options:
+          - main
+          - staging
+        default: 'main'
+      target_branch:
+        description: 'Target branch to merge into'
+        required: true
+        type: choice
+        options:
+          - staging
+          - main
+        default: 'staging'
+
+jobs:
+  sync-branches:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate input
+        run: |
+          if [ "${{ inputs.source_branch }}" == "${{ inputs.target_branch }}" ]; then
+            echo "::error::Source and target branches cannot be the same"
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.AUTO_DEPLOY_TOKEN }}
+
+      - name: Sync branches using direct merge
+        uses: tukasz/direct-merge-action@master
+        with:
+          GITHUB_TOKEN: ${{ secrets.AUTO_DEPLOY_TOKEN }}
+          source-branch: ${{ inputs.source_branch }}
+          target-branch: ${{ inputs.target_branch }}
+          commit-message: "🔄 Manual sync from ${{ inputs.source_branch }} to ${{ inputs.target_branch }}"
