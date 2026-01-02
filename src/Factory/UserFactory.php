@@ -11,6 +11,7 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
  * @extends PersistentObjectFactory<User>
+ * @codeCoverageIgnore
  */
 final class UserFactory extends PersistentObjectFactory
 {

@@ -7,6 +7,9 @@ namespace App\ApiResource\Comment;
 use ApiPlatform\Metadata\ApiProperty;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * @codeCoverageIgnore
+ */
 class CommentCreateInput
 {
     #[Assert\NotBlank(message: 'Le commentaire ne peut pas être vide')]

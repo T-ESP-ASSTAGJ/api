@@ -44,4 +44,40 @@ class LikeTest extends TestCase
         $this->assertInstanceOf(\DateTimeImmutable::class, $like->getCreatedAt());
         $this->assertInstanceOf(\DateTimeImmutable::class, $like->getUpdatedAt());
     }
+
+    public function testSetEntityClassWithComment(): void
+    {
+        $like = new Like();
+        $like->setEntityClass(LikeableTypeEnum::Comment);
+
+        $this->assertSame(\App\Entity\Comment::class, $like->getEntityClass());
+    }
+
+    public function testSetEntityClassWithMessage(): void
+    {
+        $like = new Like();
+        $like->setEntityClass(LikeableTypeEnum::Message);
+
+        $this->assertSame(\App\Entity\Message::class, $like->getEntityClass());
+    }
+
+    public function testGetLikedEntityReturnsNullByDefault(): void
+    {
+        $like = new Like();
+
+        $this->assertNull($like->getLikedEntity());
+    }
+
+    public function testSetLikedEntity(): void
+    {
+        $like = new Like();
+        $post = new Post();
+
+        $like->setLikedEntity($post);
+
+        $this->assertSame($post, $like->getLikedEntity());
+
+        $like->setLikedEntity(null);
+        $this->assertNull($like->getLikedEntity());
+    }
 }

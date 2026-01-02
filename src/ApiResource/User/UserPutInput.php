@@ -6,6 +6,9 @@ namespace App\ApiResource\User;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * @codeCoverageIgnore
+ */
 class UserPutInput
 {
     public ?string $username = null;

@@ -7,6 +7,9 @@ namespace App\ApiResource\Track;
 use ApiPlatform\Metadata\ApiProperty;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * @codeCoverageIgnore
+ */
 class TrackCreateInput
 {
     #[Assert\NotBlank]

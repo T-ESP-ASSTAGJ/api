@@ -120,18 +120,27 @@ class Like implements TimeStampableInterface
         $this->likedEntity = $likedEntity;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     #[ORM\PostPersist]
     public function incrementLikesCount(PostPersistEventArgs $event): void
     {
         $this->updateLikesCount($event, 1);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     #[ORM\PostRemove]
     public function decrementLikesCount(PostRemoveEventArgs $event): void
     {
         $this->updateLikesCount($event, -1);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     private function updateLikesCount(PostPersistEventArgs|PostRemoveEventArgs $event, int $diff): void
     {
         $objectManager = $event->getObjectManager();

@@ -7,6 +7,9 @@ namespace App\ApiResource\Post;
 use ApiPlatform\Metadata\ApiProperty;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * @codeCoverageIgnore
+ */
 class PostCreateInput
 {
     #[Assert\Length(max: 1000)]
