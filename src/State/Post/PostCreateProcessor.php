@@ -11,6 +11,7 @@ use App\ApiResource\Post\PostCreateInput;
 use App\Entity\Post;
 use App\Entity\Track;
 use App\Entity\User;
+use App\Service\ImageService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -25,6 +26,7 @@ final readonly class PostCreateProcessor implements ProcessorInterface
         private EntityManagerInterface $em,
         private ValidatorInterface $validator,
         private Security $security,
+        private ImageService $imageService,
     ) {
     }
 
@@ -48,16 +50,30 @@ final readonly class PostCreateProcessor implements ProcessorInterface
             throw new NotFoundHttpException('User not found');
         }
 
-        $track = $this->em->getRepository(Track::class)->find($data->trackId);
+        // Find or create track based on songId
+        $track = $this->em->getRepository(Track::class)->findOneBy(['songId' => $data->songId]);
+
         if (!$track) {
-            throw new NotFoundHttpException('Track not found');
+            // Create new track if it doesn't exist
+            $track = new Track();
+            $track->setSongId($data->songId);
+            $track->setTitle($data->trackTitle);
+            $track->setArtistName($data->artistName);
+            $track->setReleaseYear($data->releaseYear);
+
+            $this->em->persist($track);
         }
+
+        // Process and save images
+        $frontImageUrl = $this->imageService->saveBase64Image($data->frontImage, 'posts');
+        $backImageUrl = $this->imageService->saveBase64Image($data->backImage, 'posts');
 
         $post = new Post();
         $post->setUser($user);
         $post->setCaption($data->caption);
         $post->setTrack($track);
-        $post->setPhotoUrl($data->photoUrl);
+        $post->setFrontImage($frontImageUrl);
+        $post->setBackImage($backImageUrl);
         $post->setLocation($data->location);
 
         $violations = $this->validator->validate($post);

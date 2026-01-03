@@ -17,14 +17,31 @@ class PostCreateInput
     public ?string $caption = null;
 
     #[Assert\NotBlank]
-    #[Assert\Positive]
-    #[ApiProperty(example: 1)]
-    public int $trackId;
+    #[Assert\Length(max: 255)]
+    #[ApiProperty(example: '1234567890')]
+    public string $songId;
 
-    #[Assert\Url]
-    #[Assert\Length(max: 500)]
-    #[ApiProperty(example: 'https://example.com/photos/sunset-beach.jpg')]
-    public ?string $photoUrl = null;
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 255)]
+    #[ApiProperty(example: 'Blinding Lights')]
+    public string $trackTitle;
+
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 255)]
+    #[ApiProperty(example: 'The Weeknd')]
+    public string $artistName;
+
+    #[Assert\Positive]
+    #[ApiProperty(example: 2020)]
+    public ?int $releaseYear = null;
+
+    #[Assert\Length(max: 1000000)]
+    #[ApiProperty(example: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD...')]
+    public ?string $frontImage = null;
+
+    #[Assert\Length(max: 1000000)]
+    #[ApiProperty(example: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD...')]
+    public ?string $backImage = null;
 
     #[Assert\Length(max: 255)]
     #[ApiProperty(example: 'Paris, France')]

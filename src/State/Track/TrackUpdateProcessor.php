@@ -8,9 +8,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
 use App\ApiResource\Track\TrackUpdateInput;
-use App\Entity\Artist;
 use App\Entity\Track;
-use App\Entity\TrackSource;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -32,6 +30,7 @@ final readonly class TrackUpdateProcessor implements ProcessorInterface
      * @param array<string, mixed> $context
      *
      * @return Track
+     * @Deprecated
      */
     public function process(mixed $data, ?Operation $operation = null, array $uriVariables = [], array $context = []): mixed
     {
@@ -48,41 +47,20 @@ final readonly class TrackUpdateProcessor implements ProcessorInterface
                 throw new NotFoundHttpException('Track not found');
             }
 
+            if (null !== $data->songId) {
+                $track->setSongId($data->songId);
+            }
+
             if (null !== $data->title) {
                 $track->setTitle($data->title);
             }
 
-            if (null !== $data->coverUrl) {
-                $track->setCoverUrl($data->coverUrl);
+            if (null !== $data->artistName) {
+                $track->setArtistName($data->artistName);
             }
 
-            if (null !== $data->metadata) {
-                $track->setMetadata($data->metadata);
-            }
-
-            if (null !== $data->artistId) {
-                $artist = $this->em->getRepository(Artist::class)->find($data->artistId);
-                if (!$artist) {
-                    throw new NotFoundHttpException('Artist not found');
-                }
-                $track->setArtist($artist);
-            }
-
-            // Mise à jour des TrackSource si fournis
-            if (null !== $data->trackSources) {
-                // Supprimer les anciennes sources
-                foreach ($track->getTrackSources() as $oldSource) {
-                    $track->removeTrackSource($oldSource);
-                }
-
-                // Ajouter les nouvelles sources
-                foreach ($data->trackSources as $sourceDto) {
-                    $trackSource = new TrackSource();
-                    $trackSource->setPlatform($sourceDto->platform);
-                    $trackSource->setPlatformTrackId($sourceDto->platformTrackId);
-                    $trackSource->setMetadata($sourceDto->metadata);
-                    $track->addTrackSource($trackSource);
-                }
+            if (null !== $data->releaseYear) {
+                $track->setReleaseYear($data->releaseYear);
             }
 
             $violations = $this->validator->validate($track);

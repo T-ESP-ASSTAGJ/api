@@ -29,7 +29,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
             normalizationContext: ['groups' => [
                 self::SERIALIZATION_GROUP_DETAIL,
                 User::SERIALIZATION_GROUP_READ,
-                Artist::SERIALIZATION_GROUP_READ,
                 self::LIKE_SERIALIZATION_GROUP_READ,
             ]],
             provider: IsLikedProvider::class
@@ -38,7 +37,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
             normalizationContext: ['groups' => [
                 self::SERIALIZATION_GROUP_READ,
                 User::SERIALIZATION_GROUP_READ,
-                Artist::SERIALIZATION_GROUP_READ,
                 self::LIKE_SERIALIZATION_GROUP_READ,
             ]],
             provider: IsLikedProvider::class
@@ -47,7 +45,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
             normalizationContext: ['groups' => [
                 self::SERIALIZATION_GROUP_DETAIL,
                 User::SERIALIZATION_GROUP_READ,
-                Artist::SERIALIZATION_GROUP_READ,
+                self::LIKE_SERIALIZATION_GROUP_READ,
             ]],
             input: PostCreateInput::class,
             processor: PostCreateProcessor::class
@@ -55,8 +53,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new Put(
             normalizationContext: ['groups' => [
                 self::SERIALIZATION_GROUP_DETAIL,
-                User::SERIALIZATION_GROUP_READ,
-                Artist::SERIALIZATION_GROUP_READ,
+                User::SERIALIZATION_GROUP_READ
             ]],
             security: 'object.getUser() == user',
         ),
@@ -110,12 +107,19 @@ class Post implements LikeableInterface, TimeStampableInterface
     ])]
     private Track $track;
 
-    #[ORM\Column(name: 'photo_url', type: 'string', length: 500, nullable: true)]
+    #[ORM\Column(name: 'front_image', type: 'string', length: 500, nullable: true)]
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
     ])]
-    private ?string $photoUrl = null;
+    private ?string $frontImage = null;
+
+    #[ORM\Column(name: 'back_image', type: 'string', length: 500, nullable: true)]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
+    private ?string $backImage = null;
 
     #[ORM\Column(name: 'location', type: 'string', length: 255, nullable: true)]
     #[Groups([
@@ -183,14 +187,26 @@ class Post implements LikeableInterface, TimeStampableInterface
         return $this;
     }
 
-    public function getPhotoUrl(): ?string
+    public function getFrontImage(): ?string
     {
-        return $this->photoUrl;
+        return $this->frontImage;
     }
 
-    public function setPhotoUrl(?string $photoUrl): static
+    public function setFrontImage(?string $frontImage): static
     {
-        $this->photoUrl = $photoUrl;
+        $this->frontImage = $frontImage;
+
+        return $this;
+    }
+
+    public function getBackImage(): ?string
+    {
+        return $this->backImage;
+    }
+
+    public function setBackImage(?string $backImage): static
+    {
+        $this->backImage = $backImage;
 
         return $this;
     }
