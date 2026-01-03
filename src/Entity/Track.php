@@ -15,8 +15,6 @@ use App\ApiResource\Track\TrackUpdateInput;
 use App\Entity\Interface\TimeStampableInterface;
 use App\State\Track\TrackCreateProcessor;
 use App\State\Track\TrackUpdateProcessor;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -63,6 +61,15 @@ class Track implements TimeStampableInterface
     ])]
     private ?int $id = null;
 
+    #[ORM\Column(name: 'song_id', type: 'string', length: 255)]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+        Post::SERIALIZATION_GROUP_DETAIL,
+        Post::SERIALIZATION_GROUP_READ,
+    ])]
+    private string $songId;
+
     #[ORM\Column(name: 'title', type: 'string', length: 255)]
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
@@ -72,54 +79,39 @@ class Track implements TimeStampableInterface
     ])]
     private string $title;
 
-    #[ORM\Column(name: 'cover_url', type: 'text', nullable: true)]
+    #[ORM\Column(name: 'artist_name', type: 'string', length: 255)]
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
         Post::SERIALIZATION_GROUP_DETAIL,
         Post::SERIALIZATION_GROUP_READ,
     ])]
-    private ?string $coverUrl = null;
+    private string $artistName;
 
-    /**
-     * @var array<string, mixed>
-     */
-    #[ORM\Column(name: 'metadata', type: 'json')]
+    #[ORM\Column(name: 'release_year', type: 'integer', nullable: true)]
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
         Post::SERIALIZATION_GROUP_DETAIL,
         Post::SERIALIZATION_GROUP_READ,
     ])]
-    private array $metadata = [];
-
-    #[ORM\ManyToOne(targetEntity: Artist::class, inversedBy: 'tracks')]
-    #[ORM\JoinColumn(name: 'artist_id', referencedColumnName: 'id', nullable: false)]
-    #[Groups([
-        self::SERIALIZATION_GROUP_READ,
-        self::SERIALIZATION_GROUP_DETAIL,
-        Post::SERIALIZATION_GROUP_DETAIL,
-        Post::SERIALIZATION_GROUP_READ,
-    ])]
-    private Artist $artist;
-
-    /**
-     * @var Collection<int, TrackSource>
-     */
-    #[ORM\OneToMany(targetEntity: TrackSource::class, mappedBy: 'track', cascade: ['persist', 'remove'], orphanRemoval: true)]
-    #[Groups([
-        self::SERIALIZATION_GROUP_DETAIL,
-    ])]
-    private Collection $trackSources;
-
-    public function __construct()
-    {
-        $this->trackSources = new ArrayCollection();
-    }
+    private ?int $releaseYear = null;
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getSongId(): string
+    {
+        return $this->songId;
+    }
+
+    public function setSongId(string $songId): static
+    {
+        $this->songId = $songId;
+
+        return $this;
     }
 
     public function getTitle(): string
@@ -134,69 +126,26 @@ class Track implements TimeStampableInterface
         return $this;
     }
 
-    public function getCoverUrl(): ?string
+    public function getArtistName(): string
     {
-        return $this->coverUrl;
+        return $this->artistName;
     }
 
-    public function setCoverUrl(?string $coverUrl): static
+    public function setArtistName(string $artistName): static
     {
-        $this->coverUrl = $coverUrl;
+        $this->artistName = $artistName;
 
         return $this;
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    public function getMetadata(): array
+    public function getReleaseYear(): ?int
     {
-        return $this->metadata;
+        return $this->releaseYear;
     }
 
-    /**
-     * @param array<string, mixed> $metadata
-     */
-    public function setMetadata(array $metadata): static
+    public function setReleaseYear(?int $releaseYear): static
     {
-        $this->metadata = $metadata;
-
-        return $this;
-    }
-
-    public function getArtist(): Artist
-    {
-        return $this->artist;
-    }
-
-    public function setArtist(Artist $artist): static
-    {
-        $this->artist = $artist;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, TrackSource>
-     */
-    public function getTrackSources(): Collection
-    {
-        return $this->trackSources;
-    }
-
-    public function addTrackSource(TrackSource $trackSource): static
-    {
-        if (!$this->trackSources->contains($trackSource)) {
-            $this->trackSources->add($trackSource);
-            $trackSource->setTrack($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTrackSource(TrackSource $trackSource): static
-    {
-        $this->trackSources->removeElement($trackSource);
+        $this->releaseYear = $releaseYear;
 
         return $this;
     }

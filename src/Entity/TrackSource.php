@@ -8,6 +8,10 @@ use App\Entity\Interface\TimeStampableInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+/**
+ * @deprecated This entity is deprecated and will be removed in a future version.
+ *             Track sources are no longer needed with Apple Music integration.
+ */
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Table(name: 'track_source')]

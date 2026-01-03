@@ -8,11 +8,8 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
 use App\ApiResource\Track\TrackCreateInput;
-use App\Entity\Artist;
 use App\Entity\Track;
-use App\Entity\TrackSource;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -32,29 +29,16 @@ final readonly class TrackCreateProcessor implements ProcessorInterface
      * @param array<string, mixed> $context
      *
      * @return Track
+     * @Deprecated
      */
     public function process(mixed $data, ?Operation $operation = null, array $uriVariables = [], array $context = []): mixed
     {
         if ($data instanceof TrackCreateInput) {
-            $artist = $this->em->getRepository(Artist::class)->find($data->artistId);
-            if (!$artist) {
-                throw new NotFoundHttpException('Artist not found');
-            }
-
             $track = new Track();
+            $track->setSongId($data->songId);
             $track->setTitle($data->title);
-            $track->setCoverUrl($data->coverUrl);
-            $track->setMetadata($data->metadata);
-            $track->setArtist($artist);
-
-            // Création des TrackSource
-            foreach ($data->trackSources as $sourceDto) {
-                $trackSource = new TrackSource();
-                $trackSource->setPlatform($sourceDto->platform);
-                $trackSource->setPlatformTrackId($sourceDto->platformTrackId);
-                $trackSource->setMetadata($sourceDto->metadata);
-                $track->addTrackSource($trackSource);
-            }
+            $track->setArtistName($data->artistName);
+            $track->setReleaseYear($data->releaseYear);
 
             $violations = $this->validator->validate($track);
             if ($violations->count() > 0) {
