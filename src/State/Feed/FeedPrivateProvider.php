@@ -44,7 +44,7 @@ final readonly class FeedPrivateProvider implements ProviderInterface
             throw new \RuntimeException('Authentication required');
         }
 
-        $followedUsers = $this->followRepository->findFollowers($currentUser->getId());
+        $followedUsers = $this->followRepository->findFollowing($currentUser->getId());
         $followedUserIds = array_filter(array_map(static fn ($user) => $user->id, $followedUsers));
 
         if (empty($followedUserIds)) {
@@ -54,7 +54,7 @@ final readonly class FeedPrivateProvider implements ProviderInterface
         $offset = $this->pagination->getOffset($operation, $context);
         $limit = $this->pagination->getLimit($operation, $context);
 
-        $data = $this->postRepository->getFollowedPaginatedPosts($followedUserIds, $offset, $limit);
+        $data = $this->postRepository->getFollowingPaginatedPosts($followedUserIds, $offset, $limit);
         $this->isLikedEnricher->enrich($data, Post::class);
 
         return $data;

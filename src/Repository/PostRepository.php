@@ -30,15 +30,15 @@ class PostRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param array<int> $followedUserIds
+     * @param array<int> $followingUserIds
      *
      * @return Post[]
      */
-    public function getFollowedPaginatedPosts(array $followedUserIds, int $offset, int $limit): array
+    public function getFollowingPaginatedPosts(array $followingUserIds, int $offset, int $limit): array
     {
         $queryBuilder = $this->createQueryBuilder('p')
-            ->where('p.user IN (:followedUserIds)')
-            ->setParameter('followedUserIds', $followedUserIds)
+            ->where('p.user IN (:followingUserIds)')
+            ->setParameter('followingUserIds', $followingUserIds)
             ->orderBy('p.createdAt', 'DESC')
             ->setFirstResult($offset)
             ->setMaxResults($limit);

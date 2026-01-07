@@ -7,19 +7,15 @@ namespace DoctrineMigrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
-/**
- * Auto-generated Migration: Please modify to your needs!
- */
 final class Version20260103155216 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return '';
+        return 'Alter Post : back and front image, update Track';
     }
 
     public function up(Schema $schema): void
     {
-        // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('ALTER TABLE post ADD back_image VARCHAR(500) DEFAULT NULL');
         $this->addSql('ALTER TABLE post RENAME COLUMN photo_url TO front_image');
 
@@ -48,7 +44,6 @@ final class Version20260103155216 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        // this down() migration is auto-generated, please modify it to your needs
         $this->addSql('ALTER TABLE post ADD photo_url VARCHAR(500) DEFAULT NULL');
         $this->addSql('ALTER TABLE post DROP front_image');
         $this->addSql('ALTER TABLE post DROP back_image');
