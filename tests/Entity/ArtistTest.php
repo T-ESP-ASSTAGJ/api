@@ -6,9 +6,11 @@ namespace App\Tests\Entity;
 
 use App\Entity\Artist;
 use App\Entity\ArtistSource;
-use App\Entity\Track;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @deprecated This test is for the deprecated Artist entity.
+ */
 class ArtistTest extends TestCase
 {
     public function testConstruct(): void
@@ -50,24 +52,12 @@ class ArtistTest extends TestCase
         $this->assertCount(0, $artist->getArtistSources());
     }
 
-    public function testAddAndRemoveTrack(): void
+    public function testTracksCollection(): void
     {
         $artist = new Artist();
-        $track = new Track();
 
-        $result = $artist->addTrack($track);
-        $this->assertSame($artist, $result);
-        $this->assertCount(1, $artist->getTracks());
-        $this->assertTrue($artist->getTracks()->contains($track));
-        $this->assertSame($artist, $track->getArtist());
-
-        // Adding the same track again should not duplicate
-        $artist->addTrack($track);
-        $this->assertCount(1, $artist->getTracks());
-
-        $removed = $artist->removeTrack($track);
-        $this->assertTrue($removed);
         $this->assertCount(0, $artist->getTracks());
+        $this->assertInstanceOf(\Doctrine\Common\Collections\Collection::class, $artist->getTracks());
     }
 
     public function testTimeStampableTrait(): void

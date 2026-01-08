@@ -31,9 +31,13 @@ class PostTest extends TestCase
         $this->assertSame($post, $result);
         $this->assertSame($track, $post->getTrack());
 
-        $result = $post->setPhotoUrl('https://example.com/photo.jpg');
+        $result = $post->setFrontImage('https://example.com/front.jpg');
         $this->assertSame($post, $result);
-        $this->assertSame('https://example.com/photo.jpg', $post->getPhotoUrl());
+        $this->assertSame('https://example.com/front.jpg', $post->getFrontImage());
+
+        $result = $post->setBackImage('https://example.com/back.jpg');
+        $this->assertSame($post, $result);
+        $this->assertSame('https://example.com/back.jpg', $post->getBackImage());
 
         $result = $post->setLocation('Paris, France');
         $this->assertSame($post, $result);
@@ -59,7 +63,8 @@ class PostTest extends TestCase
         $post = new Post();
 
         $this->assertNull($post->getCaption());
-        $this->assertNull($post->getPhotoUrl());
+        $this->assertNull($post->getFrontImage());
+        $this->assertNull($post->getBackImage());
         $this->assertNull($post->getLocation());
         $this->assertSame(0, $post->getCommentsCount());
     }

@@ -27,4 +27,8 @@ class TrackUpdateInput
     #[Assert\Positive]
     #[ApiProperty(example: 2020)]
     public ?int $releaseYear = null;
+
+    #[Assert\Length(max: 300)]
+    #[ApiProperty(example: 'https://i.scdn.co/image/ab67616d0000b273123456789abcdef')]
+    public ?string $coverImage = null;
 }

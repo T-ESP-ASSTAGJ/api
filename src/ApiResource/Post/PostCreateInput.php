@@ -37,6 +37,10 @@ class PostCreateInput
 
     #[Assert\Length(max: 1000000)]
     #[ApiProperty(example: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD...')]
+    public ?string $coverImage = null;
+
+    #[Assert\Length(max: 1000000)]
+    #[ApiProperty(example: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD...')]
     public ?string $frontImage = null;
 
     #[Assert\Length(max: 1000000)]

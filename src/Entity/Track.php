@@ -97,6 +97,15 @@ class Track implements TimeStampableInterface
     ])]
     private ?int $releaseYear = null;
 
+    #[ORM\Column(length: 300, nullable: true)]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+        Post::SERIALIZATION_GROUP_DETAIL,
+        Post::SERIALIZATION_GROUP_READ,
+    ])]
+    private ?string $coverImage = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -146,6 +155,18 @@ class Track implements TimeStampableInterface
     public function setReleaseYear(?int $releaseYear): static
     {
         $this->releaseYear = $releaseYear;
+
+        return $this;
+    }
+
+    public function getCoverImage(): ?string
+    {
+        return $this->coverImage;
+    }
+
+    public function setCoverImage(?string $coverImage): static
+    {
+        $this->coverImage = $coverImage;
 
         return $this;
     }

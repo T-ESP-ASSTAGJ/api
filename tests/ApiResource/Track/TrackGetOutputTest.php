@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\ApiResource\Track;
 
 use App\ApiResource\Track\TrackGetOutput;
-use App\Entity\Artist;
 use App\Entity\Track;
 use PHPUnit\Framework\TestCase;
 
@@ -13,14 +12,12 @@ class TrackGetOutputTest extends TestCase
 {
     public function testFromEntity(): void
     {
-        $artist = new Artist();
-        $artist->setName('Test Artist');
-
         $track = new Track();
+        $track->setSongId('spotify:track:123456789');
         $track->setTitle('Test Track');
-        $track->setCoverUrl('https://example.com/cover.jpg');
-        $track->setArtist($artist);
-        $track->setMetadata(['album' => 'Test Album', 'duration' => 180]);
+        $track->setArtistName('Test Artist');
+        $track->setReleaseYear(2024);
+        $track->setCoverImage('https://example.com/cover.jpg');
 
         // Use reflection to set the ID and timestamps
         $reflection = new \ReflectionClass($track);
@@ -43,24 +40,23 @@ class TrackGetOutputTest extends TestCase
 
         $this->assertInstanceOf(TrackGetOutput::class, $output);
         $this->assertSame(123, $output->id);
+        $this->assertSame('spotify:track:123456789', $output->songId);
         $this->assertSame('Test Track', $output->title);
-        $this->assertSame('https://example.com/cover.jpg', $output->coverUrl);
-        $this->assertSame($artist, $output->artist);
-        $this->assertSame(['album' => 'Test Album', 'duration' => 180], $output->metadata);
+        $this->assertSame('Test Artist', $output->artistName);
+        $this->assertSame(2024, $output->releaseYear);
+        $this->assertSame('https://example.com/cover.jpg', $output->coverImage);
         $this->assertSame($createdAt, $output->createdAt);
         $this->assertSame($updatedAt, $output->updatedAt);
     }
 
     public function testFromEntityWithNullValues(): void
     {
-        $artist = new Artist();
-        $artist->setName('Test Artist');
-
         $track = new Track();
+        $track->setSongId('spotify:track:987654321');
         $track->setTitle('Test Track');
-        $track->setCoverUrl(null);
-        $track->setArtist($artist);
-        $track->setMetadata([]);
+        $track->setArtistName('Test Artist');
+        $track->setReleaseYear(null);
+        $track->setCoverImage(null);
 
         // Use reflection to set the ID (timestamps will not be initialized)
         $reflection = new \ReflectionClass($track);
@@ -78,10 +74,11 @@ class TrackGetOutputTest extends TestCase
 
         $this->assertInstanceOf(TrackGetOutput::class, $output);
         $this->assertSame(456, $output->id);
+        $this->assertSame('spotify:track:987654321', $output->songId);
         $this->assertSame('Test Track', $output->title);
-        $this->assertNull($output->coverUrl);
-        $this->assertSame($artist, $output->artist);
-        $this->assertSame([], $output->metadata);
+        $this->assertSame('Test Artist', $output->artistName);
+        $this->assertNull($output->releaseYear);
+        $this->assertNull($output->coverImage);
         $this->assertInstanceOf(\DateTimeInterface::class, $output->createdAt);
         $this->assertInstanceOf(\DateTimeInterface::class, $output->updatedAt);
     }

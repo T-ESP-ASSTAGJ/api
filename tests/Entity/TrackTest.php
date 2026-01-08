@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Entity;
 
-use App\Entity\Artist;
 use App\Entity\Track;
-use App\Entity\TrackSource;
 use PHPUnit\Framework\TestCase;
 
 class TrackTest extends TestCase
@@ -14,52 +12,42 @@ class TrackTest extends TestCase
     public function testGettersAndSetters(): void
     {
         $track = new Track();
-        $artist = new Artist();
 
         $this->assertNull($track->getId());
+
+        $result = $track->setSongId('spotify:track:123456');
+        $this->assertSame($track, $result);
+        $this->assertSame('spotify:track:123456', $track->getSongId());
 
         $result = $track->setTitle('Test Track');
         $this->assertSame($track, $result);
         $this->assertSame('Test Track', $track->getTitle());
 
-        $result = $track->setCoverUrl('https://example.com/cover.jpg');
+        $result = $track->setArtistName('Test Artist');
         $this->assertSame($track, $result);
-        $this->assertSame('https://example.com/cover.jpg', $track->getCoverUrl());
+        $this->assertSame('Test Artist', $track->getArtistName());
 
-        $metadata = ['duration' => 180, 'genre' => 'Rock'];
-        $result = $track->setMetadata($metadata);
+        $result = $track->setReleaseYear(2024);
         $this->assertSame($track, $result);
-        $this->assertSame($metadata, $track->getMetadata());
+        $this->assertSame(2024, $track->getReleaseYear());
 
-        $result = $track->setArtist($artist);
+        $result = $track->setCoverImage('https://example.com/cover.jpg');
         $this->assertSame($track, $result);
-        $this->assertSame($artist, $track->getArtist());
+        $this->assertSame('https://example.com/cover.jpg', $track->getCoverImage());
     }
 
-    public function testTrackSourceCollection(): void
+    public function testNullableFields(): void
     {
         $track = new Track();
-        $trackSource1 = new TrackSource();
-        $trackSource2 = new TrackSource();
 
-        $this->assertCount(0, $track->getTrackSources());
+        $this->assertNull($track->getReleaseYear());
+        $this->assertNull($track->getCoverImage());
 
-        $result = $track->addTrackSource($trackSource1);
-        $this->assertSame($track, $result);
-        $this->assertCount(1, $track->getTrackSources());
-        $this->assertTrue($track->getTrackSources()->contains($trackSource1));
+        $track->setReleaseYear(null);
+        $track->setCoverImage(null);
 
-        $track->addTrackSource($trackSource2);
-        $this->assertCount(2, $track->getTrackSources());
-
-        // Test adding same source twice (should not duplicate)
-        $track->addTrackSource($trackSource1);
-        $this->assertCount(2, $track->getTrackSources());
-
-        $result = $track->removeTrackSource($trackSource1);
-        $this->assertSame($track, $result);
-        $this->assertCount(1, $track->getTrackSources());
-        $this->assertFalse($track->getTrackSources()->contains($trackSource1));
+        $this->assertNull($track->getReleaseYear());
+        $this->assertNull($track->getCoverImage());
     }
 
     public function testTimeStampableTrait(): void
@@ -69,11 +57,5 @@ class TrackTest extends TestCase
 
         $this->assertInstanceOf(\DateTimeImmutable::class, $track->getCreatedAt());
         $this->assertInstanceOf(\DateTimeImmutable::class, $track->getUpdatedAt());
-    }
-
-    public function testDefaultMetadata(): void
-    {
-        $track = new Track();
-        $this->assertSame([], $track->getMetadata());
     }
 }

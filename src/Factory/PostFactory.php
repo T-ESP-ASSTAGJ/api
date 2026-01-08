@@ -23,7 +23,6 @@ final class PostFactory extends PersistentObjectFactory
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      *
-     * @todo add your default values here
      *
      * @return array<string, mixed>
      */
@@ -36,10 +35,13 @@ final class PostFactory extends PersistentObjectFactory
         return [
             'user' => UserFactory::random(),
             'track' => TrackFactory::new(),
-            'location' => self::faker()->country(),
+            'caption' => self::faker()->optional(0.7)->realText(200),
             // @phpstan-ignore method.notFound
-            'photoUrl' => $faker->picsumStaticRandomUrl(1920, 1080),
-            'caption' => self::faker()->realText(200),
+            'frontImage' => $faker->picsumStaticRandomUrl(1920, 1080),
+            // @phpstan-ignore method.notFound
+            'backImage' => self::faker()->optional(0.5)->passthrough($faker->picsumStaticRandomUrl(1920, 1080)),
+            'location' => self::faker()->optional(0.8)->country(),
+            'commentsCount' => 0,
         ];
     }
 

@@ -32,14 +32,11 @@ final class TrackFactory extends PersistentObjectFactory
         $faker->addProvider(new PicsumProvider($faker));
 
         return [
+            'songId' => self::faker()->uuid(),
             'title' => self::faker()->sentence(3),
-            // @phpstan-ignore method.notFound
-            'coverUrl' => $faker->picsumStaticRandomUrl(1920, 1080),
-            'metadata' => [
-                'duration' => self::faker()->numberBetween(60, 600),
-                'genre' => self::faker()->randomElement(['Pop', 'Rock', 'Jazz', 'Classical']),
-            ],
-            'artist' => ArtistFactory::new(),
+            'artistName' => self::faker()->name(),
+            'releaseYear' => self::faker()->optional(0.8)->numberBetween(1950, 2025),
+            'coverImage' => $faker->picsumStaticRandomUrl(1920, 1080)
         ];
     }
 
