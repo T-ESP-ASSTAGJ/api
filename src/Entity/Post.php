@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post as ApiPost;
 use ApiPlatform\Metadata\Put;
 use App\ApiResource\Post\PostCreateInput;
@@ -17,6 +18,7 @@ use App\Entity\Interface\LikeableInterface;
 use App\Entity\Interface\TimeStampableInterface;
 use App\State\IsLikedProvider;
 use App\State\Post\PostCreateProcessor;
+use App\State\Post\PostViewIncrementProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -60,6 +62,19 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new Delete(
             security: 'object.getUser() == user',
             output: false
+        ),
+        new Patch(
+            uriTemplate: '/posts/{id}/view',
+            normalizationContext: ['groups' => [
+                self::SERIALIZATION_GROUP_DETAIL,
+                User::SERIALIZATION_GROUP_READ,
+                self::LIKE_SERIALIZATION_GROUP_READ,
+            ]],
+            security: 'is_granted("IS_AUTHENTICATED_FULLY")',
+            input: false,
+            read: true,
+            name: 'increment_view',
+            processor: PostViewIncrementProcessor::class,
         ),
     ]
 )]
@@ -134,6 +149,13 @@ class Post implements LikeableInterface, TimeStampableInterface
         self::SERIALIZATION_GROUP_DETAIL,
     ])]
     private int $commentsCount = 0;
+
+    #[ORM\Column(name: 'views_count', type: 'integer', options: ['default' => 0])]
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
+    private int $viewsCount = 0;
 
     /**
      * @var Collection<int, Comment>
@@ -241,5 +263,17 @@ class Post implements LikeableInterface, TimeStampableInterface
     public function getComments(): Collection
     {
         return $this->comments;
+    }
+
+    public function getViewsCount(): int
+    {
+        return $this->viewsCount;
+    }
+
+    public function setViewsCount(int $viewsCount): static
+    {
+        $this->viewsCount = $viewsCount;
+
+        return $this;
     }
 }
