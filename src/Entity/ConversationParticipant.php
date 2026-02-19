@@ -6,11 +6,18 @@ namespace App\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'conversation_participant')]
+#[UniqueEntity(fields: ['user', 'conversation'], message: 'This user is already in the conversation.')]
 class ConversationParticipant
 {
+    public const SERIALIZATION_GROUP_READ = 'conversation_participant:read';
+    public const SERIALIZATION_GROUP_DETAIL = 'conversation_participant:detail';
+    public const SERIALIZATION_GROUP_WRITE = 'conversation_participant:write';
+
     public const ROLE_ADMIN = 'admin';
     public const ROLE_MEMBER = 'member';
 
@@ -23,6 +30,10 @@ class ConversationParticipant
     #[ORM\JoinColumn(name: 'conversation_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private ?Conversation $conversation = null;
 
+    #[Groups([
+        self::SERIALIZATION_GROUP_DETAIL,
+        Conversation::SERIALIZATION_GROUP_DETAIL,
+    ])]
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
     private User $user;

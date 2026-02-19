@@ -90,6 +90,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
         Message::SERIALIZATION_GROUP_DETAIL,
         Post::SERIALIZATION_GROUP_READ,
         Post::SERIALIZATION_GROUP_DETAIL,
+        Conversation::SERIALIZATION_GROUP_DETAIL,
     ])]
     private ?int $id = null;
 
@@ -103,6 +104,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
         Message::SERIALIZATION_GROUP_DETAIL,
         Post::SERIALIZATION_GROUP_READ,
         Post::SERIALIZATION_GROUP_DETAIL,
+        Conversation::SERIALIZATION_GROUP_DETAIL,
     ])]
     private ?string $username = null;
 
@@ -123,11 +125,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     private array $roles = [];
 
     #[ORM\Column(name: 'password', type: 'string', length: 255, nullable: true)]
-    private string $password;
+    private ?string $password = null;
 
     #[ORM\Column(name: 'phone_number', type: 'string', length: 20, unique: true, nullable: true)]
     #[Assert\Regex('/\+?\d+/')]
-    private string $phoneNumber;
+    private ?string $phoneNumber = null;
 
     #[ORM\Column(name: 'profile_picture', type: 'string', length: 255, nullable: true)]
     #[Groups([
@@ -346,13 +348,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
         }
     }
 
-    public function __serialize(): array
-    {
-        $data = (array) $this;
-        $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
-
-        return $data;
-    }
+//    public function __serialize(): array
+//    {
+//        $data = (array) $this;
+//        $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
+//
+//        return $data;
+//    }
 
     #[\Deprecated]
     public function eraseCredentials(): void

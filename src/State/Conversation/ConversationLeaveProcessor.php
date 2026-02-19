@@ -11,6 +11,7 @@ use App\Entity\ConversationParticipant;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -35,7 +36,7 @@ final readonly class ConversationLeaveProcessor implements ProcessorInterface
     public function process(mixed $data, ?Operation $operation = null, array $uriVariables = [], array $context = []): mixed
     {
         if (!$data instanceof Conversation) {
-            throw new \InvalidArgumentException('Expected Conversation entity');
+            throw new BadRequestException('Conversation not found.');
         }
 
         /** @var User|null $currentUser */
@@ -52,12 +53,16 @@ final readonly class ConversationLeaveProcessor implements ProcessorInterface
             throw new NotFoundHttpException('Vous n\'êtes pas membre de cette conversation');
         }
 
+        if ($data->isAdmin($currentUser)) {
+            $data->getActiveParticipants()->first()->setRole(ConversationParticipant::ROLE_ADMIN);
+        }
+
         // Mark as left
         $participant->leave();
         $this->em->flush();
 
         // Check if all participants have left (for groups)
-        if ($data->isGroup() && 0 === $data->getActiveParticipants()->count()) {
+        if ($data->getIsGroup() && 0 === $data->getActiveParticipants()->count()) {
             // Delete the conversation
             $this->em->remove($data);
             $this->em->flush();
@@ -70,7 +75,7 @@ final readonly class ConversationLeaveProcessor implements ProcessorInterface
         }
 
         return new JsonResponse([
-            'message' => 'Vous avez quitté '.($data->isGroup() ? 'le groupe' : 'la conversation'),
+            'message' => 'Vous avez quitté '.($data->getIsGroup() ? 'le groupe' : 'la conversation'),
             'left_at' => $participant->getLeftAt()?->format('c'),
         ]);
     }
