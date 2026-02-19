@@ -16,6 +16,7 @@ use App\Entity\Interface\TimeStampableInterface;
 use App\Repository\ConversationRepository;
 use App\State\Conversation\AddParticipantsProcessor;
 use App\State\Conversation\ConversationCreateProcessor;
+use App\State\Conversation\ConversationDeleteProcessor;
 use App\State\Conversation\ConversationLeaveProcessor;
 use App\State\Conversation\ConversationListProvider;
 use App\State\Conversation\ConversationMarkAsReadProcessor;
@@ -34,6 +35,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new GetCollection(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ]],
+            security: "is_granted('ROLE_USER')",
             provider: ConversationListProvider::class,
         ),
         new ApiPost(
@@ -43,12 +45,14 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new ApiPost(
             uriTemplate: '/conversations/{id}/leave',
-            output: false,
+            input: false,
             processor: ConversationLeaveProcessor::class,
         ),
         new ApiPost(
             uriTemplate: '/conversations/{id}/read',
+            input: false,
             output: false,
+            read: false,
             processor: ConversationMarkAsReadProcessor::class,
         ),
         new ApiPost(
@@ -63,8 +67,8 @@ use Symfony\Component\Validator\Constraints as Assert;
             processor: RemoveParticipantsProcessor::class,
         ),
         new Delete(
-            security: "is_granted('ROLE_ADMIN')",
-            output: false
+            output: false,
+            processor: ConversationDeleteProcessor::class
         ),
     ],
 )]
@@ -106,10 +110,16 @@ class Conversation implements TimeStampableInterface
     private ?string $groupName = null;
 
     /** @var Collection<int, ConversationParticipant> */
+    #[Groups([
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
     #[ORM\OneToMany(targetEntity: ConversationParticipant::class, mappedBy: 'conversation', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $participants;
 
     /** @var Collection<int, Message> */
+    #[Groups([
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
     #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'conversation', cascade: ['remove'], orphanRemoval: true)]
     private Collection $messages;
 
@@ -124,7 +134,7 @@ class Conversation implements TimeStampableInterface
         return $this->id;
     }
 
-    public function isGroup(): bool
+    public function getIsGroup(): bool
     {
         return $this->isGroup;
     }
@@ -198,18 +208,11 @@ class Conversation implements TimeStampableInterface
         return $this;
     }
 
-    /** @return array<int, array{user_id: int|null, username: string|null, profile_picture: string|null, role: string, joined_at: string, left_at: string|null}> */
-    #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
-    public function getParticipantsList(): array
+    public function hasUser(User $user): bool
     {
-        return $this->participants->map(fn (ConversationParticipant $participant) => [
-            'user_id' => $participant->getUser()->getId(),
-            'username' => $participant->getUser()->getUsername(),
-            'profile_picture' => $participant->getUser()->getProfilePicture(),
-            'role' => $participant->getRole(),
-            'joined_at' => $participant->getJoinedAt()?->format('c'),
-            'left_at' => $participant->getLeftAt()?->format('c'),
-        ])->toArray();
+        return $this->participants->exists(function($key, ConversationParticipant $p) use ($user) {
+            return $p->getUser() === $user;
+        });
     }
 
     #[Groups([self::SERIALIZATION_GROUP_READ, self::SERIALIZATION_GROUP_DETAIL])]
@@ -228,10 +231,11 @@ class Conversation implements TimeStampableInterface
         );
     }
 
-    #[Groups([self::SERIALIZATION_GROUP_READ])]
-    public function getType(): string
+    public function isAdmin(User $user): bool
     {
-        return $this->isGroup ? 'group' : 'private';
+        return $this->participants->exists(
+            fn (int $key, ConversationParticipant $p) => $p->getUser() === $user && $p->isAdmin()
+        );
     }
 
     /** @return array{id: int, type: string, content: string|null, preview: string, author: array{id: int|null, username: string|null}, created_at: string}|null

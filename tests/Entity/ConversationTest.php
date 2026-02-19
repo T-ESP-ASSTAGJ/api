@@ -20,7 +20,7 @@ class ConversationTest extends TestCase
 
         $result = $conversation->setIsGroup(true);
         $this->assertSame($conversation, $result);
-        $this->assertTrue($conversation->isGroup());
+        $this->assertTrue($conversation->getIsGroup());
 
         $result = $conversation->setGroupName('My Group Chat');
         $this->assertSame($conversation, $result);
@@ -35,7 +35,7 @@ class ConversationTest extends TestCase
     {
         $conversation = new Conversation();
 
-        $this->assertFalse($conversation->isGroup());
+        $this->assertFalse($conversation->getIsGroup());
         $this->assertNull($conversation->getGroupName());
         $this->assertSame(0, $conversation->getUnreadCount());
     }
@@ -139,10 +139,10 @@ class ConversationTest extends TestCase
     {
         $conversation = new Conversation();
 
-        $this->assertSame('private', $conversation->getType());
+        $this->assertSame(false, $conversation->getIsGroup());
 
         $conversation->setIsGroup(true);
-        $this->assertSame('group', $conversation->getType());
+        $this->assertSame(true, $conversation->getIsGroup());
     }
 
     public function testTimeStampableTrait(): void

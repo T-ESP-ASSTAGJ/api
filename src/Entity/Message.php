@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post as ApiPost;
 use ApiPlatform\Metadata\Put;
+use App\ApiResource\Message\MessageCreateInput;
 use App\Entity\Interface\TimeStampableInterface;
 use App\State\Message\MessageGetProvider;
 use App\State\Message\MessageProcessor;
@@ -30,9 +31,9 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new ApiPost(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
-            denormalizationContext: ['groups' => [self::SERIALIZATION_GROUP_WRITE]],
+            input: MessageCreateInput::class,
             mercure: true,
-            processor: MessageProcessor::class
+            processor: MessageProcessor::class,
         ),
         new Put(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
@@ -67,6 +68,7 @@ class Message implements TimeStampableInterface
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
+        Conversation::SERIALIZATION_GROUP_DETAIL,
     ])]
     private ?int $id = null;
 
@@ -82,6 +84,7 @@ class Message implements TimeStampableInterface
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
+        Conversation::SERIALIZATION_GROUP_DETAIL,
     ])]
     private User $author;
 
@@ -91,6 +94,7 @@ class Message implements TimeStampableInterface
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
         self::SERIALIZATION_GROUP_WRITE,
+        Conversation::SERIALIZATION_GROUP_DETAIL,
     ])]
     private string $type = self::TYPE_TEXT;
 
@@ -99,6 +103,7 @@ class Message implements TimeStampableInterface
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
         self::SERIALIZATION_GROUP_WRITE,
+        Conversation::SERIALIZATION_GROUP_DETAIL,
     ])]
     private ?string $content = null;
 
@@ -113,6 +118,7 @@ class Message implements TimeStampableInterface
     #[ORM\Column(name: 'track', type: 'json', nullable: true)]
     #[Groups([
         self::SERIALIZATION_GROUP_WRITE,
+        Conversation::SERIALIZATION_GROUP_DETAIL,
     ])]
     private ?array $track = null;
 

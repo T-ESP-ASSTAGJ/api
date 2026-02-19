@@ -44,6 +44,12 @@ final readonly class AddParticipantsProcessor implements ProcessorInterface
             throw new BadRequestHttpException('Invalid input data');
         }
 
+        /** @var User|null $currentUser */
+        $currentUser = $this->security->getUser();
+        if (!$currentUser instanceof User) {
+            throw new \RuntimeException('User must be authenticated');
+        }
+
         $conversationId = $uriVariables['id'] ?? null;
         if (!$conversationId) {
             throw new BadRequestHttpException('Conversation ID is required');
@@ -54,14 +60,8 @@ final readonly class AddParticipantsProcessor implements ProcessorInterface
             throw new BadRequestHttpException('Conversation not found');
         }
 
-        if (!$conversation->isGroup()) {
+        if (!$conversation->getIsGroup()) {
             throw new BadRequestHttpException('Cannot add participants to a private conversation');
-        }
-
-        /** @var User|null $currentUser */
-        $currentUser = $this->security->getUser();
-        if (!$currentUser instanceof User) {
-            throw new \RuntimeException('User must be authenticated');
         }
 
         // Check if current user is an active participant and is admin
@@ -73,7 +73,7 @@ final readonly class AddParticipantsProcessor implements ProcessorInterface
             }
         }
 
-        if (!$currentParticipant || !$currentParticipant->isAdmin()) {
+        if (!$currentParticipant?->isAdmin()) {
             throw new AccessDeniedHttpException('Seuls les administrateurs du groupe peuvent ajouter des participants');
         }
 

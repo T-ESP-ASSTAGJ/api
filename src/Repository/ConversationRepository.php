@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Conversation;
+use App\Entity\ConversationParticipant;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -18,6 +19,25 @@ class ConversationRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Conversation::class);
     }
+
+    /**
+     * Find conversations where the user is an active participant.
+     */
+    public function findPrivateConversation(User $userA, User $userB): ?Conversation
+    {
+        return $this->createQueryBuilder('c')
+            ->innerJoin('c.participants', 'p1')
+            ->innerJoin('c.participants', 'p2')
+            ->where('c.isGroup = :isGroup')
+            ->andWhere('p1.user = :userA')
+            ->andWhere('p2.user = :userB')
+            ->setParameter('isGroup', false)
+            ->setParameter(':userA', $userA)
+            ->setParameter(':userB', $userB)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+       }
 
     /**
      * Find conversations where the user is an active participant.
@@ -43,25 +63,13 @@ class ConversationRepository extends ServiceEntityRepository
      */
     public function findByUserWithUnreadCount(User $user): array
     {
-        $conversations = $this->createQueryBuilder('c')
-            ->innerJoin('c.participants', 'p')
-            ->where('p.user = :user')
-            ->andWhere('p.leftAt IS NULL')
+        return $this->createQueryBuilder('c')
+            ->select('c', 'p')
+            ->innerJoin('c.participants', 'p', 'WITH', 'p.user = :user')
+            ->where('p.leftAt IS NULL')
             ->setParameter('user', $user)
             ->orderBy('c.updatedAt', 'DESC')
             ->getQuery()
             ->getResult();
-
-        // Set unread count from the participant
-        foreach ($conversations as $conversation) {
-            foreach ($conversation->getParticipants() as $participant) {
-                if ($participant->getUser()->getId() === $user->getId() && null === $participant->getLeftAt()) {
-                    $conversation->setUnreadCount($participant->getUnreadCount());
-                    break;
-                }
-            }
-        }
-
-        return $conversations;
     }
 }
