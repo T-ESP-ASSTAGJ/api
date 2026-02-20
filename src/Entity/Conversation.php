@@ -111,6 +111,7 @@ class Conversation implements TimeStampableInterface
 
     /** @var Collection<int, ConversationParticipant> */
     #[Groups([
+        self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
     ])]
     #[ORM\OneToMany(targetEntity: ConversationParticipant::class, mappedBy: 'conversation', cascade: ['persist', 'remove'], orphanRemoval: true)]
@@ -288,17 +289,5 @@ class Conversation implements TimeStampableInterface
         $this->unreadCount = $unreadCount;
 
         return $this;
-    }
-
-    /** @return array<int, array{id: int|null, username: string|null, profile_picture: string|null}>
-     */
-    #[Groups([self::SERIALIZATION_GROUP_READ])]
-    public function getParticipantsInfo(): array
-    {
-        return $this->getActiveParticipants()->map(fn (ConversationParticipant $participant) => [
-            'id' => $participant->getUser()->getId(),
-            'username' => $participant->getUser()->getUsername(),
-            'profile_picture' => $participant->getUser()->getProfilePicture(),
-        ])->getValues();
     }
 }

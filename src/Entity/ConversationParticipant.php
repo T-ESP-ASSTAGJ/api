@@ -33,6 +33,7 @@ class ConversationParticipant
     #[Groups([
         self::SERIALIZATION_GROUP_DETAIL,
         Conversation::SERIALIZATION_GROUP_DETAIL,
+        Conversation::SERIALIZATION_GROUP_READ,
     ])]
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]

@@ -64,9 +64,16 @@ class ConversationRepository extends ServiceEntityRepository
     public function findByUserWithUnreadCount(User $user): array
     {
         return $this->createQueryBuilder('c')
-            ->select('c', 'p')
-            ->innerJoin('c.participants', 'p', 'WITH', 'p.user = :user')
-            ->where('p.leftAt IS NULL')
+            ->select('c', 'p2', 'u2')
+
+            ->innerJoin('c.participants', 'p1')
+            ->where('p1.user = :user')
+            ->andWhere('p1.leftAt IS NULL')
+
+            ->innerJoin('c.participants', 'p2')
+            ->innerJoin('p2.user', 'u2')
+            ->andWhere('p2.leftAt IS NULL')
+
             ->setParameter('user', $user)
             ->orderBy('c.updatedAt', 'DESC')
             ->getQuery()

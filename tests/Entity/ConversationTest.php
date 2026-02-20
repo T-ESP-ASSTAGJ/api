@@ -186,33 +186,6 @@ class ConversationTest extends TestCase
         $this->assertNull($participantsList[0]['left_at']);
     }
 
-    public function testGetParticipantsInfo(): void
-    {
-        $conversation = new Conversation();
-        $user1 = new User();
-
-        // Use reflection to set user ID
-        $reflection = new \ReflectionClass($user1);
-        $idProperty = $reflection->getProperty('id');
-        $idProperty->setAccessible(true);
-        $idProperty->setValue($user1, 42);
-
-        $user1->setUsername('alice');
-        $user1->setProfilePicture('https://example.com/alice.jpg');
-
-        $participant = new ConversationParticipant();
-        $participant->setUser($user1);
-        $conversation->addParticipant($participant);
-
-        $participantsInfo = $conversation->getParticipantsInfo();
-
-        $this->assertIsArray($participantsInfo);
-        $this->assertCount(1, $participantsInfo);
-        $this->assertSame(42, $participantsInfo[0]['id']);
-        $this->assertSame('alice', $participantsInfo[0]['username']);
-        $this->assertSame('https://example.com/alice.jpg', $participantsInfo[0]['profile_picture']);
-    }
-
     public function testGetLastMessageReturnsNullWhenNoMessages(): void
     {
         $conversation = new Conversation();
