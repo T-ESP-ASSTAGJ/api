@@ -69,6 +69,7 @@ class Message implements TimeStampableInterface
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
         Conversation::SERIALIZATION_GROUP_DETAIL,
+        Conversation::SERIALIZATION_GROUP_READ,
     ])]
     private ?int $id = null;
 
@@ -85,6 +86,7 @@ class Message implements TimeStampableInterface
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
         Conversation::SERIALIZATION_GROUP_DETAIL,
+        Conversation::SERIALIZATION_GROUP_READ,
     ])]
     private User $author;
 
@@ -144,6 +146,7 @@ class Message implements TimeStampableInterface
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
+        Conversation::SERIALIZATION_GROUP_READ,
     ])]
     private bool $isRead = false;
 
@@ -309,5 +312,17 @@ class Message implements TimeStampableInterface
         $this->readAt = new \DateTimeImmutable();
 
         return $this;
+    }
+
+    #[Groups([
+        Conversation::SERIALIZATION_GROUP_READ,
+    ])]
+    public function getMessagePreview(): string
+    {
+        if ($this->isMusicMessage()) {
+            return 'Vous a partagé une musique';
+        }
+
+        return $this->getContent() ?? '';
     }
 }

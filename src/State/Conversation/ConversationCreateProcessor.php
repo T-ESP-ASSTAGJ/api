@@ -67,7 +67,7 @@ final readonly class ConversationCreateProcessor implements ProcessorInterface
 
         $conversation = new Conversation();
         $conversation->setIsGroup($data->isGroup);
-        $conversation->setGroupName($data->groupName);
+        $conversation->setGroupName($data->isGroup ? $data->groupName : null);
 
         $creatorParticipant = new ConversationParticipant();
         $creatorParticipant->setUser($currentUser);
