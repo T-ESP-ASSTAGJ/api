@@ -20,9 +20,11 @@ trait TimeStampableTrait
     #[Gedmo\Timestampable(on: 'create')]
     #[Groups([
         Comment::SERIALIZATION_GROUP_READ,
+        Conversation::SERIALIZATION_GROUP_READ,
         Conversation::SERIALIZATION_GROUP_DETAIL,
         Like::SERIALIZATION_GROUP_READ,
         Message::SERIALIZATION_GROUP_DETAIL,
+        Message::SERIALIZATION_GROUP_READ,
         User::SERIALIZATION_GROUP_DETAIL,
     ])]
     private \DateTimeImmutable $createdAt;
@@ -31,6 +33,7 @@ trait TimeStampableTrait
     #[Gedmo\Timestampable(on: 'update')]
     #[Groups([
         Conversation::SERIALIZATION_GROUP_DETAIL,
+        Message::SERIALIZATION_GROUP_READ,
         Message::SERIALIZATION_GROUP_DETAIL,
         User::SERIALIZATION_GROUP_DETAIL,
     ])]

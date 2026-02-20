@@ -16,7 +16,6 @@ use App\Entity\Interface\TimeStampableInterface;
 use App\Repository\ConversationRepository;
 use App\State\Conversation\AddParticipantsProcessor;
 use App\State\Conversation\ConversationCreateProcessor;
-use App\State\Conversation\ConversationDeleteProcessor;
 use App\State\Conversation\ConversationLeaveProcessor;
 use App\State\Conversation\ConversationListProvider;
 use App\State\Conversation\ConversationMarkAsReadProcessor;
@@ -25,6 +24,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
@@ -32,10 +32,12 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Get(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
+            security: "object.hasUser(user)",
         ),
         new GetCollection(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ]],
-            security: "is_granted('ROLE_USER')",
+            normalizationContext: ['groups' => [
+                self::SERIALIZATION_GROUP_READ,
+            ]],
             provider: ConversationListProvider::class,
         ),
         new ApiPost(
@@ -67,8 +69,8 @@ use Symfony\Component\Validator\Constraints as Assert;
             processor: RemoveParticipantsProcessor::class,
         ),
         new Delete(
+            security: "object.hasUser(user) && object.isAdmin(user)",
             output: false,
-            processor: ConversationDeleteProcessor::class
         ),
     ],
 )]
@@ -110,10 +112,6 @@ class Conversation implements TimeStampableInterface
     private ?string $groupName = null;
 
     /** @var Collection<int, ConversationParticipant> */
-    #[Groups([
-        self::SERIALIZATION_GROUP_READ,
-        self::SERIALIZATION_GROUP_DETAIL,
-    ])]
     #[ORM\OneToMany(targetEntity: ConversationParticipant::class, mappedBy: 'conversation', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $participants;
 
@@ -239,41 +237,20 @@ class Conversation implements TimeStampableInterface
         );
     }
 
-    /** @return array{id: int, type: string, content: string|null, preview: string, author: array{id: int|null, username: string|null}, created_at: string}|null
-     */
-    #[Groups([self::SERIALIZATION_GROUP_READ])]
-    public function getLastMessage(): ?array
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+    ])]
+    public function getLastMessage(): ?Message
     {
         $lastMessage = $this->messages
             ->filter(fn (Message $m) => null !== $m->getId())
             ->last();
 
-        if (!$lastMessage instanceof Message) {
+        if (!$lastMessage) {
             return null;
         }
 
-        $preview = $this->getMessagePreview($lastMessage);
-
-        return [
-            'id' => $lastMessage->getId(),
-            'type' => $lastMessage->getType(),
-            'content' => $lastMessage->getContent(),
-            'preview' => $preview,
-            'author' => [
-                'id' => $lastMessage->getAuthor()->getId(),
-                'username' => $lastMessage->getAuthor()->getUsername(),
-            ],
-            'created_at' => $lastMessage->getCreatedAt()->format('c'),
-        ];
-    }
-
-    private function getMessagePreview(Message $message): string
-    {
-        if ($message->isMusicMessage()) {
-            return 'Vous a partagé une musique';
-        }
-
-        return $message->getContent() ?? '';
+        return $lastMessage;
     }
 
     private ?int $unreadCount = null;
@@ -289,5 +266,18 @@ class Conversation implements TimeStampableInterface
         $this->unreadCount = $unreadCount;
 
         return $this;
+    }
+
+    /**
+     * @return array<User>
+     */
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
+    #[SerializedName('participants')]
+    public function getFlattenedParticipants(): array
+    {
+        return $this->participants->map(fn (ConversationParticipant $p) => $p->getUser())->toArray();
     }
 }
