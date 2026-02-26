@@ -24,7 +24,6 @@ class ArtistCreateInputTest extends TestCase
     {
         $input = new ArtistCreateInput();
 
-        $this->assertIsArray($input->artistSources);
         $this->assertCount(0, $input->artistSources);
     }
 

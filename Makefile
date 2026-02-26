@@ -10,6 +10,9 @@ LAST_COMMIT := $(shell git log -1 --oneline --pretty=format:"%h - %an, %ar")
 BOLD_GREEN := \033[1;32m
 NC := \033[0m
 
+##
+## Setup and compose start
+##---------------------------------------------------------------------------
 install:         ## Install dependencies
 	@echo -e "\r\n${BOLD_GREEN}# Installing dependencies${NC}\r\n"
 	@docker compose --env-file .env.local build
@@ -122,6 +125,14 @@ quality:         ## Run all quality tools
 quality: phpcs phpstan unit-test
 
 .PHONY: quality
+
+##
+## Utilities
+##---------------------------------------------------------------------------
+
+redis-connect:		## Connect to Redis
+	@docker exec -it jamly-redis redis-cli
+
 
 help:            ## Show this help message
 	@echo ''

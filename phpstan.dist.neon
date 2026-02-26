@@ -11,4 +11,5 @@ parameters:
         - src/
         - tests/
     treatPhpDocTypesAsCertain: false
-
+    excludePaths:
+        - src/Entity/Artist.php

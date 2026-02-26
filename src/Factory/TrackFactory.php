@@ -36,7 +36,8 @@ final class TrackFactory extends PersistentObjectFactory
             'title' => self::faker()->sentence(3),
             'artistName' => self::faker()->name(),
             'releaseYear' => self::faker()->optional(0.8)->numberBetween(1950, 2025),
-            'coverImage' => $faker->picsumStaticRandomUrl(1920, 1080)
+            // @phpstan-ignore method.notFound
+            'coverImage' => $faker->picsumStaticRandomUrl(1920, 1080),
         ];
     }
 

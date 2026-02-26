@@ -55,7 +55,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new Put(
             normalizationContext: ['groups' => [
                 self::SERIALIZATION_GROUP_DETAIL,
-                User::SERIALIZATION_GROUP_READ
+                User::SERIALIZATION_GROUP_READ,
             ]],
             security: 'object.getUser() == user',
         ),

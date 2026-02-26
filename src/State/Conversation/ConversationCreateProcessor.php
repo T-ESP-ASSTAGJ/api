@@ -15,10 +15,7 @@ use App\Repository\ConversationRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
-use Symfony\Component\Validator\ConstraintViolation;
-use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -28,8 +25,8 @@ final readonly class ConversationCreateProcessor implements ProcessorInterface
 {
     public function __construct(
         private ValidatorInterface $validator,
-        private Security           $security,
-        private UserRepository     $userRepository,
+        private Security $security,
+        private UserRepository $userRepository,
         private ConversationRepository $conversationRepository,
         private EntityManagerInterface $entityManager,
     ) {
@@ -45,7 +42,7 @@ final readonly class ConversationCreateProcessor implements ProcessorInterface
         /** @var User $currentUser */
         $currentUser = $this->security->getUser();
 
-        if (!$data->isGroup && count($data->participants) !== 1) {
+        if (!$data->isGroup && 1 !== count($data->participants)) {
             throw new BadRequestException('A private conversation must have exactly one other participant.');
         }
 

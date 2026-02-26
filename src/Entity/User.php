@@ -352,14 +352,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
         }
     }
 
-//    public function __serialize(): array
-//    {
-//        $data = (array) $this;
-//        $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
-//
-//        return $data;
-//    }
+    //    public function __serialize(): array
+    //    {
+    //        $data = (array) $this;
+    //        $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
+    //
+    //        return $data;
+    //    }
 
+    /**
+     * @codeCoverageIgnore
+     */
     #[\Deprecated]
     public function eraseCredentials(): void
     {

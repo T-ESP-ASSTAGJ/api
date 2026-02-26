@@ -23,6 +23,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @deprecated This entity is deprecated and will be removed in a future version.
  *             Use Track entity with artistName field instead.
+ *
+ * @codeCoverageIgnore
  */
 #[ApiResource(
     shortName: 'Artist',

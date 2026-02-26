@@ -254,4 +254,31 @@ class ConversationTest extends TestCase
 
         $this->assertSame('Vous a partagé une musique', $lastMessage->getMessagePreview());
     }
+
+    public function testGetFlattenedList(): void
+    {
+        $conversation = new Conversation();
+        $user1 = new User();
+        (new \ReflectionProperty(User::class, 'id'))->setValue($user1, 1);
+        $participant = new ConversationParticipant();
+        $participant->setUser($user1);
+        $conversation->addParticipant($participant);
+
+        $this->assertContains($user1, $conversation->getFlattenedParticipants());
+    }
+
+    public function testHasUser(): void
+    {
+        $conversation = new Conversation();
+        $user1 = new User();
+        (new \ReflectionProperty(User::class, 'id'))->setValue($user1, 1);
+        $participant = new ConversationParticipant();
+        $participant->setUser($user1);
+        $conversation->addParticipant($participant);
+
+        $this->assertTrue($conversation->hasUser($user1));
+
+        $emptyConversation = new Conversation();
+        $this->assertFalse($emptyConversation->hasUser($user1));
+    }
 }

@@ -32,7 +32,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Get(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
-            security: "object.hasUser(user)",
+            security: 'object.hasUser(user)',
         ),
         new GetCollection(
             normalizationContext: ['groups' => [
@@ -69,7 +69,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             processor: RemoveParticipantsProcessor::class,
         ),
         new Delete(
-            security: "object.hasUser(user) && object.isAdmin(user)",
+            security: 'object.hasUser(user) && object.isAdmin(user)',
             output: false,
         ),
     ],
@@ -209,9 +209,9 @@ class Conversation implements TimeStampableInterface
 
     public function hasUser(User $user): bool
     {
-        return $this->participants->exists(function($key, ConversationParticipant $p) use ($user) {
-            return $p->getUser() === $user;
-        });
+        return $this->participants->exists(
+            fn ($_, ConversationParticipant $p) => $p->getUser() === $user
+        );
     }
 
     #[Groups([self::SERIALIZATION_GROUP_READ, self::SERIALIZATION_GROUP_DETAIL])]
@@ -269,15 +269,15 @@ class Conversation implements TimeStampableInterface
     }
 
     /**
-     * @return array<User>
+     * @return Collection<int, User>
      */
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
     ])]
     #[SerializedName('participants')]
-    public function getFlattenedParticipants(): array
+    public function getFlattenedParticipants(): Collection
     {
-        return $this->participants->map(fn (ConversationParticipant $p) => $p->getUser())->toArray();
+        return $this->participants->map(fn (ConversationParticipant $p) => $p->getUser());
     }
 }

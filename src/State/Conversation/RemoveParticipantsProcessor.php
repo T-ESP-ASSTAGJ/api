@@ -52,7 +52,7 @@ final readonly class RemoveParticipantsProcessor implements ProcessorInterface
             throw new BadRequestHttpException('Conversation not found');
         }
 
-        if (!$conversation->isGroup()) {
+        if (!$conversation->getIsGroup()) {
             throw new BadRequestHttpException('Cannot remove participants from a private conversation');
         }
 

@@ -9,7 +9,7 @@ use App\Entity\ArtistSource;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @deprecated This test is for the deprecated Artist entity.
+ * @deprecated this test is for the deprecated Artist entity
  */
 class ArtistTest extends TestCase
 {

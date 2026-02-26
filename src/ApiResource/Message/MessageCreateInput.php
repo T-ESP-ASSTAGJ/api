@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\ApiResource\Message;
 
-use ApiPlatform\Metadata\ApiProperty;
 use Symfony\Component\Validator\Constraints as Assert;
-
 
 /**
  * @codeCoverageIgnore

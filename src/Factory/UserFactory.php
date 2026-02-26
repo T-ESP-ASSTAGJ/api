@@ -11,6 +11,7 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
  * @extends PersistentObjectFactory<User>
+ *
  * @codeCoverageIgnore
  */
 final class UserFactory extends PersistentObjectFactory
@@ -23,7 +24,6 @@ final class UserFactory extends PersistentObjectFactory
 
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
-     *
      *
      * @return array<string, mixed>
      */
