@@ -138,4 +138,17 @@ class MessageTest extends TestCase
 
         $this->assertSame(123, $message->getConversationId());
     }
+
+    public function testGetMessagePreview(): void
+    {
+        $textMessage = new Message();
+        $textMessage->setContent('text message');
+        $textMessage->setType(Message::TYPE_TEXT);
+        $this->assertSame($textMessage->getContent(), $textMessage->getMessagePreview());
+
+        $musicMessage = new Message();
+        $musicMessage->setContent('music message');
+        $musicMessage->setType(Message::TYPE_MUSIC);
+        $this->assertSame('Vous a partagé une musique', $musicMessage->getMessagePreview());
+    }
 }
