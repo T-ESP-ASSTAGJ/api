@@ -19,7 +19,7 @@ readonly class AddParticipantsInput
         #[ApiProperty(
             openapiContext: [
                 'type' => 'array',
-                'items' => ['type' => 'integer']
+                'items' => ['type' => 'integer'],
             ]
         )]
         public array $userIds = [],

@@ -27,11 +27,10 @@ final readonly class PostViewIncrementProcessor implements ProcessorInterface
     }
 
     /**
-     * @param Post $data
-     * @param Operation $operation
+     * @param Post                 $data
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
-     * @return Post
+     *
      * @throws ExceptionInterface
      */
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Post

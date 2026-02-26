@@ -11,7 +11,7 @@ use App\ApiResource\Message\MessageCreateInput;
 use App\Entity\Conversation;
 use App\Entity\Message;
 use App\Entity\User;
-use App\Service\Message\MusicMetadataService;
+// use App\Service\Message\MusicMetadataService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -19,16 +19,15 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * @implements ProcessorInterface<Message, Message>
+ * @implements ProcessorInterface<MessageCreateInput, Message>
  */
 final readonly class MessageProcessor implements ProcessorInterface
 {
     public function __construct(
-        /** @var ProcessorInterface<Message, Message> */
         private EntityManagerInterface $entityManager,
         private ValidatorInterface $validator,
         private Security $security,
-        private MusicMetadataService $musicMetadataService,
+        //        private MusicMetadataService $musicMetadataService,
     ) {
     }
 
@@ -55,7 +54,7 @@ final readonly class MessageProcessor implements ProcessorInterface
             ->findOneBy(['id' => $data->conversationId]);
 
         if (null === $conversation) {
-            throw new NotFoundHttpException( 'Invalid conversation');
+            throw new NotFoundHttpException('Invalid conversation');
         }
 
         $message = new Message();
@@ -64,10 +63,10 @@ final readonly class MessageProcessor implements ProcessorInterface
         $message->setContent($data->content);
         $message->setType($data->type);
 
-//        if (Message::TYPE_MUSIC === $data->getType() && $data->getTrack()) {
-//            $trackMetadata = $this->musicMetadataService->getTrackMetadata($data->getTrack());
-//            $data->setTrackMetadata($trackMetadata);
-//        }
+        //        if (Message::TYPE_MUSIC === $data->getType() && $data->getTrack()) {
+        //            $trackMetadata = $this->musicMetadataService->getTrackMetadata($data->getTrack());
+        //            $data->setTrackMetadata($trackMetadata);
+        //        }
 
         $violations = $this->validator->validate($data);
         if ($violations->count() > 0) {

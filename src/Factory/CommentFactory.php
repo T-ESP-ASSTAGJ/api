@@ -21,7 +21,6 @@ final class CommentFactory extends PersistentObjectFactory
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      *
-     *
      * @return array<string, mixed>
      */
     #[\Override]

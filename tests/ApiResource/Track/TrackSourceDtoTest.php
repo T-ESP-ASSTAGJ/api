@@ -59,7 +59,6 @@ class TrackSourceDtoTest extends TestCase
     {
         $dto = new TrackSourceDto('spotify', 'id');
 
-        $this->assertIsArray($dto->metadata);
         $this->assertCount(0, $dto->metadata);
     }
 }

@@ -13,13 +13,13 @@ class PostCreateInputTest extends TestCase
     {
         $input = new PostCreateInput();
         $input->caption = 'Amazing sunset vibes!';
-        $input->trackId = 42;
-        $input->photoUrl = 'https://example.com/photo.jpg';
+        $input->songId = '42';
+        $input->coverImage = 'https://example.com/photo.jpg';
         $input->location = 'Paris, France';
 
         $this->assertSame('Amazing sunset vibes!', $input->caption);
-        $this->assertSame(42, $input->trackId);
-        $this->assertSame('https://example.com/photo.jpg', $input->photoUrl);
+        $this->assertSame('42', $input->songId);
+        $this->assertSame('https://example.com/photo.jpg', $input->coverImage);
         $this->assertSame('Paris, France', $input->location);
     }
 
@@ -28,21 +28,21 @@ class PostCreateInputTest extends TestCase
         $input = new PostCreateInput();
 
         $this->assertNull($input->caption);
-        $this->assertNull($input->photoUrl);
+        $this->assertNull($input->coverImage);
         $this->assertNull($input->location);
     }
 
     public function testCanSetNullableFields(): void
     {
         $input = new PostCreateInput();
-        $input->trackId = 1;
+        $input->songId = '1';
         $input->caption = null;
-        $input->photoUrl = null;
+        $input->coverImage = null;
         $input->location = null;
 
         $this->assertNull($input->caption);
-        $this->assertNull($input->photoUrl);
+        $this->assertNull($input->coverImage);
         $this->assertNull($input->location);
-        $this->assertSame(1, $input->trackId);
+        $this->assertSame('1', $input->songId);
     }
 }

@@ -7,15 +7,18 @@ namespace App\Tests\MessageHandler;
 use App\Entity\Post;
 use App\Message\PersistPostViewsMessage;
 use App\MessageHandler\PersistPostViewsMessageHandler;
-use App\Service\Post\PostViewsPersistenceService;
 use App\Service\Post\PostViewsPersistenceServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class PersistPostViewsMessageHandlerTest extends TestCase
 {
+    /** @var EntityManagerInterface&MockObject */
     private EntityManagerInterface $entityManager;
+
     private PersistPostViewsMessageHandler $handler;
+    /** @var PostViewsPersistenceServiceInterface&MockObject */
     private PostViewsPersistenceServiceInterface $postViewsPersistenceService;
 
     protected function setUp(): void

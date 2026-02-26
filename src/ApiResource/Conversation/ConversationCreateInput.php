@@ -23,7 +23,7 @@ readonly class ConversationCreateInput
         #[ApiProperty(
             openapiContext: [
                 'type' => 'array',
-                'items' => ['type' => 'integer']
+                'items' => ['type' => 'integer'],
             ]
         )]
         public ?array $participants = null,

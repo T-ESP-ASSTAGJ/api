@@ -30,7 +30,6 @@ class LikeableTypeEnumTest extends TestCase
     {
         $values = LikeableTypeEnum::values();
 
-        $this->assertIsArray($values);
         $this->assertCount(3, $values);
         $this->assertContains(Post::class, $values);
         $this->assertContains(Comment::class, $values);

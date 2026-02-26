@@ -30,6 +30,7 @@ final readonly class TrackUpdateProcessor implements ProcessorInterface
      * @param array<string, mixed> $context
      *
      * @return Track
+     *
      * @Deprecated
      */
     public function process(mixed $data, ?Operation $operation = null, array $uriVariables = [], array $context = []): mixed

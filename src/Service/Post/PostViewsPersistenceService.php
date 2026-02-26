@@ -12,11 +12,12 @@ final readonly class PostViewsPersistenceService implements PostViewsPersistence
     public function __construct(
         private PostRepository $postRepository,
         private \Redis $redis,
-    ) {}
+    ) {
+    }
 
     public function persistViews(int $postId): void
     {
-        $viewsKey = RedisKeys::POST_VIEWS_PREFIX . $postId;
+        $viewsKey = RedisKeys::POST_VIEWS_PREFIX.$postId;
         $redisViews = (int) ($this->redis->get($viewsKey) ?: 0);
 
         if ($redisViews > 0) {

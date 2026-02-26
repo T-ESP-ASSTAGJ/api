@@ -43,18 +43,18 @@ final readonly class ImageService
         }
 
         $extension = strtolower($matches[1]);
-        if ($extension === 'jpeg') {
+        if ('jpeg' === $extension) {
             $extension = 'jpg';
         }
 
         $allowedExtensions = ['jpg', 'png', 'gif', 'webp'];
         if (!in_array($extension, $allowedExtensions, true)) {
-            throw new BadRequestHttpException('Unsupported image format. Allowed: ' . implode(', ', $allowedExtensions));
+            throw new BadRequestHttpException('Unsupported image format. Allowed: '.implode(', ', $allowedExtensions));
         }
 
         // Decode base64
         $imageData = base64_decode($base64Data, true);
-        if ($imageData === false) {
+        if (false === $imageData) {
             throw new BadRequestHttpException('Failed to decode base64 image');
         }
 
@@ -66,12 +66,12 @@ final readonly class ImageService
 
         // Validate it's actually a valid image
         $imageInfo = @getimagesizefromstring($imageData);
-        if ($imageInfo === false) {
+        if (false === $imageInfo) {
             throw new BadRequestHttpException('Invalid image data or corrupted file');
         }
 
         // Generate unique filename using Symfony's UUID
-        $filename = Uuid::v4()->toRfc4122() . '.' . $extension;
+        $filename = Uuid::v4()->toRfc4122().'.'.$extension;
         $uploadPath = sprintf('%s/public/uploads/%s', $this->projectDir, $directory);
 
         // Ensure directory exists using Symfony Filesystem
@@ -80,7 +80,7 @@ final readonly class ImageService
         }
 
         // Save file using Symfony Filesystem
-        $filePath = $uploadPath . '/' . $filename;
+        $filePath = $uploadPath.'/'.$filename;
         $this->filesystem->dumpFile($filePath, $imageData);
 
         // Return public URL
@@ -93,7 +93,7 @@ final readonly class ImageService
             return;
         }
 
-        $filePath = $this->projectDir . '/public' . $imageUrl;
+        $filePath = $this->projectDir.'/public'.$imageUrl;
         if ($this->filesystem->exists($filePath)) {
             $this->filesystem->remove($filePath);
         }

@@ -20,7 +20,6 @@ class MusicPlatformEnumTest extends TestCase
     {
         $values = MusicPlatformEnum::values();
 
-        $this->assertIsArray($values);
         $this->assertCount(3, $values);
         $this->assertContains('spotify', $values);
         $this->assertContains('deezer', $values);
