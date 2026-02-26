@@ -46,6 +46,10 @@ class PostTest extends TestCase
         $result = $post->setCommentsCount(5);
         $this->assertSame($post, $result);
         $this->assertSame(5, $post->getCommentsCount());
+
+        $views = $post->setViewsCount(5);
+        $this->assertSame($post, $views);
+        $this->assertSame(5, $post->getViewsCount());
     }
 
     public function testCommentsCollection(): void

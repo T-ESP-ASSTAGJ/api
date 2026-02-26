@@ -7,7 +7,7 @@ namespace App\Service\Post;
 use App\Constants\RedisKeys;
 use App\Repository\PostRepository;
 
-final readonly class PostViewsPersistenceService
+final readonly class PostViewsPersistenceService implements PostViewsPersistenceServiceInterface
 {
     public function __construct(
         private PostRepository $postRepository,

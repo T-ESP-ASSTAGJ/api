@@ -154,7 +154,7 @@ class ConversationTest extends TestCase
         $this->assertInstanceOf(\DateTimeImmutable::class, $conversation->getUpdatedAt());
     }
 
-    public function testGetParticipantsList(): void
+    public function testGetParticipants(): void
     {
         $conversation = new Conversation();
         $user1 = new User();
@@ -175,15 +175,13 @@ class ConversationTest extends TestCase
 
         $conversation->addParticipant($participant);
 
-        $participantsList = $conversation->getParticipantsList();
+        $participants = $conversation->getParticipants();
 
-        $this->assertIsArray($participantsList);
-        $this->assertCount(1, $participantsList);
-        $this->assertSame(1, $participantsList[0]['user_id']);
-        $this->assertSame('user1', $participantsList[0]['username']);
-        $this->assertSame('https://example.com/user1.jpg', $participantsList[0]['profile_picture']);
-        $this->assertSame(ConversationParticipant::ROLE_ADMIN, $participantsList[0]['role']);
-        $this->assertNull($participantsList[0]['left_at']);
+        $this->assertSame(1, $participants->first()->getUser()->getId());
+        $this->assertSame('user1', $participants->first()->getUser()->getUsername());
+        $this->assertSame('https://example.com/user1.jpg', $participants->first()->getUser()->getProfilePicture());
+        $this->assertTrue($conversation->isAdmin($participants->first()->getUser()));
+        $this->assertNull($participants->first()->getLeftAt());
     }
 
     public function testGetLastMessageReturnsNullWhenNoMessages(): void
@@ -220,13 +218,12 @@ class ConversationTest extends TestCase
 
         $lastMessage = $conversation->getLastMessage();
 
-        $this->assertIsArray($lastMessage);
-        $this->assertSame(5, $lastMessage['id']);
-        $this->assertSame(Message::TYPE_TEXT, $lastMessage['type']);
-        $this->assertSame('Hello world', $lastMessage['content']);
-        $this->assertSame('Hello world', $lastMessage['preview']);
-        $this->assertSame(10, $lastMessage['author']['id']);
-        $this->assertSame('bob', $lastMessage['author']['username']);
+        $this->assertSame(5, $lastMessage->getId());
+        $this->assertSame(Message::TYPE_TEXT, $lastMessage->getType());
+        $this->assertSame('Hello world', $lastMessage->getContent());
+        $this->assertSame('Hello world', $lastMessage->getMessagePreview());
+        $this->assertSame(10, $lastMessage->getAuthor()->getId());
+        $this->assertSame('bob', $lastMessage->getAuthor()->getUsername());
     }
 
     public function testGetLastMessageReturnsPreviewForMusicMessage(): void
@@ -255,7 +252,6 @@ class ConversationTest extends TestCase
 
         $lastMessage = $conversation->getLastMessage();
 
-        $this->assertIsArray($lastMessage);
-        $this->assertSame('Vous a partagé une musique', $lastMessage['preview']);
+        $this->assertSame('Vous a partagé une musique', $lastMessage->getMessagePreview());
     }
 }

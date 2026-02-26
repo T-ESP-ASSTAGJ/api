@@ -6,7 +6,7 @@ namespace App\MessageHandler;
 
 use App\Entity\Post;
 use App\Message\PersistPostViewsMessage;
-use App\Service\Post\PostViewsPersistenceService;
+use App\Service\Post\PostViewsPersistenceServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -15,7 +15,7 @@ final readonly class PersistPostViewsMessageHandler
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private PostViewsPersistenceService $postViewsPersistenceService,
+        private PostViewsPersistenceServiceInterface $postViewsPersistenceService,
     ) {
     }
 
