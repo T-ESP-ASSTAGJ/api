@@ -29,6 +29,12 @@ stop:            ## Stop the API
 	@echo -e "\r\n${BOLD_GREEN}# Stopping API${NC}\r\n"
 	@docker compose down
 
+update:          ## Update dependencies and migration
+	@echo -e "\r\n${BOLD_GREEN}# Updating composer${NC}\r\n"
+	@docker exec -it jamly-api composer install
+	@echo -e "\r\n${BOLD_GREEN}# Running migrations${NC}\r\n"
+	@docker exec -it jamly-api bin/console d:m:m --no-interaction
+
 ##
 ## Docker Build & Push
 ##---------------------------------------------------------------------------
