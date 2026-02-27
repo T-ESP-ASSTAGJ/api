@@ -32,21 +32,17 @@ use Symfony\Component\Validator\Constraints as Assert;
         new ApiPost(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
             input: MessageCreateInput::class,
-            mercure: true,
             processor: MessageProcessor::class,
         ),
         new Put(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
             denormalizationContext: ['groups' => [self::SERIALIZATION_GROUP_WRITE]],
-            mercure: true,
             processor: MessageProcessor::class
         ),
         new Delete(
             output: false,
-            mercure: true
         ),
     ],
-    mercure: true
 )]
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]

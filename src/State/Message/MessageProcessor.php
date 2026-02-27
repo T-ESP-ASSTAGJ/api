@@ -8,7 +8,9 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
 use App\ApiResource\Message\MessageCreateInput;
+use App\ApiResource\Message\MercureMessageOutput;
 use App\Entity\Conversation;
+use App\Entity\Enum\MercureTypeEnum;
 use App\Entity\Message;
 use App\Entity\User;
 // use App\Service\Message\MusicMetadataService;
@@ -16,6 +18,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\Mercure\HubInterface;
+use Symfony\Component\Mercure\Update;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -27,6 +31,7 @@ final readonly class MessageProcessor implements ProcessorInterface
         private EntityManagerInterface $entityManager,
         private ValidatorInterface $validator,
         private Security $security,
+        private HubInterface $hub,
         //        private MusicMetadataService $musicMetadataService,
     ) {
     }
@@ -76,6 +81,14 @@ final readonly class MessageProcessor implements ProcessorInterface
         $this->entityManager->persist($message);
         $this->entityManager->flush();
 
+        $mercureMessage = new MercureMessageOutput(MercureTypeEnum::Message, $message);
+        $update = new Update(
+            $mercureMessage->getTopic(),
+            $mercureMessage->toJson()
+        );
+        $this->hub->publish($update);
+
         return $message;
     }
 }
+
