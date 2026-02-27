@@ -26,6 +26,7 @@ localhost, :80, :443 {
     mercure {
         publisher_jwt {env.MERCURE_JWT_SECRET}
         subscriber_jwt {env.MERCURE_JWT_SECRET}
+        ui
     }
 
     php_server
