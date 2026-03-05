@@ -10,11 +10,13 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post as ApiPost;
 use ApiPlatform\Metadata\Put;
 use App\ApiResource\User\UserFollowOutput;
 use App\ApiResource\User\UserPutInput;
 use App\Entity\Interface\TimeStampableInterface;
 use App\Repository\UserRepository;
+use App\State\User\UserDeviceTokenProcessor;
 use App\State\User\UserFollowersProvider;
 use App\State\User\UserFollowingProvider;
 use App\State\User\UserLikedPostProvider;
@@ -56,6 +58,10 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new GetCollection(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ]],
+        ),
+        new ApiPost(
+            uriTemplate: '/users/update-device-token',
+            processor: UserDeviceTokenProcessor::class,
         ),
         new Put(
             uriTemplate: '/users/me',
@@ -162,6 +168,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
 
     #[ORM\Column(name: 'needs_profile', type: 'boolean', options: ['default' => true])]
     private bool $needsProfile = true;
+
+    #[ORM\Column(name: 'device_token', length: 255, nullable: true)]
+    private ?string $deviceToken = null;
 
     // List of users THIS USER follows
     /** @var Collection<int, Follow> */
@@ -314,6 +323,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     public function setNeedsProfile(bool $needsProfile): static
     {
         $this->needsProfile = $needsProfile;
+
+        return $this;
+    }
+
+    public function getDeviceToken(): ?string
+    {
+        return $this->deviceToken;
+    }
+
+    public function setDeviceToken(?string $token): static
+    {
+        $this->deviceToken = $token;
 
         return $this;
     }

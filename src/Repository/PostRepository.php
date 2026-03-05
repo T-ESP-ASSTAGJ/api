@@ -46,7 +46,7 @@ class PostRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->getResult();
     }
 
-    public function updateViewCount(int $postId, int $count): void
+    public function updateViewsCount(int $postId, int $count): void
     {
         $this->createQueryBuilder('p')
             ->update()

@@ -46,6 +46,10 @@ class UserTest extends TestCase
         $result = $user->setNeedsProfile(false);
         $this->assertSame($user, $result);
         $this->assertFalse($user->getNeedsProfile());
+
+        $result = $user->setDeviceToken('azerty');
+        $this->assertSame($user, $result);
+        $this->assertSame('azerty', $user->getDeviceToken());
     }
 
     public function testRoles(): void
