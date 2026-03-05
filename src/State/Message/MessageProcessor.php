@@ -7,8 +7,8 @@ namespace App\State\Message;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
-use App\ApiResource\Message\MessageCreateInput;
 use App\ApiResource\Message\MercureMessageOutput;
+use App\ApiResource\Message\MessageCreateInput;
 use App\Entity\Conversation;
 use App\Entity\Enum\MercureTypeEnum;
 use App\Entity\Message;
@@ -83,7 +83,7 @@ final readonly class MessageProcessor implements ProcessorInterface
 
         $mercureMessage = new MercureMessageOutput(MercureTypeEnum::Message, $message);
         $update = new Update(
-            $mercureMessage->getTopic(),
+            $conversation->getMercureTopic(),
             $mercureMessage->toJson()
         );
         $this->hub->publish($update);
@@ -91,4 +91,3 @@ final readonly class MessageProcessor implements ProcessorInterface
         return $message;
     }
 }
-

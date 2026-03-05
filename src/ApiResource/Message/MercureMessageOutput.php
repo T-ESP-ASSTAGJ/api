@@ -29,18 +29,13 @@ class MercureMessageOutput
                 'conversationId' => $this->message->getConversation()->getId(),
                 'author' => [
                     'id' => $author->getId(),
-                    'username' => $author->getUserIdentifier(),
+                    'username' => $author->getUsername(),
+                    'profilePicture' => $author->getProfilePicture(),
                 ],
                 'type' => $this->message->getType(),
                 'content' => $this->message->getContent(),
-                'createdAt' => $this->message->getCreatedAt()?->format(\DateTimeInterface::ATOM),
+                'createdAt' => $this->message->getCreatedAt()->format(\DateTimeInterface::ATOM),
             ],
         ]);
     }
-
-    public function getTopic(): string
-    {
-        return '/conversations/' . $this->message->getConversation()->getId();
-    }
 }
-

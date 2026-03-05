@@ -35,9 +35,11 @@ use Symfony\Component\Validator\Constraints as Assert;
             security: 'object.hasUser(user)',
         ),
         new GetCollection(
-            normalizationContext: ['groups' => [
-                self::SERIALIZATION_GROUP_READ,
-            ]],
+            normalizationContext: [
+                'groups' => [
+                    self::SERIALIZATION_GROUP_READ,
+                ],
+            ],
             provider: ConversationListProvider::class,
         ),
         new ApiPost(
@@ -279,5 +281,14 @@ class Conversation implements TimeStampableInterface
     public function getFlattenedParticipants(): Collection
     {
         return $this->participants->map(fn (ConversationParticipant $p) => $p->getUser());
+    }
+
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+    ])]
+    public function getMercureTopic(): string
+    {
+        return '/conversations/'.$this->id;
     }
 }
