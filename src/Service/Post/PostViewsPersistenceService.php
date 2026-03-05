@@ -21,7 +21,7 @@ final readonly class PostViewsPersistenceService implements PostViewsPersistence
         $redisViews = (int) ($this->redis->get($viewsKey) ?: 0);
 
         if ($redisViews > 0) {
-            $this->postRepository->updateViewCount($postId, $redisViews);
+            $this->postRepository->updateViewsCount($postId, $redisViews);
         }
     }
 }

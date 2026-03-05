@@ -7,7 +7,7 @@ namespace App\State\Like;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Like\LikeCreateInput;
-use App\Entity\Enum\LikeableTypeEnum;
+use App\Entity\Interface\LikeableInterface;
 use App\Entity\Like;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
@@ -40,7 +40,7 @@ final readonly class LikeCreateProcessor implements ProcessorInterface
     {
         $entityClass = $data->entityClass->toEntityClass();
 
-        /** @var LikeableTypeEnum|null $entityToLike */
+        /** @var LikeableInterface|null $entityToLike */
         $entityToLike = $this->em->getRepository($entityClass)->find($data->entityId);
 
         if (!$entityToLike) {
@@ -49,6 +49,11 @@ final readonly class LikeCreateProcessor implements ProcessorInterface
 
         /** @var User $user */
         $user = $this->security->getUser();
+
+        $owner = $entityToLike->getUser();
+        if ($owner->getId() === $user->getId()) {
+            throw new BadRequestHttpException('Cannot like your own content.');
+        }
 
         $like = new Like();
         $like
@@ -65,6 +70,10 @@ final readonly class LikeCreateProcessor implements ProcessorInterface
             );
         } catch (\Throwable) {
             throw new BadRequestHttpException('You have already liked this entity.');
+        }
+
+        if ($owner->getDeviceToken()) {
+            #TODO: send notification to owner
         }
     }
 }

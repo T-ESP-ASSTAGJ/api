@@ -6,7 +6,7 @@ services:
     container_name: jamly-api
     image: app-php
     restart: unless-stopped
-    environment:
+    environment: &php-env
       APP_ENV: dev
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:${POSTGRES_PORT}/${POSTGRES_DB}?serverVersion=${POSTGRES_VERSION}&charset=${POSTGRES_CHARSET}
       # Mercure (integrated in FrankenPHP/Caddy)
@@ -64,6 +64,20 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+
+  messenger-worker:
+    image: app-php
+    working_dir: /app
+    restart: unless-stopped
+    environment:
+      <<: *php-env
+    volumes:
+      - .:/app:z
+    command: php bin/console messenger:consume async --memory-limit=128M --time-limit=3600
+    depends_on:
+      - php
+      - database
+      - redis
 
 volumes:
   caddy_data:
