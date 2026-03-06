@@ -31,9 +31,6 @@ class LikeTest extends TestCase
         $result = $like->setEntityClass(LikeableTypeEnum::Post);
         $this->assertSame($like, $result);
         $this->assertSame(Post::class, $like->getEntityClass());
-
-        $like->setLikedEntity($post);
-        $this->assertSame($post, $like->getLikedEntity());
     }
 
     public function testTimeStampableTrait(): void
@@ -59,25 +56,5 @@ class LikeTest extends TestCase
         $like->setEntityClass(LikeableTypeEnum::Message);
 
         $this->assertSame(\App\Entity\Message::class, $like->getEntityClass());
-    }
-
-    public function testGetLikedEntityReturnsNullByDefault(): void
-    {
-        $like = new Like();
-
-        $this->assertNull($like->getLikedEntity());
-    }
-
-    public function testSetLikedEntity(): void
-    {
-        $like = new Like();
-        $post = new Post();
-
-        $like->setLikedEntity($post);
-
-        $this->assertSame($post, $like->getLikedEntity());
-
-        $like->setLikedEntity(null);
-        $this->assertNull($like->getLikedEntity());
     }
 }

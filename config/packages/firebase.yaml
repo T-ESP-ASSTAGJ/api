@@ -1,0 +1,4 @@
+kreait_firebase:
+    projects:
+        jamly:
+            credentials: '%kernel.project_dir%/config/secrets/jamly-6048b-firebase.json'

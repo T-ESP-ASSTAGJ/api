@@ -19,13 +19,6 @@ class LikeableTypeEnumTest extends TestCase
         $this->assertSame(Message::class, LikeableTypeEnum::Message->value);
     }
 
-    public function testToEntityClass(): void
-    {
-        $this->assertSame(Post::class, LikeableTypeEnum::Post->toEntityClass());
-        $this->assertSame(Comment::class, LikeableTypeEnum::Comment->toEntityClass());
-        $this->assertSame(Message::class, LikeableTypeEnum::Message->toEntityClass());
-    }
-
     public function testValues(): void
     {
         $values = LikeableTypeEnum::values();

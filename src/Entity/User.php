@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post as ApiPost;
 use ApiPlatform\Metadata\Put;
+use App\ApiResource\User\UserDeviceTokenInput;
 use App\ApiResource\User\UserFollowOutput;
 use App\ApiResource\User\UserPutInput;
 use App\Entity\Interface\TimeStampableInterface;
@@ -60,7 +61,8 @@ use Symfony\Component\Validator\Constraints as Assert;
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ]],
         ),
         new ApiPost(
-            uriTemplate: '/users/update-device-token',
+            uriTemplate: '/users/device-token',
+            input: UserDeviceTokenInput::class,
             processor: UserDeviceTokenProcessor::class,
         ),
         new Put(
@@ -169,7 +171,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     #[ORM\Column(name: 'needs_profile', type: 'boolean', options: ['default' => true])]
     private bool $needsProfile = true;
 
-    #[ORM\Column(name: 'device_token', length: 255, nullable: true)]
+    #[ORM\Column(name: 'device_token', type: 'string', length: 255, nullable: true)]
     private ?string $deviceToken = null;
 
     // List of users THIS USER follows

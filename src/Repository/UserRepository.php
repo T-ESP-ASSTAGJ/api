@@ -35,28 +35,29 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
-    //    /**
-    //     * @return User[] Returns an array of User objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('u.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findDeviceTokenByUser(int $userId): ?string
+    {
+        $result = $this->createQueryBuilder('u')
+            ->select('u.deviceToken')
+            ->where('u.id = :userId')
+            ->andWhere('u.deviceToken IS NOT NULL')
+            ->setParameter('userId', $userId)
+            ->getQuery()
+            ->getOneOrNullResult();
 
-    //    public function findOneBySomeField($value): ?User
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        return $result['deviceToken'] ?? null;
+    }
+
+    public function deleteTokenByUserToken(string $deviceToken): void
+    {
+        $this->createQueryBuilder('u')
+            ->update()
+            ->set('u.deviceToken', ':null')
+            ->where('u.deviceToken = :deviceToken')
+            ->setParameter('null', null)
+            ->setParameter('deviceToken', $deviceToken)
+            ->getQuery()
+            ->execute()
+        ;
+    }
 }

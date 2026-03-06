@@ -14,11 +14,6 @@ enum LikeableTypeEnum: string
     case Comment = Comment::class;
     case Message = Message::class;
 
-    public function toEntityClass(): string
-    {
-        return $this->value;
-    }
-
     /**
      * @return string[]
      */
