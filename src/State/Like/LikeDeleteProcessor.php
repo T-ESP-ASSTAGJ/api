@@ -9,7 +9,7 @@ use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Like\LikeCreateInput;
 use App\Entity\Like;
 use App\Entity\User;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\LikeRepository;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -23,7 +23,7 @@ final readonly class LikeDeleteProcessor implements ProcessorInterface
         /** @var ProcessorInterface<Like, void> */
         #[Autowire(service: 'api_platform.doctrine.orm.state.remove_processor')]
         private ProcessorInterface $removeProcessor,
-        private EntityManagerInterface $em,
+        private LikeRepository $likeRepository,
         private Security $security,
     ) {
     }
@@ -39,9 +39,10 @@ final readonly class LikeDeleteProcessor implements ProcessorInterface
         /** @var User $user */
         $user = $this->security->getUser();
 
-        $like = $this->em->getRepository(Like::class)->findOneBy([
+        dump($data, $user);
+        $like = $this->likeRepository->findOneBy([
             'user' => $user,
-            'entityClass' => $data->entityClass,
+            'entityClass' => $data->entityClass->value,
             'entityId' => $data->entityId,
         ]);
 

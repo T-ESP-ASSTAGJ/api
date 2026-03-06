@@ -9,6 +9,7 @@ use App\Entity\User;
 interface LikeableInterface
 {
     public function getId(): ?int;
+
     public function getUser(): User;
 
     public function getLikesCount(): int;
