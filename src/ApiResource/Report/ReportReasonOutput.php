@@ -4,22 +4,16 @@ declare(strict_types=1);
 
 namespace App\ApiResource\Report;
 
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\GetCollection;
-use App\State\Report\ReportReasonsProvider;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ApiResource(
-    shortName: 'ReportReason',
-    operations: [
-        new GetCollection(
-            uriTemplate: '/report-reasons',
-            provider: ReportReasonsProvider::class,
-        ),
-    ]
-)]
 class ReportReasonOutput
 {
+    public const SERIALIZATION_GROUP_READ = 'report_reason:read';
+
+    #[Groups([self::SERIALIZATION_GROUP_READ])]
     public string $key;
+
+    #[Groups([self::SERIALIZATION_GROUP_READ])]
     public string $label;
 
     public function __construct(string $key, string $label)

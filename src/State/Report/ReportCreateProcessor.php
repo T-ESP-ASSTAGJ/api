@@ -14,6 +14,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 /**
  * @implements ProcessorInterface<ReportCreateInput, void>
@@ -51,7 +52,7 @@ final readonly class ReportCreateProcessor implements ProcessorInterface
         $user = $this->security->getUser();
 
         if (!$user instanceof User) {
-            throw new \RuntimeException('User must be authenticated');
+            throw new UnauthorizedHttpException('Bearer', 'Authentication required');
         }
 
         $report = new Report();
