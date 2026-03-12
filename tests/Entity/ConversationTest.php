@@ -8,6 +8,7 @@ use App\Entity\Conversation;
 use App\Entity\ConversationParticipant;
 use App\Entity\Message;
 use App\Entity\User;
+use App\Util\ReflectionUtil;
 use PHPUnit\Framework\TestCase;
 
 class ConversationTest extends TestCase
@@ -139,10 +140,10 @@ class ConversationTest extends TestCase
     {
         $conversation = new Conversation();
 
-        $this->assertSame(false, $conversation->getIsGroup());
+        $this->assertFalse($conversation->getIsGroup());
 
         $conversation->setIsGroup(true);
-        $this->assertSame(true, $conversation->getIsGroup());
+        $this->assertTrue($conversation->getIsGroup());
     }
 
     public function testTimeStampableTrait(): void
@@ -150,21 +151,18 @@ class ConversationTest extends TestCase
         $conversation = new Conversation();
         $conversation->setCreatedAt();
 
-        $this->assertInstanceOf(\DateTimeImmutable::class, $conversation->getCreatedAt());
-        $this->assertInstanceOf(\DateTimeImmutable::class, $conversation->getUpdatedAt());
+        $this->assertSame(
+            $conversation->getCreatedAt(),
+            $conversation->getUpdatedAt(),
+        );
     }
 
     public function testGetParticipants(): void
     {
         $conversation = new Conversation();
+
         $user1 = new User();
-
-        // Use reflection to set user ID
-        $reflection = new \ReflectionClass($user1);
-        $idProperty = $reflection->getProperty('id');
-        $idProperty->setAccessible(true);
-        $idProperty->setValue($user1, 1);
-
+        ReflectionUtil::setPropertyValue($user1, 'id', 1);
         $user1->setUsername('user1');
         $user1->setProfilePicture('https://example.com/user1.jpg');
 
@@ -194,21 +192,13 @@ class ConversationTest extends TestCase
     public function testGetLastMessageReturnsLastMessageForTextMessage(): void
     {
         $conversation = new Conversation();
-        $user = new User();
 
-        // Use reflection to set IDs
-        $userReflection = new \ReflectionClass($user);
-        $userIdProperty = $userReflection->getProperty('id');
-        $userIdProperty->setAccessible(true);
-        $userIdProperty->setValue($user, 10);
+        $user = new User();
+        ReflectionUtil::setPropertyValue($user, 'id', 10);
         $user->setUsername('bob');
 
         $message = new Message();
-        $messageReflection = new \ReflectionClass($message);
-        $messageIdProperty = $messageReflection->getProperty('id');
-        $messageIdProperty->setAccessible(true);
-        $messageIdProperty->setValue($message, 5);
-
+        ReflectionUtil::setPropertyValue($message, 'id', 5);
         $message->setAuthor($user);
         $message->setType(Message::TYPE_TEXT);
         $message->setContent('Hello world');
@@ -229,21 +219,13 @@ class ConversationTest extends TestCase
     public function testGetLastMessageReturnsPreviewForMusicMessage(): void
     {
         $conversation = new Conversation();
-        $user = new User();
 
-        // Use reflection to set IDs
-        $userReflection = new \ReflectionClass($user);
-        $userIdProperty = $userReflection->getProperty('id');
-        $userIdProperty->setAccessible(true);
-        $userIdProperty->setValue($user, 20);
+        $user = new User();
+        ReflectionUtil::setPropertyValue($user, 'id', 20);
         $user->setUsername('charlie');
 
         $message = new Message();
-        $messageReflection = new \ReflectionClass($message);
-        $messageIdProperty = $messageReflection->getProperty('id');
-        $messageIdProperty->setAccessible(true);
-        $messageIdProperty->setValue($message, 15);
-
+        ReflectionUtil::setPropertyValue($message, 'id', 15);
         $message->setAuthor($user);
         $message->setType(Message::TYPE_MUSIC);
         $message->setCreatedAt();
@@ -255,11 +237,25 @@ class ConversationTest extends TestCase
         $this->assertSame('Vous a partagé une musique', $lastMessage->getMessagePreview());
     }
 
+    public function testGetParticipantForUser(): void
+    {
+        $conversation = new Conversation();
+        $user1 = new User();
+        $participant1 = new ConversationParticipant();
+        $participant1->setUser($user1);
+        $conversation->addParticipant($participant1);
+
+        $user2 = new User();
+
+        $this->assertSame($participant1, $conversation->getParticipantForUser($user1));
+        $this->assertNull($conversation->getParticipantForUser($user2));
+    }
+
     public function testGetFlattenedList(): void
     {
         $conversation = new Conversation();
         $user1 = new User();
-        (new \ReflectionProperty(User::class, 'id'))->setValue($user1, 1);
+        ReflectionUtil::setPropertyValue($user1, 'id', 1);
         $participant = new ConversationParticipant();
         $participant->setUser($user1);
         $conversation->addParticipant($participant);
@@ -271,7 +267,8 @@ class ConversationTest extends TestCase
     {
         $conversation = new Conversation();
         $user1 = new User();
-        (new \ReflectionProperty(User::class, 'id'))->setValue($user1, 1);
+        ReflectionUtil::setPropertyValue($user1, 'id', 1);
+
         $participant = new ConversationParticipant();
         $participant->setUser($user1);
         $conversation->addParticipant($participant);

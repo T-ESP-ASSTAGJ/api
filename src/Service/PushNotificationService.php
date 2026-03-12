@@ -52,7 +52,6 @@ class PushNotificationService
                 'userId' => $userId,
                 'error' => $error,
             ]);
-            $this->userRepository->deleteTokenByUserToken($failure->target()->value());
         }
     }
 }

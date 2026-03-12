@@ -5,45 +5,20 @@ declare(strict_types=1);
 namespace App\EventListener;
 
 use App\Entity\Like;
-use App\Repository\LikeRepository;
-use App\Service\PushNotificationService;
+use App\Message\LikeCreatedMessage;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
-use Doctrine\ORM\Event\PostPersistEventArgs;
 use Doctrine\ORM\Events;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsEntityListener(event: Events::postPersist, entity: Like::class)]
-class LikeCreatedListener
+readonly class LikeCreatedListener
 {
     public function __construct(
-        private PushNotificationService $push,
-        private LikeRepository $likeRepository,
-    ) {
-    }
+        private MessageBusInterface $bus,
+    ) {}
 
-    public function postPersist(Like $like, PostPersistEventArgs $args): void
+    public function postPersist(Like $like): void
     {
-        $liker = $like->getUser();
-        $recipient = $this->likeRepository->findContentOwner($like);
-
-        if (null === $recipient) {
-            return;
-        }
-
-        if ($recipient->getId() === $liker->getId()) {
-            return;
-        }
-
-        $entityType = strtolower((new \ReflectionClass($like->getEntityClass()))->getShortName());
-        $this->push->sendToUser(
-            userId: $recipient->getId(),
-            title: 'New like',
-            body: sprintf('%s liked your %s', $liker->getUsername(), $entityType),
-            data: [
-                'type' => 'like',
-                'entity_class' => $like->getEntityClass(),
-                'entity_id' => (string) $like->getEntityId(),
-            ]
-        );
-        // TODO: add mercure update here
+        $this->bus->dispatch(new LikeCreatedMessage($like->getId()));
     }
 }
