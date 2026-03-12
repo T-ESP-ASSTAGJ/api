@@ -63,9 +63,5 @@ final readonly class LikeCreateProcessor implements ProcessorInterface
         } catch (\Throwable) {
             throw new BadRequestHttpException('You have already liked this entity.');
         }
-
-        if ($owner->getDeviceToken()) {
-            // TODO: send notification to owner
-        }
     }
 }

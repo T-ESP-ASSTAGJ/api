@@ -4,3 +4,4 @@ framework:
              async: '%env(MESSENGER_TRANSPORT_DSN)%'
         routing:
             'App\Message\PersistPostViewsMessage': async
+            'App\Message\LikeCreatedMessage': async
