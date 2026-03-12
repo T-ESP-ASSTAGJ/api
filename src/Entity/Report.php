@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use App\ApiResource\Report\ReportCreateInput;
+use App\ApiResource\Report\ReportReasonOutput;
 use App\Entity\Enum\ReportReasonEnum;
 use App\Entity\Enum\ReportableTypeEnum;
 use App\Entity\Interface\TimeStampableInterface;
-use App\Repository\ReportRepository;
 use App\State\Report\ReportCreateProcessor;
+use App\State\Report\ReportReasonsProvider;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -26,9 +28,15 @@ use Symfony\Component\Serializer\Annotation\Groups;
             output: false,
             processor: ReportCreateProcessor::class,
         ),
+        new GetCollection(
+            uriTemplate: '/report-reasons',
+            output: ReportReasonOutput::class,
+            normalizationContext: ['groups' => [ReportReasonOutput::SERIALIZATION_GROUP_READ]],
+            provider: ReportReasonsProvider::class,
+        ),
     ]
 )]
-#[ORM\Entity(repositoryClass: ReportRepository::class)]
+#[ORM\Entity]
 #[ORM\Table(name: 'report')]
 #[ORM\UniqueConstraint(name: 'report_unique', columns: ['user_id', 'entity_id', 'entity_class'])]
 class Report implements TimeStampableInterface
