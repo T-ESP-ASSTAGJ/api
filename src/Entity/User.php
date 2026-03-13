@@ -6,15 +6,17 @@ namespace App\Entity;
 
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post as ApiPost;
 use ApiPlatform\Metadata\Put;
 use App\ApiResource\User\UserDeviceTokenInput;
 use App\ApiResource\User\UserFollowOutput;
-use App\ApiResource\User\UserPutInput;
+use App\ApiResource\User\UserPatchInput;
 use App\Entity\Interface\TimeStampableInterface;
 use App\Repository\UserRepository;
 use App\State\User\UserDeviceTokenProcessor;
@@ -22,7 +24,7 @@ use App\State\User\UserFollowersProvider;
 use App\State\User\UserFollowingProvider;
 use App\State\User\UserLikedPostProvider;
 use App\State\User\UserMeProvider;
-use App\State\User\UserPutProcessor;
+use App\State\User\UserPatchProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -65,10 +67,10 @@ use Symfony\Component\Validator\Constraints as Assert;
             input: UserDeviceTokenInput::class,
             processor: UserDeviceTokenProcessor::class,
         ),
-        new Put(
+        new Patch(
             uriTemplate: '/users/me',
-            input: UserPutInput::class,
-            processor: UserPutProcessor::class
+            input: UserPatchInput::class,
+            processor: UserPatchProcessor::class
         ),
         new Delete(
             security: "is_granted('ROLE_USER') and object == user",
@@ -137,6 +139,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     #[ORM\Column(name: 'password', type: 'string', length: 255, nullable: true)]
     private ?string $password = null;
 
+    #[ApiProperty(openapiContext: ['example' => '+33612345678'])]
+    #[Groups([
+        self::SERIALIZATION_GROUP_DETAIL,
+        self::SERIALIZATION_GROUP_WRITE,
+    ])]
     #[ORM\Column(name: 'phone_number', type: 'string', length: 20, unique: true, nullable: true)]
     #[Assert\Regex('/\+?\d+/')]
     private ?string $phoneNumber = null;
