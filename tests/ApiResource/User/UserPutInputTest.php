@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Tests\ApiResource\User;
 
-use App\ApiResource\User\UserPutInput;
+use App\ApiResource\User\UserPatchInput;
 use PHPUnit\Framework\TestCase;
 
 class UserPutInputTest extends TestCase
 {
     public function testPublicProperties(): void
     {
-        $input = new UserPutInput();
+        $input = new UserPatchInput();
         $input->username = 'johndoe';
         $input->phoneNumber = '+33123456789';
         $input->profilePicture = 'https://example.com/profile.jpg';
@@ -25,7 +25,7 @@ class UserPutInputTest extends TestCase
 
     public function testDefaultValuesAreNull(): void
     {
-        $input = new UserPutInput();
+        $input = new UserPatchInput();
 
         $this->assertNull($input->username);
         $this->assertNull($input->phoneNumber);
@@ -35,8 +35,7 @@ class UserPutInputTest extends TestCase
 
     public function testCanSetFieldsToNull(): void
     {
-        $input = new UserPutInput();
-        $input->username = 'test';
+        $input = new UserPatchInput();
         $input->username = null;
 
         $this->assertNull($input->username);
