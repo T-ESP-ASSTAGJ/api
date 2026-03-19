@@ -73,6 +73,9 @@
             ".php-cs-fixer.dist.php"
         ]
     },
+    "kreait/firebase-bundle": {
+        "version": "5.6.0"
+    },
     "lexik/jwt-authentication-bundle": {
         "version": "3.1",
         "recipe": {

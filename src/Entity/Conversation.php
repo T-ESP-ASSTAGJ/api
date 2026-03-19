@@ -56,7 +56,6 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: '/conversations/{id}/read',
             input: false,
             output: false,
-            read: false,
             processor: ConversationMarkAsReadProcessor::class,
         ),
         new ApiPost(
@@ -232,6 +231,17 @@ class Conversation implements TimeStampableInterface
         );
     }
 
+    public function getParticipantForUser(User $user): ?ConversationParticipant
+    {
+        foreach ($this->participants as $participant) {
+            if ($participant->getUser() === $user) {
+                return $participant;
+            }
+        }
+
+        return null;
+    }
+
     public function isAdmin(User $user): bool
     {
         return $this->participants->exists(
@@ -257,7 +267,10 @@ class Conversation implements TimeStampableInterface
 
     private ?int $unreadCount = null;
 
-    #[Groups([self::SERIALIZATION_GROUP_READ])]
+    #[Groups([
+        self::SERIALIZATION_GROUP_DETAIL,
+        self::SERIALIZATION_GROUP_READ,
+    ])]
     public function getUnreadCount(): int
     {
         return $this->unreadCount ?? 0;

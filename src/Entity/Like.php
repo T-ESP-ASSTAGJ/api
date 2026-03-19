@@ -66,9 +66,6 @@ class Like implements TimeStampableInterface
     #[ORM\Column(name: 'entity_class', type: 'string', length: 255, nullable: false, enumType: LikeableTypeEnum::class)]
     private LikeableTypeEnum $entityClass;
 
-    #[Groups([self::SERIALIZATION_GROUP_READ])]
-    private ?object $likedEntity = null;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -108,16 +105,6 @@ class Like implements TimeStampableInterface
         $this->entityClass = $entityClass;
 
         return $this;
-    }
-
-    public function getLikedEntity(): ?object
-    {
-        return $this->likedEntity;
-    }
-
-    public function setLikedEntity(?object $likedEntity): void
-    {
-        $this->likedEntity = $likedEntity;
     }
 
     /**

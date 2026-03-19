@@ -6,20 +6,25 @@ namespace App\Entity;
 
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post as ApiPost;
 use ApiPlatform\Metadata\Put;
+use App\ApiResource\User\UserDeviceTokenInput;
 use App\ApiResource\User\UserFollowOutput;
-use App\ApiResource\User\UserPutInput;
+use App\ApiResource\User\UserPatchInput;
 use App\Entity\Interface\TimeStampableInterface;
 use App\Repository\UserRepository;
+use App\State\User\UserDeviceTokenProcessor;
 use App\State\User\UserFollowersProvider;
 use App\State\User\UserFollowingProvider;
 use App\State\User\UserLikedPostProvider;
 use App\State\User\UserMeProvider;
-use App\State\User\UserPutProcessor;
+use App\State\User\UserPatchProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -57,10 +62,15 @@ use Symfony\Component\Validator\Constraints as Assert;
         new GetCollection(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ]],
         ),
-        new Put(
+        new ApiPost(
+            uriTemplate: '/users/device-token',
+            input: UserDeviceTokenInput::class,
+            processor: UserDeviceTokenProcessor::class,
+        ),
+        new Patch(
             uriTemplate: '/users/me',
-            input: UserPutInput::class,
-            processor: UserPutProcessor::class
+            input: UserPatchInput::class,
+            processor: UserPatchProcessor::class
         ),
         new Delete(
             security: "is_granted('ROLE_USER') and object == user",
@@ -129,6 +139,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     #[ORM\Column(name: 'password', type: 'string', length: 255, nullable: true)]
     private ?string $password = null;
 
+    #[ApiProperty(openapiContext: ['example' => '+33612345678'])]
+    #[Groups([
+        self::SERIALIZATION_GROUP_DETAIL,
+        self::SERIALIZATION_GROUP_WRITE,
+    ])]
     #[ORM\Column(name: 'phone_number', type: 'string', length: 20, unique: true, nullable: true)]
     #[Assert\Regex('/\+?\d+/')]
     private ?string $phoneNumber = null;
@@ -162,6 +177,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
 
     #[ORM\Column(name: 'needs_profile', type: 'boolean', options: ['default' => true])]
     private bool $needsProfile = true;
+
+    #[ORM\Column(name: 'device_token', type: 'string', length: 255, nullable: true)]
+    private ?string $deviceToken = null;
 
     // List of users THIS USER follows
     /** @var Collection<int, Follow> */
@@ -314,6 +332,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     public function setNeedsProfile(bool $needsProfile): static
     {
         $this->needsProfile = $needsProfile;
+
+        return $this;
+    }
+
+    public function getDeviceToken(): ?string
+    {
+        return $this->deviceToken;
+    }
+
+    public function setDeviceToken(?string $token): static
+    {
+        $this->deviceToken = $token;
 
         return $this;
     }

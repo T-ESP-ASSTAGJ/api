@@ -7,7 +7,7 @@ namespace App\State\User;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
-use App\ApiResource\User\UserPutInput;
+use App\ApiResource\User\UserPatchInput;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -15,9 +15,9 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * @implements ProcessorInterface<UserPutInput, User>
+ * @implements ProcessorInterface<UserPatchInput, User>
  */
-class UserPutProcessor implements ProcessorInterface
+class UserPatchProcessor implements ProcessorInterface
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
@@ -27,35 +27,35 @@ class UserPutProcessor implements ProcessorInterface
     }
 
     /**
-     * @param UserPutInput $data
+     * @param UserPatchInput $data
      */
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): User
     {
-        /** @var User|null $user */
         $user = $this->security->getUser();
 
-        if (!$user) {
-            throw new AccessDeniedHttpException('You must be authenticated to update your profile.');
+        if (!$user instanceof User) {
+            throw new AccessDeniedHttpException('You must be authenticated.');
         }
 
-        try {
+        if (isset($data->username)) {
             $user->setUsername($data->username);
-            if ($data->phoneNumber) {
-                $user->setPhoneNumber($data->phoneNumber);
-            }
-
-            $user->setProfilePicture($data->profilePicture);
-            $user->setBio($data->bio);
-
-            $violations = $this->validator->validate($user);
-            if ($violations->count() > 0) {
-                throw new ValidationException($violations);
-            }
-
-            $this->entityManager->flush();
-        } catch (\Throwable $exception) {
-            throw new \RuntimeException('An error occurred while updating the user profile: '.$exception->getMessage());
         }
+        if (isset($data->phoneNumber)) {
+            $user->setPhoneNumber($data->phoneNumber);
+        }
+        if (isset($data->bio)) {
+            $user->setBio($data->bio);
+        }
+        if (isset($data->profilePicture)) {
+            $user->setProfilePicture($data->profilePicture);
+        }
+
+        $violations = $this->validator->validate($user);
+        if ($violations->count() > 0) {
+            throw new ValidationException($violations);
+        }
+
+        $this->entityManager->flush();
 
         return $user;
     }

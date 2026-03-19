@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Service\Message;
+namespace App\Service;
 
 use App\Entity\Token;
 use App\Entity\User;

@@ -38,22 +38,11 @@ final readonly class ConversationMarkAsReadProcessor implements ProcessorInterfa
             throw new UnauthorizedHttpException('Bearer', 'Authentication required');
         }
 
-        // Find the participant for this user in this conversation
-        $participant = null;
-        foreach ($data->getActiveParticipants() as $p) {
-            if ($p->getUser()->getId() === $user->getId()) {
-                $participant = $p;
-                break;
-            }
-        }
-
-        if (null === $participant) {
+        if (!$participant = $data->getParticipantForUser($user)) {
             throw new AccessDeniedHttpException('You are not a participant of this conversation');
         }
 
-        // Reset unread count
         $participant->resetUnreadCount();
-
         $this->entityManager->flush();
     }
 }

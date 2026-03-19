@@ -7,6 +7,7 @@ namespace App\Tests\Entity;
 use App\Entity\Conversation;
 use App\Entity\Message;
 use App\Entity\User;
+use App\Util\ReflectionUtil;
 use PHPUnit\Framework\TestCase;
 
 class MessageTest extends TestCase
@@ -127,12 +128,7 @@ class MessageTest extends TestCase
     {
         $message = new Message();
         $conversation = new Conversation();
-
-        // We need to use reflection to set a private id on the conversation
-        $reflection = new \ReflectionClass($conversation);
-        $idProperty = $reflection->getProperty('id');
-        $idProperty->setAccessible(true);
-        $idProperty->setValue($conversation, 123);
+        ReflectionUtil::setPropertyValue($conversation, 'id', 123);
 
         $message->setConversation($conversation);
 
