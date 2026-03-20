@@ -13,7 +13,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post as ApiPost;
-use ApiPlatform\Metadata\Put;
 use App\ApiResource\User\UserDeviceTokenInput;
 use App\ApiResource\User\UserFollowOutput;
 use App\ApiResource\User\UserPatchInput;

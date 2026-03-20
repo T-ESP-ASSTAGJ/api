@@ -43,14 +43,17 @@ class PushNotificationService
             )
         ;
 
-        $report = $this->messaging->sendMulticast($message, [$token]);
+        try {
+            $this->messaging->send(
+                $message->toToken($token)
+            );
 
-        foreach ($report->failures()->getItems() as $failure) {
-            $error = $failure->error()?->getMessage();
-
-            $this->logger->error('Push failure for user {userId}: {error}', [
+            $this->logger->info('Push sent', ['userId' => $userId]);
+        } catch (\Throwable $e) {
+            $this->logger->error('Push failed', [
                 'userId' => $userId,
-                'error' => $error,
+                'token' => $token,
+                'error' => $e->getMessage(),
             ]);
         }
     }
