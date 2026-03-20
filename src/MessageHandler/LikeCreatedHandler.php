@@ -33,10 +33,9 @@ class LikeCreatedHandler
 
         $this->push->sendToUser(
             userId: $recipient->getId(),
-            title: 'New like',
-            body: sprintf('%s liked your %s', $liker->getUsername(), $like->getEntityClass()),
+            title: $liker->getUsername(),
+            body: sprintf('has liked your %s', $like->getEntityClass()),
             data: [
-                'type' => 'like',
                 'entity_class' => $like->getEntityClass(),
                 'entity_id' => (string) $like->getEntityId(),
             ]
