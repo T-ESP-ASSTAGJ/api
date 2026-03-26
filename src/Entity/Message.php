@@ -11,9 +11,12 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post as ApiPost;
 use ApiPlatform\Metadata\Put;
 use App\ApiResource\Message\MessageCreateInput;
+use App\ApiResource\Message\MessageUpdateInput;
 use App\Entity\Interface\TimeStampableInterface;
+use App\State\IsReadProvider;
 use App\State\Message\MessageGetProvider;
 use App\State\Message\MessageProcessor;
+use App\State\Message\MessageUpdateProcessor;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -24,29 +27,28 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Get(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
-            provider: MessageGetProvider::class,
+            provider: IsReadProvider::class,
         ),
         new GetCollection(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ]],
+            provider: IsReadProvider::class,
         ),
         new ApiPost(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
             input: MessageCreateInput::class,
-            mercure: true,
             processor: MessageProcessor::class,
         ),
         new Put(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
-            denormalizationContext: ['groups' => [self::SERIALIZATION_GROUP_WRITE]],
-            mercure: true,
-            processor: MessageProcessor::class
+            denormalizationContext: ['groups' => [self::SERIALIZATION_GROUP_UPDATE]],
+            input: MessageUpdateInput::class,
+            provider: IsReadProvider::class,
+            processor: MessageUpdateProcessor::class
         ),
         new Delete(
             output: false,
-            mercure: true
         ),
     ],
-    mercure: true
 )]
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
@@ -58,6 +60,7 @@ class Message implements TimeStampableInterface
     public const SERIALIZATION_GROUP_READ = 'message:read';
     public const SERIALIZATION_GROUP_DETAIL = 'message:detail';
     public const SERIALIZATION_GROUP_WRITE = 'message:write';
+    public const SERIALIZATION_GROUP_UPDATE = 'message:update';
 
     public const TYPE_TEXT = 'text';
     public const TYPE_MUSIC = 'music';
@@ -105,6 +108,7 @@ class Message implements TimeStampableInterface
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
         self::SERIALIZATION_GROUP_WRITE,
+        self::SERIALIZATION_GROUP_UPDATE,
         Conversation::SERIALIZATION_GROUP_DETAIL,
     ])]
     private ?string $content = null;
@@ -149,6 +153,13 @@ class Message implements TimeStampableInterface
         Conversation::SERIALIZATION_GROUP_READ,
     ])]
     private bool $isRead = false;
+
+    #[Groups([
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+        Conversation::SERIALIZATION_GROUP_READ,
+    ])]
+    private ?bool $read = null;
 
     #[ORM\Column(name: 'read_at', type: Types::DATETIME_IMMUTABLE, nullable: true)]
     #[Groups([
@@ -290,6 +301,18 @@ class Message implements TimeStampableInterface
     public function setIsRead(bool $isRead): static
     {
         $this->isRead = $isRead;
+
+        return $this;
+    }
+
+    public function getRead(): ?bool
+    {
+        return $this->read;
+    }
+
+    public function setRead(?bool $read): static
+    {
+        $this->read = $read;
 
         return $this;
     }

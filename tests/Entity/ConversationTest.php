@@ -16,8 +16,9 @@ class ConversationTest extends TestCase
     public function testGettersAndSetters(): void
     {
         $conversation = new Conversation();
+        (new \ReflectionProperty(Conversation::class, 'id'))->setValue($conversation, 30);
 
-        $this->assertNull($conversation->getId());
+        $this->assertSame(30, $conversation->getId());
 
         $result = $conversation->setIsGroup(true);
         $this->assertSame($conversation, $result);
@@ -30,6 +31,9 @@ class ConversationTest extends TestCase
         $result = $conversation->setUnreadCount(5);
         $this->assertSame($conversation, $result);
         $this->assertSame(5, $conversation->getUnreadCount());
+
+        $result = $conversation->getMercureTopic();
+        $this->assertSame('/conversations/30', $result);
     }
 
     public function testDefaultValues(): void

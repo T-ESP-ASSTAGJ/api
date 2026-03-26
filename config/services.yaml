@@ -63,3 +63,7 @@ services:
     App\Service\Post\PostViewsPersistenceService:
         arguments:
             $redis: '@app.redis_connection'
+
+    App\State\Mercure\MercureTokenProvider:
+        arguments:
+            $mercureSecret: '%env(MERCURE_JWT_SECRET)%'

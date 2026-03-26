@@ -8,12 +8,10 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
 use App\ApiResource\Message\MercureMessageOutput;
-use App\ApiResource\Message\MessageCreateInput;
-use App\Entity\Conversation;
+use App\ApiResource\Message\MessageUpdateInput;
 use App\Entity\Enum\MercureTypeEnum;
 use App\Entity\Message;
 use App\Entity\User;
-// use App\Service\Message\MusicMetadataService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -23,30 +21,32 @@ use Symfony\Component\Mercure\Update;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * @implements ProcessorInterface<MessageCreateInput, Message>
+ * @implements ProcessorInterface<MessageUpdateInput, Message>
  */
-final readonly class MessageProcessor implements ProcessorInterface
+final readonly class MessageUpdateProcessor implements ProcessorInterface
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
         private ValidatorInterface $validator,
         private Security $security,
         private HubInterface $hub,
-        //        private MusicMetadataService $musicMetadataService,
     ) {
     }
 
     /**
-     * @param MessageCreateInput   $data
+     * @param MessageUpdateInput   $data
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *
      * @return Message
      */
-    public function process(mixed $data, ?Operation $operation = null, array $uriVariables = [], array $context = []): mixed
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Message
     {
-        if (!$data instanceof MessageCreateInput) {
-            return $data;
+        /** @var Message|null $message */
+        $message = $context['previous_data'] ?? null;
+
+        if (!$message instanceof Message) {
+            throw new NotFoundHttpException('Message not found');
         }
 
         /** @var User|null $user */
@@ -55,32 +55,18 @@ final readonly class MessageProcessor implements ProcessorInterface
             throw new UnauthorizedHttpException('Bearer', 'Authentication required');
         }
 
-        $conversation = $this->entityManager->getRepository(Conversation::class)
-            ->findOneBy(['id' => $data->conversationId]);
-
-        if (null === $conversation) {
-            throw new NotFoundHttpException('Invalid conversation');
+        if ($data instanceof MessageUpdateInput && null !== $data->content) {
+            $message->setContent($data->content);
         }
 
-        $message = new Message();
-        $message->setAuthor($user);
-        $message->setConversation($conversation);
-        $message->setContent($data->content);
-        $message->setType($data->type);
-
-        //        if (Message::TYPE_MUSIC === $data->getType() && $data->getTrack()) {
-        //            $trackMetadata = $this->musicMetadataService->getTrackMetadata($data->getTrack());
-        //            $data->setTrackMetadata($trackMetadata);
-        //        }
-
-        $violations = $this->validator->validate($data);
+        $violations = $this->validator->validate($message);
         if ($violations->count() > 0) {
             throw new ValidationException($violations);
         }
 
-        $this->entityManager->persist($message);
         $this->entityManager->flush();
 
+        $conversation = $message->getConversation();
         $mercureMessage = new MercureMessageOutput(MercureTypeEnum::Message, $message);
         $update = new Update(
             $conversation->getMercureTopic(),
