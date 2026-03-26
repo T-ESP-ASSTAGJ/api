@@ -37,6 +37,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ]
 )]
 #[ORM\Entity]
+#[ORM\HasLifecycleCallbacks]
 #[ORM\Table(name: 'report')]
 #[ORM\UniqueConstraint(name: 'report_unique', columns: ['user_id', 'entity_id', 'entity_class'])]
 class Report implements TimeStampableInterface
@@ -75,63 +76,23 @@ class Report implements TimeStampableInterface
         return $this->id;
     }
 
-    public function getUser(): User
-    {
-        return $this->user;
-    }
+    public function getUser(): User { return $this->user; }
 
-    public function setUser(User $user): static
-    {
-        $this->user = $user;
+    public function setUser(User $user): static { $this->user = $user; return $this; }
 
-        return $this;
-    }
+    public function getEntityId(): int { return $this->entityId; }
 
-    public function getEntityId(): int
-    {
-        return $this->entityId;
-    }
+    public function setEntityId(int $entityId): static { $this->entityId = $entityId; return $this; }
 
-    public function setEntityId(int $entityId): static
-    {
-        $this->entityId = $entityId;
+    public function getEntityClass(): ReportableTypeEnum { return $this->entityClass; }
 
-        return $this;
-    }
+    public function setEntityClass(ReportableTypeEnum $entityClass): static { $this->entityClass = $entityClass; return $this; }
 
-    public function getEntityClass(): ReportableTypeEnum
-    {
-        return $this->entityClass;
-    }
+    public function getReason(): ReportReasonEnum { return $this->reason; }
 
-    public function setEntityClass(ReportableTypeEnum $entityClass): static
-    {
-        $this->entityClass = $entityClass;
+    public function setReason(ReportReasonEnum $reason): static { $this->reason = $reason; return $this; }
 
-        return $this;
-    }
+    public function getMessage(): ?string { return $this->message; }
 
-    public function getReason(): ReportReasonEnum
-    {
-        return $this->reason;
-    }
-
-    public function setReason(ReportReasonEnum $reason): static
-    {
-        $this->reason = $reason;
-
-        return $this;
-    }
-
-    public function getMessage(): ?string
-    {
-        return $this->message;
-    }
-
-    public function setMessage(?string $message): static
-    {
-        $this->message = $message;
-
-        return $this;
-    }
+    public function setMessage(?string $message): static { $this->message = $message; return $this; }
 }
