@@ -14,6 +14,7 @@ use App\State\Report\ReportCreateProcessor;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use App\Tests\Trait\AuthenticationTrait;
 
@@ -35,14 +36,14 @@ class ReportCreateProcessorTest extends KernelTestCase
         $user = UserFactory::createOne();
         $post = PostFactory::createOne();
 
-        $this->authenticateUser($user->_real());
+        $this->authenticateUser($user);
 
         $input = new ReportCreateInput();
         $input->entityClass = ReportableTypeEnum::Post;
         $input->entityId = $post->getId();
         $input->reason = ReportReasonEnum::Spam;
 
-        $this->processor->process($input);
+        $this->processor->process($input, $this->createMock(\ApiPlatform\Metadata\Operation::class));
 
         $em = self::getContainer()->get('doctrine')->getManager();
         $report = $em->getRepository(Report::class)->findOneBy([
@@ -60,7 +61,7 @@ class ReportCreateProcessorTest extends KernelTestCase
         $user = UserFactory::createOne();
         $post = PostFactory::createOne();
 
-        $this->authenticateUser($user->_real());
+        $this->authenticateUser($user);
 
         $input = new ReportCreateInput();
         $input->entityClass = ReportableTypeEnum::Post;
@@ -68,7 +69,7 @@ class ReportCreateProcessorTest extends KernelTestCase
         $input->reason = ReportReasonEnum::Other;
         $input->message = 'Ce contenu est inapproprié.';
 
-        $this->processor->process($input);
+        $this->processor->process($input, $this->createMock(\ApiPlatform\Metadata\Operation::class));
 
         $em = self::getContainer()->get('doctrine')->getManager();
         $report = $em->getRepository(Report::class)->findOneBy([
@@ -84,26 +85,26 @@ class ReportCreateProcessorTest extends KernelTestCase
         $user = UserFactory::createOne();
         $post = PostFactory::createOne();
 
-        $this->authenticateUser($user->_real());
+        $this->authenticateUser($user);
 
         $input = new ReportCreateInput();
         $input->entityClass = ReportableTypeEnum::Post;
         $input->entityId = $post->getId();
         $input->reason = ReportReasonEnum::Spam;
 
-        $this->processor->process($input);
+        $this->processor->process($input, $this->createMock(\ApiPlatform\Metadata\Operation::class));
 
         $this->expectException(BadRequestHttpException::class);
         $this->expectExceptionMessage('Vous avez déjà signalé ce contenu.');
 
-        $this->processor->process($input);
+        $this->processor->process($input, $this->createMock(\ApiPlatform\Metadata\Operation::class));
     }
 
     public function testReportOnNonExistentEntityThrowsNotFoundException(): void
     {
         $user = UserFactory::createOne();
 
-        $this->authenticateUser($user->_real());
+        $this->authenticateUser($user);
 
         $input = new ReportCreateInput();
         $input->entityClass = ReportableTypeEnum::Post;
@@ -112,11 +113,12 @@ class ReportCreateProcessorTest extends KernelTestCase
 
         $this->expectException(NotFoundHttpException::class);
 
-        $this->processor->process($input);
+        $this->processor->process($input, $this->createMock(\ApiPlatform\Metadata\Operation::class));
     }
 
-    public function testUnauthenticatedUserThrowsRuntimeException(): void
+    public function testUnauthenticatedUserThrowsUnauthorizedException(): void
     {
+        UserFactory::createOne();
         $post = PostFactory::createOne();
 
         $input = new ReportCreateInput();
@@ -124,10 +126,9 @@ class ReportCreateProcessorTest extends KernelTestCase
         $input->entityId = $post->getId();
         $input->reason = ReportReasonEnum::Spam;
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('User must be authenticated');
+        $this->expectException(UnauthorizedHttpException::class);
 
-        $this->processor->process($input);
+        $this->processor->process($input, $this->createMock(\ApiPlatform\Metadata\Operation::class));
     }
 
     public function testCreateReportOnUser(): void
@@ -135,14 +136,14 @@ class ReportCreateProcessorTest extends KernelTestCase
         $reporter = UserFactory::createOne();
         $reportedUser = UserFactory::createOne();
 
-        $this->authenticateUser($reporter->_real());
+        $this->authenticateUser($reporter);
 
         $input = new ReportCreateInput();
         $input->entityClass = ReportableTypeEnum::User;
         $input->entityId = $reportedUser->getId();
         $input->reason = ReportReasonEnum::Harassment;
 
-        $this->processor->process($input);
+        $this->processor->process($input, $this->createMock(\ApiPlatform\Metadata\Operation::class));
 
         $em = self::getContainer()->get('doctrine')->getManager();
         $report = $em->getRepository(Report::class)->findOneBy([
