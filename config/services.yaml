@@ -90,10 +90,6 @@ services:
         arguments:
             $azureStorage: '@azure.storage'
             $azureBaseUrl: '%env(AZURE_STORAGE_BASE_URL)%'
-    # Auth
-    App\State\Auth\AuthRequestProcessor:
-        arguments:
-            $environment: '%kernel.environment%'
 
     ###### SOUNDCLOUD #####
 
@@ -117,7 +113,6 @@ services:
         arguments:
             $soundcloudApiClient: '@soundcloud.api.client'
             $soundcloudAuthClient: '@soundcloud.auth.client'
-            $entityManager: '@doctrine.orm.entity_manager'
             $clientId: '%env(SOUNDCLOUD_CLIENT_ID)%'
             $clientSecret: '%env(SOUNDCLOUD_CLIENT_SECRET)%'
             $redirectUri: '%env(SOUNDCLOUD_REDIRECT_URI)%'

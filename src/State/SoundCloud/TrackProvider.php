@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\State\SoundCloud;
 
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\SoundCloud\TrackDTO;
@@ -47,7 +48,7 @@ final readonly class TrackProvider implements ProviderInterface
         $token = $this->getSoundCloudToken($user);
 
         // GetCollection : /soundcloud/tracks/search?q=...
-        if ($operation instanceof \ApiPlatform\Metadata\GetCollection) {
+        if ($operation instanceof GetCollection) {
             $request = $this->requestStack->getMainRequest();
             $query = $request?->query->get('q');
 
@@ -55,9 +56,10 @@ final readonly class TrackProvider implements ProviderInterface
                 throw new BadRequestHttpException('Query parameter "q" is required for search');
             }
 
-            $limit = $request->query->getInt('limit', 20);
-
-            return $this->soundCloudService->searchMusic($token->getAccessToken(), $query, $limit);
+            return $this->soundCloudService->searchMusic(
+                $token->getAccessToken(),
+                $query,
+            );
         }
 
         // Get : /soundcloud/tracks/{id}

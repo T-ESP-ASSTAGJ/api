@@ -14,12 +14,12 @@ use App\State\SoundCloud\PlaylistProvider;
     operations: [
         new GetCollection(
             uriTemplate: '/soundcloud/playlists',
-            shortName: 'SoundCloudPlaylist',
+            shortName: 'SoundCloud',
             provider: PlaylistProvider::class
         ),
         new Get(
             uriTemplate: '/soundcloud/playlists/{id}',
-            shortName: 'SoundCloudPlaylist',
+            shortName: 'SoundCloud',
             provider: PlaylistProvider::class
         ),
     ],

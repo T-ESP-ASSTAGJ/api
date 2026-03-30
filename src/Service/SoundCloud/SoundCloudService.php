@@ -33,7 +33,7 @@ readonly class SoundCloudService
 
             return array_map(
                 fn (array $item) => $this->mapToPlaylistDTO($item),
-                $data['collection'] ?? []
+                $data
             );
         } catch (\Throwable $e) {
             throw new \RuntimeException('Failed to get user playlists: '.$e->getMessage());
@@ -41,7 +41,7 @@ readonly class SoundCloudService
     }
 
     /** @return TrackDTO[] */
-    public function searchMusic(string $accessToken, string $query, int $limit = 20): array
+    public function searchMusic(string $accessToken, string $query): array
     {
         try {
             $response = $this->soundcloudApiClient->request('GET', '/tracks', [
@@ -50,15 +50,16 @@ readonly class SoundCloudService
                 ],
                 'query' => [
                     'q' => $query,
-                    'limit' => $limit,
+                    'limit' => 20,
                 ],
             ]);
 
             $data = $response->toArray();
+            usort($data, static fn($a, $b) => $b['playback_count'] <=> $a['playback_count']);
 
             return array_map(
                 fn (array $item) => $this->mapToTrackDTO($item),
-                $data['collection'] ?? []
+                $data,
             );
         } catch (\Throwable $e) {
             throw new \RuntimeException('Failed to search music: '.$e->getMessage());
@@ -151,6 +152,7 @@ readonly class SoundCloudService
             created_at: $data['created_at'] ?? '',
             genre: $data['genre'] ?? null,
             tag_list: $data['tag_list'] ?? null,
+            isrc: $data['isrc'] ?? null,
         );
     }
 

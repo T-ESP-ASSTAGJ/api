@@ -13,7 +13,7 @@ use App\State\SoundCloud\UserProvider;
     operations: [
         new Get(
             uriTemplate: '/soundcloud/users/{id}',
-            shortName: 'SoundCloudUser',
+            shortName: 'SoundCloud',
             provider: UserProvider::class
         ),
     ],
