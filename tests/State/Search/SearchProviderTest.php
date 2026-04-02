@@ -27,7 +27,7 @@ class SearchProviderTest extends KernelTestCase
         $this->provider = self::getContainer()->get(SearchProvider::class);
         $this->operation = new GetCollection(uriTemplate: '/search');
     }
-
+// test with query and type posts
     public function testSearchPostsByQuery(): void
     {
         UserFactory::createOne();
