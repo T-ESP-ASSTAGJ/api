@@ -53,14 +53,26 @@ class PostRepository extends ServiceEntityRepository
     /** @return Post[] */
     public function searchByQuery(string $query, int $offset, int $limit): array
     {
-        return $this->createQueryBuilder('p')
-            ->where('p.caption LIKE :query')
+        return $this->buildSearchQuery('caption', $query, $offset, $limit, 'createdAt', 'DESC')->getResult();
+    }
+
+    /**
+     * @param string $searchField Field to search on
+     * @param string $query Search query term
+     * @param int $offset Pagination offset
+     * @param int $limit Pagination limit
+     * @param string $orderField Field to order by
+     * @param string $direction Sort direction
+     */
+    protected function buildSearchQuery(string $searchField, string $query, int $offset, int $limit, string $orderField, string $direction): \Doctrine\ORM\Query
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.'.$searchField.' LIKE :query')
             ->setParameter('query', '%'.$query.'%')
-            ->orderBy('p.createdAt', 'DESC')
+            ->orderBy('e.'.$orderField, $direction)
             ->setFirstResult($offset)
             ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
+            ->getQuery();
     }
 
     public function updateViewsCount(int $postId, int $count): void
