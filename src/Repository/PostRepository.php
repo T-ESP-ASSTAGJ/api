@@ -50,6 +50,19 @@ class PostRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->getResult();
     }
 
+    /** @return Post[] */
+    public function searchByQuery(string $query, int $offset, int $limit): array
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.caption LIKE :query')
+            ->setParameter('query', '%'.$query.'%')
+            ->orderBy('p.createdAt', 'DESC')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function updateViewsCount(int $postId, int $count): void
     {
         $this->createQueryBuilder('p')

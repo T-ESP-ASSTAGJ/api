@@ -49,6 +49,19 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $result['deviceToken'] ?? null;
     }
 
+    /** @return \App\Entity\User[] */
+    public function searchByQuery(string $query, int $offset, int $limit): array
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.username LIKE :query')
+            ->setParameter('query', '%'.$query.'%')
+            ->orderBy('u.username', 'ASC')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function deleteTokenByUserToken(string $deviceToken): void
     {
         $this->createQueryBuilder('u')
