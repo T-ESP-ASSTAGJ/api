@@ -67,3 +67,25 @@ services:
     App\State\Mercure\MercureTokenProvider:
         arguments:
             $mercureSecret: '%env(MERCURE_JWT_SECRET)%'
+
+
+    AzureOss\Storage\Blob\BlobServiceClient:
+        factory: ['App\Service\Azure\AzureClientFactory', 'createServiceClient']
+        arguments:
+            $connectionString: '%env(AZURE_STORAGE_CONNECTION_STRING)%'
+
+    AzureOss\Storage\Blob\BlobContainerClient:
+        factory: ['App\Service\Azure\AzureClientFactory', 'createContainerClient']
+        arguments:
+            $serviceClient: '@AzureOss\Storage\Blob\BlobServiceClient'
+            $containerName: '%env(AZURE_STORAGE_CONTAINER)%'
+
+    AzureOss\Storage\BlobFlysystem\AzureBlobStorageAdapter:
+        arguments:
+            $containerClient: '@AzureOss\Storage\Blob\BlobContainerClient'
+            $prefix: ''
+
+    App\Service\Azure\AzureStorageService:
+        arguments:
+            $azureStorage: '@azure.storage'
+            $azureBaseUrl: '%env(AZURE_STORAGE_BASE_URL)%'

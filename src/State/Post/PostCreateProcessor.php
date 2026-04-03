@@ -52,7 +52,7 @@ final readonly class PostCreateProcessor implements ProcessorInterface
 
         // Find or create track based on songId
         $track = $this->em->getRepository(Track::class)->findOneBy(['songId' => $data->songId]);
-        $coverImage = $this->imageService->saveBase64Image($data->coverImage, 'track');
+        $coverImage = $this->imageService->saveBase64ToStorage($data->coverImage, 'covers');
 
         if (!$track) {
             // Create new track if it doesn't exist
@@ -67,8 +67,8 @@ final readonly class PostCreateProcessor implements ProcessorInterface
         }
 
         // Process and save images
-        $frontImageUrl = $this->imageService->saveBase64Image($data->frontImage, 'posts');
-        $backImageUrl = $this->imageService->saveBase64Image($data->backImage, 'posts');
+        $frontImageUrl = $this->imageService->saveBase64ToStorage($data->frontImage, 'posts');
+        $backImageUrl = $this->imageService->saveBase64ToStorage($data->backImage, 'posts');
 
         $post = new Post();
         $post->setUser($user);
