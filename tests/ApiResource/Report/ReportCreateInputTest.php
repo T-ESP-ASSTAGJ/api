@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\ApiResource\Report;
 
 use App\ApiResource\Report\ReportCreateInput;
-use App\Entity\Enum\ReportReasonEnum;
 use App\Entity\Enum\ReportableTypeEnum;
+use App\Entity\Enum\ReportReasonEnum;
 use PHPUnit\Framework\TestCase;
 
 class ReportCreateInputTest extends TestCase

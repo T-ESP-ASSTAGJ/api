@@ -15,7 +15,8 @@ readonly class LikeCreatedListener
 {
     public function __construct(
         private MessageBusInterface $bus,
-    ) {}
+    ) {
+    }
 
     public function postPersist(Like $like): void
     {

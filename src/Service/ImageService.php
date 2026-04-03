@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Service\Azure\AzureStorageService;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -15,7 +16,17 @@ final readonly class ImageService
         #[Autowire('%kernel.project_dir%')]
         private string $projectDir,
         private Filesystem $filesystem,
+        private AzureStorageService $azureStorage,
     ) {
+    }
+
+    public function saveBase64ToStorage(string $base64Image, string $folder): ?string
+    {
+        if (!$base64Image) {
+            return null;
+        }
+
+        return $this->azureStorage->uploadBase64($base64Image, $folder);
     }
 
     public function saveBase64Image(?string $base64Image, string $directory = 'posts'): ?string

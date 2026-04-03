@@ -37,8 +37,6 @@ final readonly class MessageUpdateProcessor implements ProcessorInterface
      * @param MessageUpdateInput   $data
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
-     *
-     * @return Message
      */
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Message
     {

@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Factory;
 
-use App\Entity\Enum\ReportReasonEnum;
 use App\Entity\Enum\ReportableTypeEnum;
+use App\Entity\Enum\ReportReasonEnum;
 use App\Entity\Report;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
  * @extends PersistentObjectFactory<Report>
+ *
  * @codeCoverageIgnore
  */
 final class ReportFactory extends PersistentObjectFactory
