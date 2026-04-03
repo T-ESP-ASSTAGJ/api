@@ -18,10 +18,10 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 final readonly class IsReadProvider implements ProviderInterface
 {
     public function __construct(
-            /** @var ProviderInterface<object> */
+        /** @var ProviderInterface<object> */
         #[Autowire(service: MessageGetProvider::class)]
         private ProviderInterface $itemProvider,
-            /** @var ProviderInterface<object> $collectionProvider */
+        /** @var ProviderInterface<object> $collectionProvider */
         #[Autowire(service: 'api_platform.doctrine.orm.state.collection_provider')]
         private ProviderInterface $collectionProvider,
         private IsReadEnricher $isReadEnricher,

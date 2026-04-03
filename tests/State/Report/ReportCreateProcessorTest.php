@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace App\Tests\State\Report;
 
 use App\ApiResource\Report\ReportCreateInput;
-use App\Entity\Enum\ReportReasonEnum;
 use App\Entity\Enum\ReportableTypeEnum;
+use App\Entity\Enum\ReportReasonEnum;
 use App\Entity\Report;
 use App\Factory\PostFactory;
 use App\Factory\UserFactory;
 use App\State\Report\ReportCreateProcessor;
+use App\Tests\Trait\AuthenticationTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Zenstruck\Foundry\Test\ResetDatabase;
-use App\Tests\Trait\AuthenticationTrait;
 
 class ReportCreateProcessorTest extends KernelTestCase
 {

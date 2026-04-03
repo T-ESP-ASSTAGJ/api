@@ -9,10 +9,10 @@ use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Report\ReportCreateInput;
 use App\Entity\Report;
 use App\Entity\User;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
@@ -33,7 +33,6 @@ final readonly class ReportCreateProcessor implements ProcessorInterface
 
     /**
      * @param ReportCreateInput    $data
-     * @param Operation|null       $operation
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      */

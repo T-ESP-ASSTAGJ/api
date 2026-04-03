@@ -14,7 +14,6 @@ use App\ApiResource\Message\MessageCreateInput;
 use App\ApiResource\Message\MessageUpdateInput;
 use App\Entity\Interface\TimeStampableInterface;
 use App\State\IsReadProvider;
-use App\State\Message\MessageGetProvider;
 use App\State\Message\MessageProcessor;
 use App\State\Message\MessageUpdateProcessor;
 use Doctrine\DBAL\Types\Types;

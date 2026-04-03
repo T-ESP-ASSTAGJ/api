@@ -14,7 +14,7 @@ enum ReportReasonEnum: string
 
     public function getLabel(): string
     {
-        return match($this) {
+        return match ($this) {
             self::Spam => 'Spam',
             self::Harassment => 'Harcèlement',
             self::HatefulContent => 'Contenu haineux',

@@ -30,7 +30,6 @@ class ReportableTypeEnumTest extends TestCase
     {
         $values = ReportableTypeEnum::values();
 
-        $this->assertIsArray($values);
         $this->assertCount(3, $values);
         $this->assertContains(Post::class, $values);
         $this->assertContains(Comment::class, $values);

@@ -9,8 +9,8 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use App\ApiResource\Report\ReportCreateInput;
 use App\ApiResource\Report\ReportReasonOutput;
-use App\Entity\Enum\ReportReasonEnum;
 use App\Entity\Enum\ReportableTypeEnum;
+use App\Entity\Enum\ReportReasonEnum;
 use App\Entity\Interface\TimeStampableInterface;
 use App\State\Report\ReportCreateProcessor;
 use App\State\Report\ReportReasonsProvider;
@@ -76,23 +76,63 @@ class Report implements TimeStampableInterface
         return $this->id;
     }
 
-    public function getUser(): User { return $this->user; }
+    public function getUser(): User
+    {
+        return $this->user;
+    }
 
-    public function setUser(User $user): static { $this->user = $user; return $this; }
+    public function setUser(User $user): static
+    {
+        $this->user = $user;
 
-    public function getEntityId(): int { return $this->entityId; }
+        return $this;
+    }
 
-    public function setEntityId(int $entityId): static { $this->entityId = $entityId; return $this; }
+    public function getEntityId(): int
+    {
+        return $this->entityId;
+    }
 
-    public function getEntityClass(): ReportableTypeEnum { return $this->entityClass; }
+    public function setEntityId(int $entityId): static
+    {
+        $this->entityId = $entityId;
 
-    public function setEntityClass(ReportableTypeEnum $entityClass): static { $this->entityClass = $entityClass; return $this; }
+        return $this;
+    }
 
-    public function getReason(): ReportReasonEnum { return $this->reason; }
+    public function getEntityClass(): ReportableTypeEnum
+    {
+        return $this->entityClass;
+    }
 
-    public function setReason(ReportReasonEnum $reason): static { $this->reason = $reason; return $this; }
+    public function setEntityClass(ReportableTypeEnum $entityClass): static
+    {
+        $this->entityClass = $entityClass;
 
-    public function getMessage(): ?string { return $this->message; }
+        return $this;
+    }
 
-    public function setMessage(?string $message): static { $this->message = $message; return $this; }
+    public function getReason(): ReportReasonEnum
+    {
+        return $this->reason;
+    }
+
+    public function setReason(ReportReasonEnum $reason): static
+    {
+        $this->reason = $reason;
+
+        return $this;
+    }
+
+    public function getMessage(): ?string
+    {
+        return $this->message;
+    }
+
+    public function setMessage(?string $message): static
+    {
+        $this->message = $message;
+
+        return $this;
+    }
 }

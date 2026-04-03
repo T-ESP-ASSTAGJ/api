@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\State\Report;
 
+use ApiPlatform\Metadata\Operation;
 use App\ApiResource\Report\ReportReasonOutput;
 use App\Entity\Enum\ReportReasonEnum;
 use App\State\Report\ReportReasonsProvider;
@@ -20,17 +21,16 @@ class ReportReasonsProviderTest extends TestCase
 
     public function testProvideReturnsAllReasons(): void
     {
-        $operation = $this->createMock(\ApiPlatform\Metadata\Operation::class);
+        $operation = $this->createMock(Operation::class);
 
         $results = $this->provider->provide($operation);
 
-        $this->assertIsArray($results);
         $this->assertCount(count(ReportReasonEnum::cases()), $results);
     }
 
     public function testProvideReturnsReportReasonOutputInstances(): void
     {
-        $operation = $this->createMock(\ApiPlatform\Metadata\Operation::class);
+        $operation = $this->createMock(Operation::class);
 
         $results = $this->provider->provide($operation);
 
@@ -41,12 +41,12 @@ class ReportReasonsProviderTest extends TestCase
 
     public function testProvideReturnsCorrectKeysAndLabels(): void
     {
-        $operation = $this->createMock(\ApiPlatform\Metadata\Operation::class);
+        $operation = $this->createMock(Operation::class);
 
         $results = $this->provider->provide($operation);
 
-        $keys = array_map(static fn(ReportReasonOutput $o) => $o->key, $results);
-        $labels = array_map(static fn(ReportReasonOutput $o) => $o->label, $results);
+        $keys = array_map(static fn (ReportReasonOutput $o) => $o->key, $results);
+        $labels = array_map(static fn (ReportReasonOutput $o) => $o->label, $results);
 
         $this->assertContains('spam', $keys);
         $this->assertContains('harassment', $keys);
