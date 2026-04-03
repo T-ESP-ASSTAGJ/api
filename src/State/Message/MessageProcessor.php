@@ -11,9 +11,10 @@ use App\ApiResource\Message\MercureMessageOutput;
 use App\ApiResource\Message\MessageCreateInput;
 use App\Entity\Conversation;
 use App\Entity\Enum\MercureTypeEnum;
+use App\Entity\Enum\MessageTypeEnum;
 use App\Entity\Message;
 use App\Entity\User;
-// use App\Service\Message\MusicMetadataService;
+use App\Service\Track\TrackService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -32,7 +33,7 @@ final readonly class MessageProcessor implements ProcessorInterface
         private ValidatorInterface $validator,
         private Security $security,
         private HubInterface $hub,
-        //        private MusicMetadataService $musicMetadataService,
+        private TrackService $trackService,
     ) {
     }
 
@@ -68,12 +69,15 @@ final readonly class MessageProcessor implements ProcessorInterface
         $message->setContent($data->content);
         $message->setType($data->type);
 
-        //        if (Message::TYPE_MUSIC === $data->getType() && $data->getTrack()) {
-        //            $trackMetadata = $this->musicMetadataService->getTrackMetadata($data->getTrack());
-        //            $data->setTrackMetadata($trackMetadata);
-        //        }
+        if (MessageTypeEnum::Music === $data->getType() && $data->getTrack()) {
+            $track = $this->trackService->findOrCreate($data->track);
+            $message->setTrack($track);
+        }
 
-        $violations = $this->validator->validate($data);
+        $violations = $this->validator->validate($message, groups: [
+            'Default',
+            ...($message->isMusicMessage() ? ['music'] : []),
+        ]);
         if ($violations->count() > 0) {
             throw new ValidationException($violations);
         }

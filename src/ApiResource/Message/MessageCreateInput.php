@@ -4,17 +4,24 @@ declare(strict_types=1);
 
 namespace App\ApiResource\Message;
 
+use App\ApiResource\Track\TrackInput;
+use App\Entity\Enum\MessageTypeEnum;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @codeCoverageIgnore
  */
-class MessageCreateInput
+final readonly class MessageCreateInput
 {
-    #[Assert\NotNull]
-    public ?int $conversationId = null;
-    #[Assert\NotNull]
-    public ?string $type = null;
-    #[Assert\NotNull]
-    public ?string $content = null;
+    public function __construct(
+        #[Assert\NotNull]
+        public int $conversationId,
+        #[Assert\NotNull]
+        public MessageTypeEnum $type,
+        public ?string $content = null,
+        #[Assert\NotNull(message: 'A music message must include track data.', groups: ['music'])]
+        #[Assert\Valid]
+        public ?TrackInput $track = null,
+    ) {
+    }
 }

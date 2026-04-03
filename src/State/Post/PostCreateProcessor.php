@@ -9,9 +9,9 @@ use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
 use App\ApiResource\Post\PostCreateInput;
 use App\Entity\Post;
-use App\Entity\Track;
 use App\Entity\User;
 use App\Service\ImageService;
+use App\Service\Track\TrackService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -27,6 +27,7 @@ final readonly class PostCreateProcessor implements ProcessorInterface
         private ValidatorInterface $validator,
         private Security $security,
         private ImageService $imageService,
+        private TrackService $trackService,
     ) {
     }
 
@@ -50,21 +51,7 @@ final readonly class PostCreateProcessor implements ProcessorInterface
             throw new NotFoundHttpException('User not found');
         }
 
-        // Find or create track based on songId
-        $track = $this->em->getRepository(Track::class)->findOneBy(['songId' => $data->songId]);
-        $coverImage = $this->imageService->saveBase64ToStorage($data->coverImage, 'covers');
-
-        if (!$track) {
-            // Create new track if it doesn't exist
-            $track = new Track();
-            $track->setSongId($data->songId);
-            $track->setTitle($data->trackTitle);
-            $track->setArtistName($data->artistName);
-            $track->setReleaseYear($data->releaseYear);
-            $track->setCoverImage($coverImage);
-
-            $this->em->persist($track);
-        }
+        $track = $this->trackService->findOrCreate($data);
 
         // Process and save images
         $frontImageUrl = $this->imageService->saveBase64ToStorage($data->frontImage, 'posts');

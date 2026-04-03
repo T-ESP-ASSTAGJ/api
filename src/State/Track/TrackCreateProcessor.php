@@ -7,13 +7,13 @@ namespace App\State\Track;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
-use App\ApiResource\Track\TrackCreateInput;
+use App\ApiResource\Track\TrackInput;
 use App\Entity\Track;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * @implements ProcessorInterface<TrackCreateInput, Track>
+ * @implements ProcessorInterface<TrackInput, Track>
  */
 final readonly class TrackCreateProcessor implements ProcessorInterface
 {
@@ -24,7 +24,7 @@ final readonly class TrackCreateProcessor implements ProcessorInterface
     }
 
     /**
-     * @param TrackCreateInput     $data
+     * @param TrackInput           $data
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *
@@ -34,7 +34,7 @@ final readonly class TrackCreateProcessor implements ProcessorInterface
      */
     public function process(mixed $data, ?Operation $operation = null, array $uriVariables = [], array $context = []): mixed
     {
-        if ($data instanceof TrackCreateInput) {
+        if ($data instanceof TrackInput) {
             $track = new Track();
             $track->setSongId($data->songId);
             $track->setTitle($data->title);
