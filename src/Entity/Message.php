@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Post as ApiPost;
 use ApiPlatform\Metadata\Put;
 use App\ApiResource\Message\MessageCreateInput;
 use App\ApiResource\Message\MessageUpdateInput;
+use App\Entity\Enum\MessageTypeEnum;
 use App\Entity\Interface\TimeStampableInterface;
 use App\State\IsReadProvider;
 use App\State\Message\MessageProcessor;
@@ -61,9 +62,6 @@ class Message implements TimeStampableInterface
     public const SERIALIZATION_GROUP_WRITE = 'message:write';
     public const SERIALIZATION_GROUP_UPDATE = 'message:update';
 
-    public const TYPE_TEXT = 'text';
-    public const TYPE_MUSIC = 'music';
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id', type: 'integer')]
@@ -92,15 +90,14 @@ class Message implements TimeStampableInterface
     ])]
     private User $author;
 
-    #[ORM\Column(name: 'type', type: 'string', length: 20)]
-    #[Assert\Choice(choices: [self::TYPE_TEXT, self::TYPE_MUSIC], message: 'Choose a valid message type.')]
+    #[ORM\Column(name: 'type', type: 'string', length: 20, enumType: MessageTypeEnum::class)]
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
         self::SERIALIZATION_GROUP_WRITE,
         Conversation::SERIALIZATION_GROUP_DETAIL,
     ])]
-    private string $type = self::TYPE_TEXT;
+    private MessageTypeEnum $type = MessageTypeEnum::Text;
 
     #[ORM\Column(name: 'content', type: 'text', nullable: true)]
     #[Groups([
@@ -112,38 +109,14 @@ class Message implements TimeStampableInterface
     ])]
     private ?string $content = null;
 
-    // TODO: Change to Track Entity when implemented
-    /**
-     * @var array{
-     *     platform: string,
-     *     track_id: string,
-     *     fallback_ids: array<string, string>
-     * }|null
-     */
-    #[ORM\Column(name: 'track', type: 'json', nullable: true)]
+    #[ORM\ManyToOne(targetEntity: Track::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Assert\NotNull(message: 'A music message must have a track.', groups: ['music'])]
     #[Groups([
         self::SERIALIZATION_GROUP_WRITE,
         Conversation::SERIALIZATION_GROUP_DETAIL,
     ])]
-    private ?array $track = null;
-
-    // TODO: Remove when Track Entity implemented
-    /**
-     * @var array{
-     *     title: string,
-     *     artist: string,
-     *     album_cover: string,
-     *     preview_url: string|null,
-     *     platform_link: string,
-     *     availability: string
-     * }|null
-     */
-    #[ORM\Column(name: 'track_metadata', type: 'json', nullable: true)]
-    #[Groups([
-        self::SERIALIZATION_GROUP_READ,
-        self::SERIALIZATION_GROUP_DETAIL,
-    ])]
-    private ?array $trackMetadata = null;
+    private ?Track $track = null;
 
     #[ORM\Column(name: 'is_read', type: 'boolean', options: ['default' => false])]
     #[Groups([
@@ -205,12 +178,12 @@ class Message implements TimeStampableInterface
         return $this;
     }
 
-    public function getType(): string
+    public function getType(): MessageTypeEnum
     {
         return $this->type;
     }
 
-    public function setType(string $type): static
+    public function setType(MessageTypeEnum $type): static
     {
         $this->type = $type;
 
@@ -229,67 +202,21 @@ class Message implements TimeStampableInterface
         return $this;
     }
 
-    /**
-     * @return array{
-     *     platform: string,
-     *     track_id: string,
-     *     fallback_ids: array<string, string>
-     * }|null
-     */
-    public function getTrack(): ?array
+    public function getTrack(): ?Track
     {
         return $this->track;
     }
 
-    /**
-     * @param array{
-     *     platform: string,
-     *     track_id: string,
-     *     fallback_ids: array<string, string>
-     * }|null $track
-     */
-    public function setTrack(?array $track): static
+    public function setTrack(?Track $track): static
     {
         $this->track = $track;
 
         return $this;
     }
 
-    /**
-     * @return array{
-     *     title: string,
-     *     artist: string,
-     *     album_cover: string,
-     *     preview_url: string|null,
-     *     platform_link: string,
-     *     availability: string
-     * }|null
-     */
-    public function getTrackMetadata(): ?array
-    {
-        return $this->trackMetadata;
-    }
-
-    /**
-     * @param array{
-     *     title: string,
-     *     artist: string,
-     *     album_cover: string,
-     *     preview_url: string|null,
-     *     platform_link: string,
-     *     availability: string
-     * }|null $trackMetadata
-     */
-    public function setTrackMetadata(?array $trackMetadata): static
-    {
-        $this->trackMetadata = $trackMetadata;
-
-        return $this;
-    }
-
     public function isMusicMessage(): bool
     {
-        return self::TYPE_MUSIC === $this->type;
+        return MessageTypeEnum::Music === $this->type;
     }
 
     public function isRead(): bool
