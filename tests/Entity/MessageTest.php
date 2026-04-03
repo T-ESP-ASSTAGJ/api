@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Entity;
 
 use App\Entity\Conversation;
+use App\Entity\Enum\MessageTypeEnum;
 use App\Entity\Message;
+use App\Entity\Track;
 use App\Entity\User;
 use App\Util\ReflectionUtil;
 use PHPUnit\Framework\TestCase;
@@ -28,34 +30,35 @@ class MessageTest extends TestCase
         $this->assertSame($message, $result);
         $this->assertSame($author, $message->getAuthor());
 
-        $result = $message->setType(Message::TYPE_TEXT);
+        $result = $message->setType(MessageTypeEnum::Text);
         $this->assertSame($message, $result);
-        $this->assertSame(Message::TYPE_TEXT, $message->getType());
+        $this->assertSame(MessageTypeEnum::Text, $message->getType());
 
         $result = $message->setContent('Hello, world!');
         $this->assertSame($message, $result);
         $this->assertSame('Hello, world!', $message->getContent());
 
-        $track = [
-            'platform' => 'spotify',
-            'track_id' => 'abc123',
-            'fallback_ids' => ['deezer' => 'xyz789'],
-        ];
+        $track = new Track();
+        $track->setArtistName('ArtistName');
+        $track->setTitle('Song Title');
+        $track->setCoverImage('https://example.com/cover.jpg');
+        $track->setSongId('123');
+        $track->setReleaseYear(1999);
+
         $result = $message->setTrack($track);
         $this->assertSame($message, $result);
         $this->assertSame($track, $message->getTrack());
 
-        $trackMetadata = [
-            'title' => 'Song Title',
-            'artist' => 'Artist Name',
-            'album_cover' => 'https://example.com/cover.jpg',
-            'preview_url' => 'https://example.com/preview.mp3',
-            'platform_link' => 'https://spotify.com/track/abc123',
-            'availability' => 'available',
-        ];
-        $result = $message->setTrackMetadata($trackMetadata);
+        $track = new Track();
+        $track->setArtistName('ArtistName');
+        $track->setTitle('Song Title');
+        $track->setCoverImage('https://example.com/cover.jpg');
+        $track->setSongId('123');
+        $track->setReleaseYear(1999);
+
+        $result = $message->setTrack($track);
         $this->assertSame($message, $result);
-        $this->assertSame($trackMetadata, $message->getTrackMetadata());
+        $this->assertSame($track, $message->getTrack());
 
         $result = $message->setIsRead(true);
         $this->assertSame($message, $result);
@@ -71,10 +74,9 @@ class MessageTest extends TestCase
     {
         $message = new Message();
 
-        $this->assertSame(Message::TYPE_TEXT, $message->getType());
+        $this->assertSame(MessageTypeEnum::Text, $message->getType());
         $this->assertNull($message->getContent());
         $this->assertNull($message->getTrack());
-        $this->assertNull($message->getTrackMetadata());
         $this->assertFalse($message->isRead());
         $this->assertNull($message->getReadAt());
     }
@@ -83,10 +85,10 @@ class MessageTest extends TestCase
     {
         $message = new Message();
 
-        $message->setType(Message::TYPE_TEXT);
+        $message->setType(MessageTypeEnum::Text);
         $this->assertFalse($message->isMusicMessage());
 
-        $message->setType(Message::TYPE_MUSIC);
+        $message->setType(MessageTypeEnum::Music);
         $this->assertTrue($message->isMusicMessage());
     }
 
@@ -111,8 +113,8 @@ class MessageTest extends TestCase
 
     public function testTypeConstants(): void
     {
-        $this->assertSame('text', Message::TYPE_TEXT);
-        $this->assertSame('music', Message::TYPE_MUSIC);
+        $this->assertSame('text', MessageTypeEnum::Text);
+        $this->assertSame('music', MessageTypeEnum::Music);
     }
 
     public function testTimeStampableTrait(): void
@@ -139,12 +141,12 @@ class MessageTest extends TestCase
     {
         $textMessage = new Message();
         $textMessage->setContent('text message');
-        $textMessage->setType(Message::TYPE_TEXT);
+        $textMessage->setType(MessageTypeEnum::Text);
         $this->assertSame($textMessage->getContent(), $textMessage->getMessagePreview());
 
         $musicMessage = new Message();
         $musicMessage->setContent('music message');
-        $musicMessage->setType(Message::TYPE_MUSIC);
+        $musicMessage->setType(MessageTypeEnum::Music);
         $this->assertSame('Vous a partagé une musique', $musicMessage->getMessagePreview());
     }
 }

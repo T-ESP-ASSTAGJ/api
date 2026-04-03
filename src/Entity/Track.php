@@ -10,11 +10,11 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post as ApiPost;
-use App\ApiResource\Track\TrackCreateInput;
-use App\ApiResource\Track\TrackUpdateInput;
+use App\ApiResource\Track\TrackInput;
 use App\Entity\Interface\TimeStampableInterface;
 use App\State\Track\TrackCreateProcessor;
 use App\State\Track\TrackUpdateProcessor;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -29,12 +29,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new ApiPost(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
-            input: TrackCreateInput::class,
+            input: TrackInput::class,
             processor: TrackCreateProcessor::class
         ),
         new Patch(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
-            input: TrackUpdateInput::class,
+            input: TrackInput::class,
             processor: TrackUpdateProcessor::class
         ),
         new Delete(output: false),
