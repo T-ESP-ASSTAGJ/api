@@ -31,7 +31,6 @@ class ReportReasonEnumTest extends TestCase
     {
         $values = ReportReasonEnum::values();
 
-        $this->assertIsArray($values);
         $this->assertCount(5, $values);
         $this->assertContains('spam', $values);
         $this->assertContains('harassment', $values);

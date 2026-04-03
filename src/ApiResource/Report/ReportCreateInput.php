@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\ApiResource\Report;
 
-use App\Entity\Enum\ReportReasonEnum;
 use App\Entity\Enum\ReportableTypeEnum;
+use App\Entity\Enum\ReportReasonEnum;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**

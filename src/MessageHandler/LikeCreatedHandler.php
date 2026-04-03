@@ -15,7 +15,8 @@ class LikeCreatedHandler
     public function __construct(
         private LikeRepository $likeRepository,
         private PushNotificationService $push,
-    ) {}
+    ) {
+    }
 
     public function __invoke(LikeCreatedMessage $message): void
     {

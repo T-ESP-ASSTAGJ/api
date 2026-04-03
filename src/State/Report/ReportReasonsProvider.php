@@ -23,7 +23,7 @@ final readonly class ReportReasonsProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
         return array_map(
-            static fn(ReportReasonEnum $reason) => new ReportReasonOutput($reason->value, $reason->getLabel()),
+            static fn (ReportReasonEnum $reason) => new ReportReasonOutput($reason->value, $reason->getLabel()),
             ReportReasonEnum::cases(),
         );
     }
