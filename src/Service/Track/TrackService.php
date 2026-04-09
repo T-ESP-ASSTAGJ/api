@@ -17,8 +17,8 @@ final readonly class TrackService
     ) {
     }
 
-    public function findOrCreate(TrackInput $trackCreateInput,
-    ): Track {
+    public function findOrCreate(TrackInput $trackCreateInput): Track
+    {
         $track = $this->em->getRepository(Track::class)->findOneBy(['songId' => $trackCreateInput->songId]);
 
         if (!$track) {

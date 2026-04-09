@@ -7,115 +7,86 @@ namespace App\Tests\ApiResource\Message;
 use App\ApiResource\Message\MercureMessageOutput;
 use App\Entity\Conversation;
 use App\Entity\Enum\MercureTypeEnum;
+use App\Entity\Enum\MessageTypeEnum;
 use App\Entity\Message;
 use App\Entity\User;
+use App\Util\ReflectionUtil;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
+use Symfony\Component\Serializer\Normalizer\BackedEnumNormalizer;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class MercureMessageOutputTest extends TestCase
 {
+    private SerializerInterface $serializer;
+
+    protected function setUp(): void
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+
+        $normalizer = new ObjectNormalizer($classMetadataFactory);
+
+        $this->serializer = new Serializer(
+            [
+                new DateTimeNormalizer(),
+                new BackedEnumNormalizer(),
+                $normalizer,
+            ],
+            [new JsonEncoder()]
+        );
+    }
+
     private function createMessageWithDependencies(): Message
     {
         $user = new User();
-        $reflection = new \ReflectionClass($user);
-        $idProperty = $reflection->getProperty('id');
-        $idProperty->setAccessible(true);
-        $idProperty->setValue($user, 42);
-
-        $emailProperty = $reflection->getProperty('email');
-        $emailProperty->setAccessible(true);
-        $emailProperty->setValue($user, 'sergio@test.com');
-
+        ReflectionUtil::setPropertyValue($user, 'id', 42);
         $user->setUsername('sergio');
         $user->setProfilePicture('https://example.com/pic.jpg');
 
         $conversation = new Conversation();
-        $convReflection = new \ReflectionClass($conversation);
-        $convIdProperty = $convReflection->getProperty('id');
-        $convIdProperty->setAccessible(true);
-        $convIdProperty->setValue($conversation, 7);
+        ReflectionUtil::setPropertyValue($conversation, 'id', 9);
 
         $message = new Message();
-        $msgReflection = new \ReflectionClass($message);
-        $msgIdProperty = $msgReflection->getProperty('id');
-        $msgIdProperty->setAccessible(true);
-        $msgIdProperty->setValue($message, 99);
-
+        ReflectionUtil::setPropertyValue($message, 'id', 99);
         $message->setAuthor($user);
         $message->setConversation($conversation);
-        $message->setType(Message::TYPE_TEXT);
+        $message->setType(MessageTypeEnum::Text);
         $message->setContent('Hello world!');
         $message->setCreatedAt();
 
         return $message;
     }
 
-    public function testConstructor(): void
+    public function testSerializationMatchesExpectedStructure(): void
     {
         $message = $this->createMessageWithDependencies();
         $output = new MercureMessageOutput(MercureTypeEnum::Message, $message);
 
-        $this->assertInstanceOf(MercureMessageOutput::class, $output);
-    }
+        $json = $this->serializer->serialize(
+            $output,
+            'json',
+            ['groups' => [Message::SERIALIZATION_GROUP_MERCURE]]
+        );
 
-    public function testToJsonReturnsValidJson(): void
-    {
-        $message = $this->createMessageWithDependencies();
-        $output = new MercureMessageOutput(MercureTypeEnum::Message, $message);
+        $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
 
-        $json = $output->toJson();
+        $this->assertSame(MercureTypeEnum::Message->value, $data['type']);
+        $this->assertIsArray($data['message']);
 
-        $this->assertJson($json);
-    }
-
-    public function testToJsonContainsExpectedFields(): void
-    {
-        $message = $this->createMessageWithDependencies();
-        $output = new MercureMessageOutput(MercureTypeEnum::Message, $message);
-
-        $data = json_decode($output->toJson(), true);
-
-        $this->assertSame('message', $data['type']);
         $this->assertSame(99, $data['message']['id']);
-        $this->assertSame(7, $data['message']['conversationId']);
-        $this->assertSame(42, $data['message']['author']['id']);
-        $this->assertSame('sergio', $data['message']['author']['username']);
-        $this->assertSame('https://example.com/pic.jpg', $data['message']['author']['profilePicture']);
-        $this->assertSame(Message::TYPE_TEXT, $data['message']['type']);
+        $this->assertSame(9, $data['message']['conversationId']);
         $this->assertSame('Hello world!', $data['message']['content']);
-        $this->assertArrayHasKey('createdAt', $data['message']);
-    }
-
-    public function testToJsonCreatedAtIsFormatted(): void
-    {
-        $user = new User();
-        $reflection = new \ReflectionClass($user);
-        $idProperty = $reflection->getProperty('id');
-        $idProperty->setAccessible(true);
-        $idProperty->setValue($user, 1);
-
-        $emailProperty = $reflection->getProperty('email');
-        $emailProperty->setAccessible(true);
-        $emailProperty->setValue($user, 'test@test.com');
-
-        $conversation = new Conversation();
-        $convReflection = new \ReflectionClass($conversation);
-        $convIdProperty = $convReflection->getProperty('id');
-        $convIdProperty->setAccessible(true);
-        $convIdProperty->setValue($conversation, 1);
-
-        $message = new Message();
-        $message->setAuthor($user);
-        $message->setConversation($conversation);
-        $message->setContent('test');
-        $message->setCreatedAt();
-
-        $output = new MercureMessageOutput(MercureTypeEnum::Message, $message);
-        $data = json_decode($output->toJson(), true);
-
-        $this->assertNotNull($data['message']['createdAt']);
         $this->assertMatchesRegularExpression(
             '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2}$/',
             $data['message']['createdAt']
         );
+        $this->assertSame(42, $data['message']['author']['id']);
+        $this->assertSame('sergio', $data['message']['author']['username']);
+        $this->assertArrayNotHasKey('updatedAt', $data['message']['author']);
     }
 }

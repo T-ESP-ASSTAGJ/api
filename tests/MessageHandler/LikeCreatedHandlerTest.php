@@ -82,10 +82,9 @@ class LikeCreatedHandlerTest extends TestCase
             ->method('sendToUser')
             ->with(
                 99,
-                'New like',
-                'JaneDoe liked your Post',
+                'JaneDoe',
+                'has liked your Post',
                 [
-                    'type' => 'like',
                     'entity_class' => 'Post',
                     'entity_id' => '456',
                 ]
