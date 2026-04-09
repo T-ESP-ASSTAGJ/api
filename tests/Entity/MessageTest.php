@@ -113,8 +113,8 @@ class MessageTest extends TestCase
 
     public function testTypeConstants(): void
     {
-        $this->assertSame('text', MessageTypeEnum::Text);
-        $this->assertSame('music', MessageTypeEnum::Music);
+        $this->assertSame('text', MessageTypeEnum::Text->value);
+        $this->assertSame('music', MessageTypeEnum::Music->value);
     }
 
     public function testTimeStampableTrait(): void

@@ -14,7 +14,6 @@ use App\ApiResource\Track\TrackInput;
 use App\Entity\Interface\TimeStampableInterface;
 use App\State\Track\TrackCreateProcessor;
 use App\State\Track\TrackUpdateProcessor;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -56,6 +55,8 @@ class Track implements TimeStampableInterface
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
+        Message::SERIALIZATION_GROUP_DETAIL,
+        Message::SERIALIZATION_GROUP_MERCURE,
         Post::SERIALIZATION_GROUP_DETAIL,
         Post::SERIALIZATION_GROUP_READ,
     ])]
@@ -65,6 +66,8 @@ class Track implements TimeStampableInterface
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
+        Message::SERIALIZATION_GROUP_DETAIL,
+        Message::SERIALIZATION_GROUP_MERCURE,
         Post::SERIALIZATION_GROUP_DETAIL,
         Post::SERIALIZATION_GROUP_READ,
     ])]
@@ -74,6 +77,8 @@ class Track implements TimeStampableInterface
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
+        Message::SERIALIZATION_GROUP_DETAIL,
+        Message::SERIALIZATION_GROUP_MERCURE,
         Post::SERIALIZATION_GROUP_DETAIL,
         Post::SERIALIZATION_GROUP_READ,
     ])]
@@ -83,6 +88,7 @@ class Track implements TimeStampableInterface
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
+        Message::SERIALIZATION_GROUP_DETAIL,
         Post::SERIALIZATION_GROUP_DETAIL,
         Post::SERIALIZATION_GROUP_READ,
     ])]
@@ -92,6 +98,7 @@ class Track implements TimeStampableInterface
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
+        Message::SERIALIZATION_GROUP_DETAIL,
         Post::SERIALIZATION_GROUP_DETAIL,
         Post::SERIALIZATION_GROUP_READ,
     ])]
@@ -101,6 +108,8 @@ class Track implements TimeStampableInterface
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
+        Message::SERIALIZATION_GROUP_DETAIL,
+        Message::SERIALIZATION_GROUP_MERCURE,
         Post::SERIALIZATION_GROUP_DETAIL,
         Post::SERIALIZATION_GROUP_READ,
     ])]

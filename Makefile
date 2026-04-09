@@ -123,7 +123,7 @@ phpstan:         ## Execute PHPStan
 
 unit-test:       ## Run unit tests
 	@echo -e "\r\n${BOLD_GREEN}# Testing API${NC}\r\n"
-	@docker exec -it -u $$(id -u):$$(id -g) -eCOMPOSER_NO_INTERACTION=1 -eXDEBUG_MODE=coverage,debug jamly-api bin/phpunit
+	@docker exec -it -u $$(id -u):$$(id -g) -eCOMPOSER_NO_INTERACTION=1 -eXDEBUG_MODE=coverage,debug jamly-api php -d memory_limit=512M bin/phpunit
 
 .PHONY: unit-test
 

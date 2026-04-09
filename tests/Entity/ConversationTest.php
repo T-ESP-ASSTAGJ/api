@@ -6,6 +6,7 @@ namespace App\Tests\Entity;
 
 use App\Entity\Conversation;
 use App\Entity\ConversationParticipant;
+use App\Entity\Enum\MessageTypeEnum;
 use App\Entity\Message;
 use App\Entity\User;
 use App\Util\ReflectionUtil;
@@ -204,7 +205,7 @@ class ConversationTest extends TestCase
         $message = new Message();
         ReflectionUtil::setPropertyValue($message, 'id', 5);
         $message->setAuthor($user);
-        $message->setType(Message::TYPE_TEXT);
+        $message->setType(MessageTypeEnum::Text);
         $message->setContent('Hello world');
         $message->setCreatedAt();
 
@@ -213,7 +214,7 @@ class ConversationTest extends TestCase
         $lastMessage = $conversation->getLastMessage();
 
         $this->assertSame(5, $lastMessage->getId());
-        $this->assertSame(Message::TYPE_TEXT, $lastMessage->getType());
+        $this->assertSame(MessageTypeEnum::Text, $lastMessage->getType());
         $this->assertSame('Hello world', $lastMessage->getContent());
         $this->assertSame('Hello world', $lastMessage->getMessagePreview());
         $this->assertSame(10, $lastMessage->getAuthor()->getId());
@@ -231,7 +232,7 @@ class ConversationTest extends TestCase
         $message = new Message();
         ReflectionUtil::setPropertyValue($message, 'id', 15);
         $message->setAuthor($user);
-        $message->setType(Message::TYPE_MUSIC);
+        $message->setType(MessageTypeEnum::Music);
         $message->setCreatedAt();
 
         $conversation->addMessage($message);
