@@ -10,8 +10,8 @@ use ApiPlatform\Validator\Exception\ValidationException;
 use App\ApiResource\Track\TrackInput;
 use App\Entity\Track;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -37,7 +37,7 @@ final readonly class TrackUpdateProcessor implements ProcessorInterface
     public function process(mixed $data, ?Operation $operation = null, array $uriVariables = [], array $context = []): mixed
     {
         if (!$data instanceof TrackInput) {
-            return new BadRequestException('Invalid payload');
+            throw new UnprocessableEntityHttpException('Invalid payload');
         }
 
         $trackId = $uriVariables['id'] ?? null;

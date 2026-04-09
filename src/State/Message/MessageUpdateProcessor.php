@@ -18,6 +18,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -30,6 +31,7 @@ final readonly class MessageUpdateProcessor implements ProcessorInterface
         private ValidatorInterface $validator,
         private Security $security,
         private HubInterface $hub,
+        private SerializerInterface $serializer,
     ) {
     }
 
@@ -66,9 +68,16 @@ final readonly class MessageUpdateProcessor implements ProcessorInterface
 
         $conversation = $message->getConversation();
         $mercureMessage = new MercureMessageOutput(MercureTypeEnum::Message, $message);
+
+        $jsonPayload = $this->serializer->serialize(
+            $mercureMessage,
+            'json',
+            ['groups' => Message::SERIALIZATION_GROUP_MERCURE]
+        );
+
         $update = new Update(
             $conversation->getMercureTopic(),
-            $mercureMessage->toJson()
+            $jsonPayload,
         );
         $this->hub->publish($update);
 

@@ -51,7 +51,7 @@ final readonly class PostCreateProcessor implements ProcessorInterface
             throw new NotFoundHttpException('User not found');
         }
 
-        $track = $this->trackService->findOrCreate($data);
+        $track = $this->trackService->findOrCreate($data->track);
 
         // Process and save images
         $frontImageUrl = $this->imageService->saveBase64ToStorage($data->frontImage, 'posts');

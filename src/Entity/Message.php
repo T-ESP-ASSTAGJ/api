@@ -61,6 +61,7 @@ class Message implements TimeStampableInterface
     public const SERIALIZATION_GROUP_DETAIL = 'message:detail';
     public const SERIALIZATION_GROUP_WRITE = 'message:write';
     public const SERIALIZATION_GROUP_UPDATE = 'message:update';
+    public const SERIALIZATION_GROUP_MERCURE = 'message:mercure';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -68,6 +69,7 @@ class Message implements TimeStampableInterface
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
+        self::SERIALIZATION_GROUP_MERCURE,
         Conversation::SERIALIZATION_GROUP_DETAIL,
         Conversation::SERIALIZATION_GROUP_READ,
     ])]
@@ -85,6 +87,7 @@ class Message implements TimeStampableInterface
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
+        self::SERIALIZATION_GROUP_MERCURE,
         Conversation::SERIALIZATION_GROUP_DETAIL,
         Conversation::SERIALIZATION_GROUP_READ,
     ])]
@@ -95,6 +98,7 @@ class Message implements TimeStampableInterface
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
         self::SERIALIZATION_GROUP_WRITE,
+        self::SERIALIZATION_GROUP_MERCURE,
         Conversation::SERIALIZATION_GROUP_DETAIL,
     ])]
     private MessageTypeEnum $type = MessageTypeEnum::Text;
@@ -105,6 +109,7 @@ class Message implements TimeStampableInterface
         self::SERIALIZATION_GROUP_DETAIL,
         self::SERIALIZATION_GROUP_WRITE,
         self::SERIALIZATION_GROUP_UPDATE,
+        self::SERIALIZATION_GROUP_MERCURE,
         Conversation::SERIALIZATION_GROUP_DETAIL,
     ])]
     private ?string $content = null;
@@ -114,6 +119,9 @@ class Message implements TimeStampableInterface
     #[Assert\NotNull(message: 'A music message must have a track.', groups: ['music'])]
     #[Groups([
         self::SERIALIZATION_GROUP_WRITE,
+        self::SERIALIZATION_GROUP_READ,
+        self::SERIALIZATION_GROUP_DETAIL,
+        self::SERIALIZATION_GROUP_MERCURE,
         Conversation::SERIALIZATION_GROUP_DETAIL,
     ])]
     private ?Track $track = null;
@@ -160,6 +168,7 @@ class Message implements TimeStampableInterface
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
+        self::SERIALIZATION_GROUP_MERCURE,
     ])]
     public function getConversationId(): int
     {

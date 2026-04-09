@@ -25,6 +25,7 @@ trait TimeStampableTrait
         Like::SERIALIZATION_GROUP_READ,
         Message::SERIALIZATION_GROUP_DETAIL,
         Message::SERIALIZATION_GROUP_READ,
+        Message::SERIALIZATION_GROUP_MERCURE,
         User::SERIALIZATION_GROUP_DETAIL,
     ])]
     private \DateTimeImmutable $createdAt;
