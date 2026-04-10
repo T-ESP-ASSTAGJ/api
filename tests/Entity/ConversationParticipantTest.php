@@ -41,9 +41,10 @@ class ConversationParticipantTest extends TestCase
         $this->assertSame($participant, $result);
         $this->assertSame(ConversationParticipant::ROLE_ADMIN, $participant->getRole());
 
-        $result = $participant->setUnreadCount(5);
+        $datetime = new \DateTimeImmutable('now');
+        $result = $participant->setLastReadAt($datetime);
         $this->assertSame($participant, $result);
-        $this->assertSame(5, $participant->getUnreadCount());
+        $this->assertSame($datetime, $participant->getLastReadAt());
     }
 
     public function testDefaultValues(): void
@@ -52,7 +53,7 @@ class ConversationParticipantTest extends TestCase
 
         $this->assertSame(ConversationParticipant::ROLE_MEMBER, $participant->getRole());
         $this->assertNull($participant->getLeftAt());
-        $this->assertSame(0, $participant->getUnreadCount());
+        $this->assertNull($participant->getLastReadAt());
         $this->assertInstanceOf(\DateTimeImmutable::class, $participant->getJoinedAt());
     }
 
@@ -126,33 +127,6 @@ class ConversationParticipantTest extends TestCase
         $this->assertSame($participant, $result);
         $this->assertSame(ConversationParticipant::ROLE_MEMBER, $participant->getRole());
         $this->assertFalse($participant->isAdmin());
-    }
-
-    public function testIncrementUnreadCount(): void
-    {
-        $participant = new ConversationParticipant();
-
-        $this->assertSame(0, $participant->getUnreadCount());
-
-        $result = $participant->incrementUnreadCount();
-        $this->assertSame($participant, $result);
-        $this->assertSame(1, $participant->getUnreadCount());
-
-        $participant->incrementUnreadCount();
-        $this->assertSame(2, $participant->getUnreadCount());
-    }
-
-    public function testResetUnreadCount(): void
-    {
-        $participant = new ConversationParticipant();
-        $participant->setUnreadCount(10);
-
-        $this->assertSame(10, $participant->getUnreadCount());
-
-        $result = $participant->resetUnreadCount();
-
-        $this->assertSame($participant, $result);
-        $this->assertSame(0, $participant->getUnreadCount());
     }
 
     public function testRoleConstants(): void

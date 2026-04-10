@@ -123,6 +123,8 @@ class Conversation implements TimeStampableInterface
     #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'conversation', cascade: ['remove'], orphanRemoval: true)]
     private Collection $messages;
 
+    private ?int $unreadCount = null;
+
     public function __construct()
     {
         $this->participants = new ArrayCollection();
@@ -264,8 +266,6 @@ class Conversation implements TimeStampableInterface
 
         return $lastMessage;
     }
-
-    private ?int $unreadCount = null;
 
     #[Groups([
         self::SERIALIZATION_GROUP_DETAIL,

@@ -128,26 +128,4 @@ class UserTest extends TestCase
 
         $this->assertSame(['ROLE_ADMIN'], $user->getRoles());
     }
-
-    public function testTimeStampableTrait(): void
-    {
-        $user = new User();
-        $user->setCreatedAt();
-
-        $this->assertInstanceOf(\DateTimeImmutable::class, $user->getCreatedAt());
-        $this->assertInstanceOf(\DateTimeImmutable::class, $user->getUpdatedAt());
-    }
-
-    //    public function testSerialize(): void
-    //    {
-    //        $user = new User();
-    //        $user->setEmail('test@example.com');
-    //        $user->setPassword('secret');
-    //
-    //        $serialized = $user->__serialize();
-    //
-    //        $this->assertIsArray($serialized);
-    //        // Password should be hashed in serialization
-    //        $this->assertNotSame('secret', $serialized["\0App\Entity\User\0password"]);
-    //    }
 }

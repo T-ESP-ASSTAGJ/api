@@ -70,7 +70,6 @@ final readonly class FollowProcessor implements ProcessorInterface
             $newFollow = new FollowEntity();
             $newFollow->setFollower($currentUser);
             $newFollow->setFollowedUser($userToFollow);
-            $newFollow->setCreatedAt();
 
             $this->em->persist($newFollow);
             $this->em->flush();

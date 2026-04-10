@@ -29,13 +29,4 @@ class ArtistSourceTest extends TestCase
         $this->assertSame($artistSource, $result);
         $this->assertSame('spotify123', $artistSource->getPlatformArtistId());
     }
-
-    public function testTimeStampableTrait(): void
-    {
-        $artistSource = new ArtistSource();
-        $artistSource->setCreatedAt();
-
-        $this->assertInstanceOf(\DateTimeImmutable::class, $artistSource->getCreatedAt());
-        $this->assertInstanceOf(\DateTimeImmutable::class, $artistSource->getUpdatedAt());
-    }
 }

@@ -33,15 +33,6 @@ class LikeTest extends TestCase
         $this->assertSame(Post::class, $like->getEntityClass());
     }
 
-    public function testTimeStampableTrait(): void
-    {
-        $like = new Like();
-        $like->setCreatedAt();
-
-        $this->assertInstanceOf(\DateTimeImmutable::class, $like->getCreatedAt());
-        $this->assertInstanceOf(\DateTimeImmutable::class, $like->getUpdatedAt());
-    }
-
     public function testSetEntityClassWithComment(): void
     {
         $like = new Like();

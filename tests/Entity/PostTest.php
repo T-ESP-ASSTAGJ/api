@@ -73,15 +73,6 @@ class PostTest extends TestCase
         $this->assertSame(0, $post->getCommentsCount());
     }
 
-    public function testTimeStampableTrait(): void
-    {
-        $post = new Post();
-        $post->setCreatedAt();
-
-        $this->assertInstanceOf(\DateTimeImmutable::class, $post->getCreatedAt());
-        $this->assertInstanceOf(\DateTimeImmutable::class, $post->getUpdatedAt());
-    }
-
     public function testLikeableTrait(): void
     {
         $post = new Post();

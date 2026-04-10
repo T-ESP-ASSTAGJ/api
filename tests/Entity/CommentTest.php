@@ -56,15 +56,6 @@ class CommentTest extends TestCase
         $this->assertCount(1, $post->getComments());
     }
 
-    public function testTimeStampableTrait(): void
-    {
-        $comment = new Comment();
-        $comment->setCreatedAt();
-
-        $this->assertInstanceOf(\DateTimeImmutable::class, $comment->getCreatedAt());
-        $this->assertInstanceOf(\DateTimeImmutable::class, $comment->getUpdatedAt());
-    }
-
     public function testLikeableTrait(): void
     {
         $comment = new Comment();

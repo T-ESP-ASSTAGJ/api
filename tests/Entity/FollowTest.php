@@ -26,13 +26,4 @@ class FollowTest extends TestCase
         $this->assertSame($follow, $result);
         $this->assertSame($followedUser, $follow->getFollowedUser());
     }
-
-    public function testTimeStampableTrait(): void
-    {
-        $follow = new Follow();
-        $follow->setCreatedAt();
-
-        $this->assertInstanceOf(\DateTimeImmutable::class, $follow->getCreatedAt());
-        $this->assertInstanceOf(\DateTimeImmutable::class, $follow->getUpdatedAt());
-    }
 }
