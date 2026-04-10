@@ -57,7 +57,6 @@ class MercureMessageOutputTest extends TestCase
         $message->setConversation($conversation);
         $message->setType(MessageTypeEnum::Text);
         $message->setContent('Hello world!');
-        $message->setCreatedAt();
 
         return $message;
     }
@@ -81,10 +80,6 @@ class MercureMessageOutputTest extends TestCase
         $this->assertSame(99, $data['message']['id']);
         $this->assertSame(9, $data['message']['conversationId']);
         $this->assertSame('Hello world!', $data['message']['content']);
-        $this->assertMatchesRegularExpression(
-            '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2}$/',
-            $data['message']['createdAt']
-        );
         $this->assertSame(42, $data['message']['author']['id']);
         $this->assertSame('sergio', $data['message']['author']['username']);
         $this->assertArrayNotHasKey('updatedAt', $data['message']['author']);

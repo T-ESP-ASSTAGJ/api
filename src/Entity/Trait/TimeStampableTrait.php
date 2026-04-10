@@ -40,18 +40,32 @@ trait TimeStampableTrait
     ])]
     private \DateTimeImmutable $updatedAt;
 
-    #[ORM\PrePersist]
-    public function setCreatedAt(): void
+    public function setCreatedAt(\DateTimeImmutable $createdAt = new \DateTimeImmutable()): void
     {
+        $this->createdAt = $createdAt;
+        $this->updatedAt = $createdAt;
+    }
+
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
+    {
+        if (isset($this->createdAt)) {
+            return;
+        }
+
         $now = new \DateTimeImmutable();
-        $this->createdAt = $now;
-        $this->updatedAt = $now;
+        $this->setCreatedAt($now);
+    }
+
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
     }
 
     #[ORM\PreUpdate]
-    public function setUpdatedAt(): void
+    public function onPreUpdate(): void
     {
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->setUpdatedAt(new \DateTimeImmutable());
     }
 
     public function getCreatedAt(): \DateTimeImmutable

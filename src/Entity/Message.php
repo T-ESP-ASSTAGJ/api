@@ -14,10 +14,8 @@ use App\ApiResource\Message\MessageCreateInput;
 use App\ApiResource\Message\MessageUpdateInput;
 use App\Entity\Enum\MessageTypeEnum;
 use App\Entity\Interface\TimeStampableInterface;
-use App\State\IsReadProvider;
 use App\State\Message\MessageProcessor;
 use App\State\Message\MessageUpdateProcessor;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -27,11 +25,9 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Get(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
-            provider: IsReadProvider::class,
         ),
         new GetCollection(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ]],
-            provider: IsReadProvider::class,
         ),
         new ApiPost(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
@@ -42,7 +38,6 @@ use Symfony\Component\Validator\Constraints as Assert;
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
             denormalizationContext: ['groups' => [self::SERIALIZATION_GROUP_UPDATE]],
             input: MessageUpdateInput::class,
-            provider: IsReadProvider::class,
             processor: MessageUpdateProcessor::class
         ),
         new Delete(
@@ -126,28 +121,6 @@ class Message implements TimeStampableInterface
     ])]
     private ?Track $track = null;
 
-    #[ORM\Column(name: 'is_read', type: 'boolean', options: ['default' => false])]
-    #[Groups([
-        self::SERIALIZATION_GROUP_READ,
-        self::SERIALIZATION_GROUP_DETAIL,
-        Conversation::SERIALIZATION_GROUP_READ,
-    ])]
-    private bool $isRead = false;
-
-    #[Groups([
-        self::SERIALIZATION_GROUP_READ,
-        self::SERIALIZATION_GROUP_DETAIL,
-        Conversation::SERIALIZATION_GROUP_READ,
-    ])]
-    private ?bool $read = null;
-
-    #[ORM\Column(name: 'read_at', type: Types::DATETIME_IMMUTABLE, nullable: true)]
-    #[Groups([
-        self::SERIALIZATION_GROUP_READ,
-        self::SERIALIZATION_GROUP_DETAIL,
-    ])]
-    private ?\DateTimeImmutable $readAt = null;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -228,48 +201,19 @@ class Message implements TimeStampableInterface
         return MessageTypeEnum::Music === $this->type;
     }
 
-    public function isRead(): bool
+    #[Groups([
+        self::SERIALIZATION_GROUP_DETAIL,
+        self::SERIALIZATION_GROUP_READ,
+    ])]
+    public function isReadBy(User $user): bool
     {
-        return $this->isRead;
-    }
+        $participant = $this->conversation->getParticipantForUser($user);
+        if (!$participant || !$participant->getLastReadAt()) {
+            return false;
+        }
 
-    public function setIsRead(bool $isRead): static
-    {
-        $this->isRead = $isRead;
-
-        return $this;
-    }
-
-    public function getRead(): ?bool
-    {
-        return $this->read;
-    }
-
-    public function setRead(?bool $read): static
-    {
-        $this->read = $read;
-
-        return $this;
-    }
-
-    public function getReadAt(): ?\DateTimeImmutable
-    {
-        return $this->readAt;
-    }
-
-    public function setReadAt(?\DateTimeImmutable $readAt): static
-    {
-        $this->readAt = $readAt;
-
-        return $this;
-    }
-
-    public function markAsRead(): static
-    {
-        $this->isRead = true;
-        $this->readAt = new \DateTimeImmutable();
-
-        return $this;
+        // If message was created before or at the time the user last checked the chat
+        return $this->createdAt <= $participant->getLastReadAt();
     }
 
     #[Groups([

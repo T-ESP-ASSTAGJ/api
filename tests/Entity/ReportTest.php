@@ -43,13 +43,4 @@ class ReportTest extends TestCase
         $this->assertSame($report, $result);
         $this->assertNull($report->getMessage());
     }
-
-    public function testTimeStampableTrait(): void
-    {
-        $report = new Report();
-        $report->setCreatedAt();
-
-        $this->assertInstanceOf(\DateTimeImmutable::class, $report->getCreatedAt());
-        $this->assertInstanceOf(\DateTimeImmutable::class, $report->getUpdatedAt());
-    }
 }

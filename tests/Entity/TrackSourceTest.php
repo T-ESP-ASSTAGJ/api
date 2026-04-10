@@ -76,14 +76,6 @@ class TrackSourceTest extends TestCase
         $this->assertContains(TrackSource::PLATFORM_APPLE_MUSIC, TrackSource::PLATFORMS);
     }
 
-    public function testTimeStampableTrait(): void
-    {
-        $trackSource = new TrackSource();
-        $trackSource->setCreatedAt();
-
-        $this->assertInstanceOf(\DateTimeImmutable::class, $trackSource->getCreatedAt());
-        $this->assertInstanceOf(\DateTimeImmutable::class, $trackSource->getUpdatedAt());
-    }
 
     public function testDefaultMetadata(): void
     {

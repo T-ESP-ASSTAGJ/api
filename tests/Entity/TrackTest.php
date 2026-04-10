@@ -49,13 +49,4 @@ class TrackTest extends TestCase
         $this->assertNull($track->getReleaseYear());
         $this->assertNull($track->getCoverImage());
     }
-
-    public function testTimeStampableTrait(): void
-    {
-        $track = new Track();
-        $track->setCreatedAt();
-
-        $this->assertInstanceOf(\DateTimeImmutable::class, $track->getCreatedAt());
-        $this->assertInstanceOf(\DateTimeImmutable::class, $track->getUpdatedAt());
-    }
 }

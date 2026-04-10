@@ -32,7 +32,7 @@ final class PostFactory extends PersistentObjectFactory
         $faker->addProvider(new PicsumProvider($faker));
 
         return [
-            'user' => UserFactory::random(),
+            'user' => UserFactory::new(),
             'track' => TrackFactory::new(),
             'caption' => self::faker()->optional(0.7)->realText(200),
             // @phpstan-ignore method.notFound

@@ -7,18 +7,14 @@ namespace App\State\Message;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
-use App\ApiResource\Message\MercureMessageOutput;
 use App\ApiResource\Message\MessageUpdateInput;
-use App\Entity\Enum\MercureTypeEnum;
 use App\Entity\Message;
 use App\Entity\User;
+use App\Service\Message\MessageMercurePublisherService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
-use Symfony\Component\Mercure\HubInterface;
-use Symfony\Component\Mercure\Update;
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -30,8 +26,7 @@ final readonly class MessageUpdateProcessor implements ProcessorInterface
         private EntityManagerInterface $entityManager,
         private ValidatorInterface $validator,
         private Security $security,
-        private HubInterface $hub,
-        private SerializerInterface $serializer,
+        private MessageMercurePublisherService $mercurePublisher,
     ) {
     }
 
@@ -66,20 +61,7 @@ final readonly class MessageUpdateProcessor implements ProcessorInterface
 
         $this->entityManager->flush();
 
-        $conversation = $message->getConversation();
-        $mercureMessage = new MercureMessageOutput(MercureTypeEnum::Message, $message);
-
-        $jsonPayload = $this->serializer->serialize(
-            $mercureMessage,
-            'json',
-            ['groups' => Message::SERIALIZATION_GROUP_MERCURE]
-        );
-
-        $update = new Update(
-            $conversation->getMercureTopic(),
-            $jsonPayload,
-        );
-        $this->hub->publish($update);
+        $this->mercurePublisher->publish($message);
 
         return $message;
     }

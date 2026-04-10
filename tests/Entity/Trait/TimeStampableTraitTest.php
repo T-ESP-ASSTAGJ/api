@@ -4,51 +4,67 @@ declare(strict_types=1);
 
 namespace App\Tests\Entity\Trait;
 
-use App\Entity\User;
+use App\Entity\Trait\TimeStampableTrait;
 use PHPUnit\Framework\TestCase;
 
 class TimeStampableTraitTest extends TestCase
 {
-    public function testSetCreatedAtSetsCreatedAtAndUpdatedAt(): void
+    private function createTraitInstance(): object
     {
-        $entity = new User();
+        return new class {
+            use TimeStampableTrait;
+        };
+    }
 
-        $entity->setCreatedAt();
+    public function testOnPrePersistSetsBothTimestamps(): void
+    {
+        $entity = $this->createTraitInstance();
+
+        $entity->onPrePersist();
 
         $this->assertInstanceOf(\DateTimeImmutable::class, $entity->getCreatedAt());
         $this->assertInstanceOf(\DateTimeImmutable::class, $entity->getUpdatedAt());
-
-        // Both should be set to the same time
-        $this->assertEquals($entity->getCreatedAt(), $entity->getUpdatedAt());
+        $this->assertSame($entity->getCreatedAt(), $entity->getUpdatedAt());
     }
 
-    public function testSetUpdatedAtUpdatesOnlyUpdatedAt(): void
+    public function testOnPrePersistDoesNotOverwriteExistingCreatedAt(): void
     {
-        $entity = new User();
-        $entity->setCreatedAt();
+        $entity = $this->createTraitInstance();
+        $pastDate = new \DateTimeImmutable('2000-01-01 10:00:00');
 
-        $originalCreatedAt = $entity->getCreatedAt();
-        $originalUpdatedAt = $entity->getUpdatedAt();
+        $entity->setCreatedAt($pastDate);
 
-        // Wait a tiny bit to ensure time difference
-        usleep(1000);
+        $entity->onPrePersist();
 
-        $entity->setUpdatedAt();
-
-        // CreatedAt should remain unchanged
-        $this->assertSame($originalCreatedAt, $entity->getCreatedAt());
-
-        // UpdatedAt should be different from original
-        $this->assertNotEquals($originalUpdatedAt, $entity->getUpdatedAt());
-        $this->assertGreaterThan($originalUpdatedAt, $entity->getUpdatedAt());
+        $this->assertSame($pastDate, $entity->getCreatedAt());
     }
 
-    public function testTimestampsAreImmutable(): void
+    public function testOnPreUpdateOnlyChangesUpdatedAt(): void
     {
-        $entity = new User();
-        $entity->setCreatedAt();
+        $entity = $this->createTraitInstance();
 
-        $this->assertInstanceOf(\DateTimeImmutable::class, $entity->getCreatedAt());
-        $this->assertInstanceOf(\DateTimeImmutable::class, $entity->getUpdatedAt());
+        $pastDate = new \DateTimeImmutable('2020-01-01 10:00:00');
+        $entity->setCreatedAt($pastDate);
+
+        $entity->onPreUpdate();
+
+        $this->assertSame($pastDate, $entity->getCreatedAt());
+        $this->assertNotSame($pastDate, $entity->getUpdatedAt());
+        $this->assertGreaterThan($pastDate, $entity->getUpdatedAt());
+    }
+
+    public function testManualSetters(): void
+    {
+        $entity = $this->createTraitInstance();
+        $customDate = new \DateTimeImmutable('2024-12-25 00:00:00');
+
+        $entity->setCreatedAt($customDate);
+        $this->assertSame($customDate, $entity->getCreatedAt());
+        $this->assertSame($customDate, $entity->getUpdatedAt());
+
+        $newUpdate = new \DateTimeImmutable('2025-01-01 00:00:00');
+        $entity->setUpdatedAt($newUpdate);
+        $this->assertSame($customDate, $entity->getCreatedAt());
+        $this->assertSame($newUpdate, $entity->getUpdatedAt());
     }
 }
