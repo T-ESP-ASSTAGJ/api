@@ -6,6 +6,7 @@ namespace App\Repository;
 
 use App\Entity\Conversation;
 use App\Entity\Message;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -19,13 +20,14 @@ class MessageRepository extends ServiceEntityRepository
         parent::__construct($registry, Message::class);
     }
 
-    public function countUnreadMessages(Conversation $conversation, ?\DateTimeImmutable $lastReadAt): int
+    public function countUnreadMessages(Conversation $conversation, User $user, ?\DateTimeImmutable $lastReadAt): int
     {
-        dump($conversation, $lastReadAt);
         $qb = $this->createQueryBuilder('m')
             ->select('count(m.id)')
             ->where('m.conversation = :conversation')
-            ->setParameter('conversation', $conversation);
+            ->andWhere('m.author != :user')
+            ->setParameter('conversation', $conversation)
+            ->setParameter('user', $user);
 
         if ($lastReadAt) {
             $qb->andWhere('m.createdAt > :lastReadAt')

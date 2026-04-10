@@ -49,6 +49,7 @@ final readonly class ConversationListProvider implements ProviderInterface
             // Calculate count of messages created AFTER lastReadAt
             $unreadCount = $this->messageRepository->countUnreadMessages(
                 $conversation,
+                $user,
                 $lastReadAt
             );
 
