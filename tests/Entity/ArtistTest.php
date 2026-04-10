@@ -59,13 +59,4 @@ class ArtistTest extends TestCase
         $this->assertCount(0, $artist->getTracks());
         $this->assertInstanceOf(\Doctrine\Common\Collections\Collection::class, $artist->getTracks());
     }
-
-    public function testTimeStampableTrait(): void
-    {
-        $artist = new Artist();
-        $artist->setCreatedAt();
-
-        $this->assertInstanceOf(\DateTimeImmutable::class, $artist->getCreatedAt());
-        $this->assertInstanceOf(\DateTimeImmutable::class, $artist->getUpdatedAt());
-    }
 }

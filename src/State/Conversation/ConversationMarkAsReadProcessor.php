@@ -42,7 +42,7 @@ final readonly class ConversationMarkAsReadProcessor implements ProcessorInterfa
             throw new AccessDeniedHttpException('You are not a participant of this conversation');
         }
 
-        $participant->resetUnreadCount();
+        $participant->setLastReadAt(new \DateTimeImmutable());
         $this->entityManager->flush();
     }
 }

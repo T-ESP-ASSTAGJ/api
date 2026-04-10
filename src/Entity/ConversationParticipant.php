@@ -48,8 +48,12 @@ class ConversationParticipant
     #[ORM\Column(name: 'left_at', type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $leftAt = null;
 
-    #[ORM\Column(name: 'unread_count', type: 'integer', options: ['default' => 0])]
-    private int $unreadCount = 0;
+    #[Groups([
+        Conversation::SERIALIZATION_GROUP_READ,
+        Conversation::SERIALIZATION_GROUP_DETAIL,
+    ])]
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $lastReadAt = null;
 
     public function __construct()
     {
@@ -152,28 +156,14 @@ class ConversationParticipant
         return $this;
     }
 
-    public function getUnreadCount(): int
+    public function getLastReadAt(): ?\DateTimeImmutable
     {
-        return $this->unreadCount;
+        return $this->lastReadAt;
     }
 
-    public function setUnreadCount(int $unreadCount): static
+    public function setLastReadAt(?\DateTimeImmutable $lastReadAt): static
     {
-        $this->unreadCount = $unreadCount;
-
-        return $this;
-    }
-
-    public function incrementUnreadCount(): static
-    {
-        ++$this->unreadCount;
-
-        return $this;
-    }
-
-    public function resetUnreadCount(): static
-    {
-        $this->unreadCount = 0;
+        $this->lastReadAt = $lastReadAt;
 
         return $this;
     }

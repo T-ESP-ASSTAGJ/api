@@ -151,17 +151,6 @@ class ConversationTest extends TestCase
         $this->assertTrue($conversation->getIsGroup());
     }
 
-    public function testTimeStampableTrait(): void
-    {
-        $conversation = new Conversation();
-        $conversation->setCreatedAt();
-
-        $this->assertSame(
-            $conversation->getCreatedAt(),
-            $conversation->getUpdatedAt(),
-        );
-    }
-
     public function testGetParticipants(): void
     {
         $conversation = new Conversation();
@@ -207,7 +196,6 @@ class ConversationTest extends TestCase
         $message->setAuthor($user);
         $message->setType(MessageTypeEnum::Text);
         $message->setContent('Hello world');
-        $message->setCreatedAt();
 
         $conversation->addMessage($message);
 
@@ -233,7 +221,6 @@ class ConversationTest extends TestCase
         ReflectionUtil::setPropertyValue($message, 'id', 15);
         $message->setAuthor($user);
         $message->setType(MessageTypeEnum::Music);
-        $message->setCreatedAt();
 
         $conversation->addMessage($message);
 

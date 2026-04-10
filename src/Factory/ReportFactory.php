@@ -29,7 +29,7 @@ final class ReportFactory extends PersistentObjectFactory
     protected function defaults(): array
     {
         return [
-            'user' => UserFactory::random(),
+            'user' => UserFactory::new(),
             'entityId' => self::faker()->numberBetween(1, 100),
             'entityClass' => self::faker()->randomElement(ReportableTypeEnum::cases()),
             'reason' => self::faker()->randomElement(ReportReasonEnum::cases()),

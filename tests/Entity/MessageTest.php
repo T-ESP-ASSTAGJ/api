@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Entity;
 
 use App\Entity\Conversation;
+use App\Entity\ConversationParticipant;
 use App\Entity\Enum\MessageTypeEnum;
 use App\Entity\Message;
 use App\Entity\Track;
@@ -59,15 +60,6 @@ class MessageTest extends TestCase
         $result = $message->setTrack($track);
         $this->assertSame($message, $result);
         $this->assertSame($track, $message->getTrack());
-
-        $result = $message->setIsRead(true);
-        $this->assertSame($message, $result);
-        $this->assertTrue($message->isRead());
-
-        $readAt = new \DateTimeImmutable('2024-01-15 10:30:00');
-        $result = $message->setReadAt($readAt);
-        $this->assertSame($message, $result);
-        $this->assertSame($readAt, $message->getReadAt());
     }
 
     public function testDefaultValues(): void
@@ -77,8 +69,6 @@ class MessageTest extends TestCase
         $this->assertSame(MessageTypeEnum::Text, $message->getType());
         $this->assertNull($message->getContent());
         $this->assertNull($message->getTrack());
-        $this->assertFalse($message->isRead());
-        $this->assertNull($message->getReadAt());
     }
 
     public function testIsMusicMessage(): void
@@ -92,38 +82,10 @@ class MessageTest extends TestCase
         $this->assertTrue($message->isMusicMessage());
     }
 
-    public function testMarkAsRead(): void
-    {
-        $message = new Message();
-
-        $this->assertFalse($message->isRead());
-        $this->assertNull($message->getReadAt());
-
-        $result = $message->markAsRead();
-
-        $this->assertSame($message, $result);
-        $this->assertTrue($message->isRead());
-        $this->assertInstanceOf(\DateTimeImmutable::class, $message->getReadAt());
-        $this->assertEqualsWithDelta(
-            new \DateTimeImmutable(),
-            $message->getReadAt(),
-            1
-        );
-    }
-
     public function testTypeConstants(): void
     {
         $this->assertSame('text', MessageTypeEnum::Text->value);
         $this->assertSame('music', MessageTypeEnum::Music->value);
-    }
-
-    public function testTimeStampableTrait(): void
-    {
-        $message = new Message();
-        $message->setCreatedAt();
-
-        $this->assertInstanceOf(\DateTimeImmutable::class, $message->getCreatedAt());
-        $this->assertInstanceOf(\DateTimeImmutable::class, $message->getUpdatedAt());
     }
 
     public function testGetConversationId(): void
@@ -148,5 +110,29 @@ class MessageTest extends TestCase
         $musicMessage->setContent('music message');
         $musicMessage->setType(MessageTypeEnum::Music);
         $this->assertSame('Vous a partagé une musique', $musicMessage->getMessagePreview());
+    }
+
+    public function testIsReadBy(): void
+    {
+        $user = new User();
+        $conversation = new Conversation();
+        $participant = new ConversationParticipant();
+        $participant->setUser($user);
+
+        $conversation->addParticipant($participant);
+
+        $message = new Message();
+        $message->setConversation($conversation);
+
+        $readTime = new \DateTimeImmutable('2024-01-01 12:00:00');
+
+        $this->assertFalse($message->isReadBy($user), 'Should be false if lastReadAt is null');
+
+        $participant->setLastReadAt($readTime);
+        $message->setCreatedAt($readTime->modify('-1 hour'));
+        $this->assertTrue($message->isReadBy($user), 'Should be true if message is older than read date');
+
+        $message->setCreatedAt($readTime->modify('+1 hour'));
+        $this->assertFalse($message->isReadBy($user), 'Should be false if message is newer than read date');
     }
 }
