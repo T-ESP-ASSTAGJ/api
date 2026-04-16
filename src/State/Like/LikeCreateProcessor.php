@@ -7,13 +7,17 @@ namespace App\State\Like;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Like\LikeCreateInput;
+use App\Entity\Comment;
 use App\Entity\Interface\LikeableInterface;
 use App\Entity\Like;
+use App\Entity\Post;
 use App\Entity\User;
+use App\Message\LikeCreatedMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * @implements ProcessorInterface<LikeCreateInput, void>
@@ -23,6 +27,7 @@ final readonly class LikeCreateProcessor implements ProcessorInterface
     public function __construct(
         private EntityManagerInterface $entityManager,
         private Security $security,
+        private MessageBusInterface $bus,
     ) {
     }
 
@@ -57,9 +62,20 @@ final readonly class LikeCreateProcessor implements ProcessorInterface
             ->setEntityId($data->entityId)
             ->setUser($user);
 
+        $content = null;
+
+        if ($entityToLike instanceof Comment) {
+            $content = $entityToLike->getPost();
+        }
+
+        if ($entityToLike instanceof Post) {
+            $content = $entityToLike;
+        }
+
         try {
             $this->entityManager->persist($like);
             $this->entityManager->flush();
+            $this->bus->dispatch(new LikeCreatedMessage($user, $owner, $like, $content));
         } catch (\Throwable) {
             throw new BadRequestHttpException('You have already liked this entity.');
         }

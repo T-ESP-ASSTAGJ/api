@@ -11,6 +11,9 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
+/**
+ * @extends ConstraintValidatorTestCase<Base64Validator>
+ */
 class Base64ValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator(): Base64Validator
@@ -50,6 +53,9 @@ class Base64ValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($value, new Base64());
     }
 
+    /**
+     * @return iterable<string, array{0: mixed}>
+     */
     public static function provideNonStringValues(): iterable
     {
         yield 'integer' => [42];
@@ -69,6 +75,7 @@ class Base64ValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    /** @return iterable<string, array{0: string}> */
     public static function provideValidBase64Values(): iterable
     {
         yield 'simple base64' => [base64_encode('Hello, World!')];
@@ -82,9 +89,7 @@ class Base64ValidatorTest extends ConstraintValidatorTestCase
         yield 'empty base64 (zero bytes)' => [''];
     }
 
-    /**
-     * @dataProvider provideInvalidBase64Values
-     */
+    /** @dataProvider provideInvalidBase64Values */
     public function testInvalidBase64RaisesViolation(string $value): void
     {
         $constraint = new Base64();
@@ -98,19 +103,8 @@ class Base64ValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * Expose the protected ConstraintValidator::formatValue() so tests can mirror
-     * exactly what the validator passes to setParameter().
+     * @return iterable<string, array{0: string}>
      */
-    private function formatValue(mixed $value): string
-    {
-        return (new class extends Base64Validator {
-            public function expose(mixed $v): string
-            {
-                return $this->formatValue($v);
-            }
-        })->expose($value);
-    }
-
     public static function provideInvalidBase64Values(): iterable
     {
         yield 'contains spaces' => ['SGVsbG8g V29ybGQ='];
@@ -131,5 +125,15 @@ class Base64ValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ value }}', $this->formatValue($value))
             ->setCode('INVALID_BASE64_ERROR')
             ->assertRaised();
+    }
+
+    private function formatValue(mixed $value): string
+    {
+        return (new class extends Base64Validator {
+            public function expose(mixed $v): string
+            {
+                return $this->formatValue($v);
+            }
+        })->expose($value);
     }
 }

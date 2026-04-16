@@ -9,10 +9,12 @@ use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Follow\FollowOutput;
 use App\Entity\Follow as FollowEntity;
 use App\Entity\User;
+use App\Message\FollowCreatedMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * @implements ProcessorInterface<null, FollowEntity|FollowOutput>
@@ -22,6 +24,7 @@ final readonly class FollowProcessor implements ProcessorInterface
     public function __construct(
         private EntityManagerInterface $em,
         private Security $security,
+        private MessageBusInterface $bus,
     ) {
     }
 
@@ -73,6 +76,13 @@ final readonly class FollowProcessor implements ProcessorInterface
 
             $this->em->persist($newFollow);
             $this->em->flush();
+            $this->bus->dispatch(
+                new FollowCreatedMessage(
+                    $currentUser,
+                    $userToFollow,
+                )
+            );
+
             $output->message = 'Successfully followed the user.';
 
             return $output;

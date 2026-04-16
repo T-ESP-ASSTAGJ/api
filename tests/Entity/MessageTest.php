@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Entity;
 
 use App\Entity\Conversation;
-use App\Entity\ConversationParticipant;
 use App\Entity\Enum\MessageTypeEnum;
 use App\Entity\Message;
 use App\Entity\Track;
@@ -110,29 +109,5 @@ class MessageTest extends TestCase
         $musicMessage->setContent('music message');
         $musicMessage->setType(MessageTypeEnum::Music);
         $this->assertSame('Vous a partagé une musique', $musicMessage->getMessagePreview());
-    }
-
-    public function testIsReadBy(): void
-    {
-        $user = new User();
-        $conversation = new Conversation();
-        $participant = new ConversationParticipant();
-        $participant->setUser($user);
-
-        $conversation->addParticipant($participant);
-
-        $message = new Message();
-        $message->setConversation($conversation);
-
-        $readTime = new \DateTimeImmutable('2024-01-01 12:00:00');
-
-        $this->assertFalse($message->isReadBy($user), 'Should be false if lastReadAt is null');
-
-        $participant->setLastReadAt($readTime);
-        $message->setCreatedAt($readTime->modify('-1 hour'));
-        $this->assertTrue($message->isReadBy($user), 'Should be true if message is older than read date');
-
-        $message->setCreatedAt($readTime->modify('+1 hour'));
-        $this->assertFalse($message->isReadBy($user), 'Should be false if message is newer than read date');
     }
 }

@@ -28,4 +28,11 @@ class LikeableTypeEnumTest extends TestCase
         $this->assertContains(Comment::class, $values);
         $this->assertContains(Message::class, $values);
     }
+
+    public function testLabels(): void
+    {
+        $this->assertSame('post', LikeableTypeEnum::Post->label());
+        $this->assertSame('comment', LikeableTypeEnum::Comment->label());
+        $this->assertSame('message', LikeableTypeEnum::Message->label());
+    }
 }
