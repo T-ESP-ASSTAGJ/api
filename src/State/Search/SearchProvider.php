@@ -7,6 +7,7 @@ namespace App\State\Search;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\ProviderInterface;
+use App\ApiResource\Search\SearchTypeEnum;
 use App\Entity\Post;
 use App\Repository\PostRepository;
 use App\Repository\UserRepository;
@@ -43,13 +44,23 @@ final readonly class SearchProvider implements ProviderInterface
         }
 
         $sanitizedQuery = strip_tags($query);
-        $type = $context['filters']['type'] ?? 'posts';
+        $type = SearchTypeEnum::from($context['filters']['type'] ?? SearchTypeEnum::Users->value);
 
         $offset = $this->pagination->getOffset($operation, $context);
         $limit = $this->pagination->getLimit($operation, $context);
 
-        if ('users' === $type) {
+        if (SearchTypeEnum::Users === $type) {
             return $this->userRepository->searchByQuery($sanitizedQuery, $offset, $limit);
+        }
+
+        if (SearchTypeEnum::Tracks === $type) {
+            // TODO: implement track search
+            return [];
+        }
+
+        if (SearchTypeEnum::Artists === $type) {
+            // TODO: implement artist search
+            return [];
         }
 
         $posts = $this->postRepository->searchByQuery($sanitizedQuery, $offset, $limit);

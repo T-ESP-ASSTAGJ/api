@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Entity;
+namespace App\ApiResource\Search;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
+use App\Entity\Post;
+use App\Entity\User;
 use App\State\Search\SearchProvider;
 
 #[ApiResource(
@@ -22,7 +24,7 @@ use App\State\Search\SearchProvider;
             provider: SearchProvider::class,
             parameters: [
                 'query' => new QueryParameter(required: true, description: 'Terme de recherche'),
-                'type' => new QueryParameter(required: false, description: 'Type de contenu : posts (défaut) ou users'),
+                'type' => new QueryParameter(required: false, description: 'Type de contenu : users (défaut), posts, tracks ou artists'),
             ],
         ),
     ]
