@@ -14,14 +14,15 @@ class MessageTypeEnumTest extends TestCase
         $this->assertSame('text', MessageTypeEnum::Text->value);
         $this->assertSame('music', MessageTypeEnum::Music->value);
         $this->assertSame('image', MessageTypeEnum::Image->value);
+        $this->assertSame('share', MessageTypeEnum::Share->value);
     }
 
     public function testValues(): void
     {
         $values = MessageTypeEnum::values();
 
-        $this->assertCount(3, $values);
+        $this->assertCount(4, $values);
 
-        $this->assertEqualsCanonicalizing(['music', 'text', 'image'], $values);
+        $this->assertEqualsCanonicalizing(['music', 'text', 'image', 'share'], $values);
     }
 }

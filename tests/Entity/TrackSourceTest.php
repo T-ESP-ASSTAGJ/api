@@ -76,7 +76,6 @@ class TrackSourceTest extends TestCase
         $this->assertContains(TrackSource::PLATFORM_APPLE_MUSIC, TrackSource::PLATFORMS);
     }
 
-
     public function testDefaultMetadata(): void
     {
         $trackSource = new TrackSource();

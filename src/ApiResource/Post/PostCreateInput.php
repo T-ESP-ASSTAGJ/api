@@ -6,6 +6,7 @@ namespace App\ApiResource\Post;
 
 use ApiPlatform\Metadata\ApiProperty;
 use App\ApiResource\Track\TrackInput;
+use App\Validator\Constraints\Base64;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -18,10 +19,10 @@ class PostCreateInput
         #[Assert\Length(max: 1000)]
         #[ApiProperty(example: 'Amazing sunset vibes! 🌅 #music #vibes')]
         public ?string $caption = null,
-        #[Assert\Length(max: 7000000)]
+        #[Base64]
         #[ApiProperty(example: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD...')]
         public ?string $frontImage = null,
-        #[Assert\Length(max: 7000000)]
+        #[Base64]
         #[ApiProperty(example: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD...')]
         public ?string $backImage = null,
         #[Assert\Length(max: 255)]
