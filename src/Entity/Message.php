@@ -202,21 +202,6 @@ class Message implements TimeStampableInterface
     }
 
     #[Groups([
-        self::SERIALIZATION_GROUP_DETAIL,
-        self::SERIALIZATION_GROUP_READ,
-    ])]
-    public function isReadBy(User $user): bool
-    {
-        $participant = $this->conversation->getParticipantForUser($user);
-        if (!$participant || !$participant->getLastReadAt()) {
-            return false;
-        }
-
-        // If message was created before or at the time the user last checked the chat
-        return $this->createdAt <= $participant->getLastReadAt();
-    }
-
-    #[Groups([
         Conversation::SERIALIZATION_GROUP_READ,
     ])]
     public function getMessagePreview(): string

@@ -4,17 +4,14 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Entity\Like;
 use App\Entity\Post;
 use App\Entity\User;
 
-readonly class LikeCreatedMessage
+readonly class CommentCreatedMessage
 {
     public function __construct(
+        public Post $post,
         public User $user,
-        public User $owner,
-        public Like $like,
-        public Post $content,
     ) {
     }
 }

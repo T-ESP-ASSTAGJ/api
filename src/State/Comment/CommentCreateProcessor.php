@@ -11,9 +11,11 @@ use App\ApiResource\Comment\CommentCreateInput;
 use App\Entity\Comment;
 use App\Entity\Post;
 use App\Entity\User;
+use App\Message\CommentCreatedMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -25,6 +27,7 @@ final readonly class CommentCreateProcessor implements ProcessorInterface
         private EntityManagerInterface $em,
         private ValidatorInterface $validator,
         private Security $security,
+        private MessageBusInterface $bus,
     ) {
     }
 
@@ -70,6 +73,13 @@ final readonly class CommentCreateProcessor implements ProcessorInterface
 
         $this->em->persist($comment);
         $this->em->flush();
+
+        $this->bus->dispatch(
+            new CommentCreatedMessage(
+                $post,
+                $user,
+            )
+        );
 
         return $comment;
     }

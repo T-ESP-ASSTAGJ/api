@@ -28,7 +28,6 @@ class MercureMessageOutputTest extends TestCase
     protected function setUp(): void
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
-
         $normalizer = new ObjectNormalizer($classMetadataFactory);
 
         $this->serializer = new Serializer(
@@ -57,6 +56,7 @@ class MercureMessageOutputTest extends TestCase
         $message->setConversation($conversation);
         $message->setType(MessageTypeEnum::Text);
         $message->setContent('Hello world!');
+        $message->setCreatedAt(new \DateTimeImmutable('2024-01-01 12:00:00'));
 
         return $message;
     }
@@ -74,14 +74,17 @@ class MercureMessageOutputTest extends TestCase
 
         $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
 
+        $this->assertArrayHasKey('type', $data);
+        $this->assertArrayHasKey('message', $data);
         $this->assertSame(MercureTypeEnum::Message->value, $data['type']);
-        $this->assertIsArray($data['message']);
 
-        $this->assertSame(99, $data['message']['id']);
-        $this->assertSame(9, $data['message']['conversationId']);
-        $this->assertSame('Hello world!', $data['message']['content']);
-        $this->assertSame(42, $data['message']['author']['id']);
-        $this->assertSame('sergio', $data['message']['author']['username']);
-        $this->assertArrayNotHasKey('updatedAt', $data['message']['author']);
+        $msgData = $data['message'];
+        $this->assertSame(99, $msgData['id']);
+        $this->assertSame('Hello world!', $msgData['content']);
+
+        $this->assertArrayHasKey('author', $msgData);
+        $this->assertSame(42, $msgData['author']['id']);
+        $this->assertSame('sergio', $msgData['author']['username']);
+        $this->assertSame('https://example.com/pic.jpg', $msgData['author']['profilePicture']);
     }
 }

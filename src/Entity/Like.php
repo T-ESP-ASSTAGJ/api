@@ -107,6 +107,11 @@ class Like implements TimeStampableInterface
         return $this;
     }
 
+    public function getEntityClassLabel(): string
+    {
+        return $this->entityClass->label();
+    }
+
     /**
      * @codeCoverageIgnore
      */

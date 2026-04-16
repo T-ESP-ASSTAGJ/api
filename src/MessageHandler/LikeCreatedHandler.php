@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Message\LikeCreatedMessage;
-use App\Repository\LikeRepository;
 use App\Service\PushNotificationService;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -13,33 +12,28 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 class LikeCreatedHandler
 {
     public function __construct(
-        private LikeRepository $likeRepository,
         private PushNotificationService $push,
     ) {
     }
 
     public function __invoke(LikeCreatedMessage $message): void
     {
-        $like = $this->likeRepository->find($message->likeId);
-        if (null === $like) {
-            return;
-        }
-
-        $liker = $like->getUser();
-        $recipient = $this->likeRepository->findContentOwner($like);
-
-        if (null === $recipient || $recipient->getId() === $liker->getId()) {
-            return;
-        }
+        $like = $message->like;
+        $user = $message->user;
+        $owner = $message->owner;
+        $content = $message->content;
 
         $this->push->sendToUser(
-            userId: $recipient->getId(),
-            title: $liker->getUsername(),
-            body: sprintf('has liked your %s', $like->getEntityClass()),
+            userId: $owner->getId(),
+            title: $user->getUsername(),
+            body: sprintf('has liked your %s', $like->getEntityClassLabel()),
             data: [
-                'entity_class' => $like->getEntityClass(),
-                'entity_id' => (string) $like->getEntityId(),
-            ]
+                'postId' => $content->getId(),
+                'entityClass' => $like->getEntityClass(),
+                'entityId' => (string) $like->getEntityId(),
+                'profilePicture' => $user->getProfilePicture(),
+                'postImage' => $content->getFrontImage(),
+            ],
         );
     }
 }
