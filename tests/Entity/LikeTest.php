@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Entity;
 
+use App\Entity\Comment;
 use App\Entity\Enum\LikeableTypeEnum;
 use App\Entity\Like;
+use App\Entity\Message;
 use App\Entity\Post;
 use App\Entity\User;
 use PHPUnit\Framework\TestCase;
@@ -16,7 +18,6 @@ class LikeTest extends TestCase
     {
         $like = new Like();
         $user = new User();
-        $post = new Post();
 
         $this->assertNull($like->getId());
 
@@ -31,6 +32,8 @@ class LikeTest extends TestCase
         $result = $like->setEntityClass(LikeableTypeEnum::Post);
         $this->assertSame($like, $result);
         $this->assertSame(Post::class, $like->getEntityClass());
+
+        $this->assertSame('post', $like->getEntityClassLabel());
     }
 
     public function testSetEntityClassWithComment(): void
@@ -38,7 +41,7 @@ class LikeTest extends TestCase
         $like = new Like();
         $like->setEntityClass(LikeableTypeEnum::Comment);
 
-        $this->assertSame(\App\Entity\Comment::class, $like->getEntityClass());
+        $this->assertSame(Comment::class, $like->getEntityClass());
     }
 
     public function testSetEntityClassWithMessage(): void
@@ -46,6 +49,6 @@ class LikeTest extends TestCase
         $like = new Like();
         $like->setEntityClass(LikeableTypeEnum::Message);
 
-        $this->assertSame(\App\Entity\Message::class, $like->getEntityClass());
+        $this->assertSame(Message::class, $like->getEntityClass());
     }
 }
