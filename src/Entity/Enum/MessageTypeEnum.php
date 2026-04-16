@@ -9,6 +9,7 @@ enum MessageTypeEnum: string
     case Text = 'text';
     case Image = 'image';
     case Music = 'music';
+    case Share = 'share';
 
     /**
      * @return string[]
