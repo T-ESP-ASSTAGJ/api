@@ -56,16 +56,17 @@ class SearchProviderTest extends KernelTestCase
         $this->assertInstanceOf(User::class, $results[0]);
     }
 
-    public function testDefaultTypeIsPosts(): void
+    public function testDefaultTypeIsUsers(): void
     {
-        UserFactory::createOne();
+        UserFactory::createOne(['username' => 'testuser']);
         PostFactory::createOne(['caption' => 'test caption']);
 
         $results = $this->provider->provide($this->operation, [], [
             'filters' => ['query' => 'test'],
         ]);
 
-        $this->assertInstanceOf(Post::class, $results[0]);
+        $this->assertNotEmpty($results);
+        $this->assertInstanceOf(User::class, $results[0]);
     }
 
     public function testEmptyQueryThrowsBadRequestException(): void
