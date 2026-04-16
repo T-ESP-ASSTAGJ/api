@@ -9,13 +9,12 @@ use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Report\ReportCreateInput;
 use App\Entity\Report;
 use App\Entity\User;
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 /**
  * @implements ProcessorInterface<ReportCreateInput, void>
@@ -65,8 +64,8 @@ final readonly class ReportCreateProcessor implements ProcessorInterface
 
         try {
             $this->persistProcessor->process($report, $operation, $uriVariables, $context);
-        } catch (UniqueConstraintViolationException) {
-            throw new BadRequestHttpException('Vous avez déjà signalé ce contenu.');
+        } catch (\Throwable) {
+            throw new UnprocessableEntityHttpException('Vous avez déjà signalé ce contenu.');
         }
     }
 }

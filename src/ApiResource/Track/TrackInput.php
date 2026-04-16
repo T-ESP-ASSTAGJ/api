@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\ApiResource\Track;
 
 use ApiPlatform\Metadata\ApiProperty;
+use App\Validator\Constraints\Base64;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -28,7 +29,7 @@ class TrackInput
         #[Assert\Positive]
         #[ApiProperty(example: 2020)]
         public ?int $releaseYear = null,
-        #[Assert\Length(max: 7000000)]
+        #[Base64]
         #[ApiProperty(example: 'https://i.scdn.co/image/ab67616d0000b273123456789abcdef')]
         public ?string $coverImage = null,
     ) {
