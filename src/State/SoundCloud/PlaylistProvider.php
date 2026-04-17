@@ -32,9 +32,10 @@ final readonly class PlaylistProvider implements ProviderInterface
     /**
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
+     *
      * @return PlaylistDTO|PlaylistDTO[]
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array
     {
         /** @var User|null $user */
         $user = $this->security->getUser();

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Entity;
 
 use App\Entity\Conversation;
-use App\Entity\ConversationParticipant;
 use App\Entity\Enum\MessageTypeEnum;
 use App\Entity\Message;
 use App\Entity\Track;

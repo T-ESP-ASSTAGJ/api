@@ -55,7 +55,7 @@ readonly class SoundCloudService
             ]);
 
             $data = $response->toArray();
-            usort($data, static fn($a, $b) => $b['playback_count'] <=> $a['playback_count']);
+            usort($data, static fn ($a, $b) => $b['playback_count'] <=> $a['playback_count']);
 
             return array_map(
                 fn (array $item) => $this->mapToTrackDTO($item),
@@ -117,6 +117,20 @@ readonly class SoundCloudService
         }
     }
 
+    /** @param array{
+     *     id: int,
+     *     username?: string,
+     *     permalink?: string,
+     *     permalink_url?: string,
+     *     avatar_url?: string|null,
+     *     country?: string|null,
+     *     city?: string|null,
+     *     description?: string|null,
+     *     followers_count?: int,
+     *     followings_count?: int,
+     *     track_count?: int,
+     *     playlist_count?: int
+     * } $data */
     private function mapToUserDTO(array $data): UserDTO
     {
         return new UserDTO(
@@ -135,6 +149,23 @@ readonly class SoundCloudService
         );
     }
 
+    /** @param array{
+     *     id: int,
+     *     title?: string,
+     *     description?: string|null,
+     *     duration?: int,
+     *     permalink_url?: string,
+     *     artwork_url?: string|null,
+     *     playback_count?: int,
+     *     likes_count?: int,
+     *     streamable?: bool,
+     *     download_url?: string|null,
+     *     user?: array<string, mixed>,
+     *     created_at?: string,
+     *     genre?: string|null,
+     *     tag_list?: string|null,
+     *     isrc?: string|null
+     * } $data */
     private function mapToTrackDTO(array $data): TrackDTO
     {
         return new TrackDTO(
@@ -156,6 +187,21 @@ readonly class SoundCloudService
         );
     }
 
+    /** @param array{
+     *     id: int,
+     *     title?: string,
+     *     description?: string|null,
+     *     duration?: int,
+     *     permalink_url?: string,
+     *     artwork_url?: string|null,
+     *     user?: array<string, mixed>,
+     *     created_at?: string,
+     *     track_count?: int,
+     *     tracks?: array<int, array<string, mixed>>,
+     *     public?: bool,
+     *     genre?: string|null,
+     *     tag_list?: string|null
+     * } $data */
     private function mapToPlaylistDTO(array $data): PlaylistDTO
     {
         $tracks = null;

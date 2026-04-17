@@ -20,7 +20,7 @@ use App\State\SoundCloud\TrackProvider;
             parameters: [
                 'q' => new QueryParameter(required: true),
                 'isrc' => new QueryParameter(),
-            ]        ),
+            ]),
         new Get(
             uriTemplate: '/soundcloud/tracks/{id}',
             shortName: 'SoundCloud',

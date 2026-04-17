@@ -37,6 +37,7 @@ readonly class PlaylistDTO
         public UserDTO $user,
         public string $created_at,
         public int $track_count,
+        /** @var TrackDTO[] */
         public ?array $tracks,
         public bool $is_public,
         public ?string $genre,

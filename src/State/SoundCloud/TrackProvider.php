@@ -34,9 +34,10 @@ final readonly class TrackProvider implements ProviderInterface
     /**
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
+     *
      * @return TrackDTO|TrackDTO[]
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array
     {
         /** @var User|null $user */
         $user = $this->security->getUser();

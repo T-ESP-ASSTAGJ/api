@@ -11,6 +11,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
+/** @extends ConstraintValidatorTestCase<Base64Validator> */
 class Base64ValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator(): Base64Validator
@@ -50,6 +51,7 @@ class Base64ValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($value, new Base64());
     }
 
+    /** @return iterable<string, array{mixed}> */
     public static function provideNonStringValues(): iterable
     {
         yield 'integer' => [42];
@@ -69,6 +71,7 @@ class Base64ValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    /** @return iterable<string, array{string}> */
     public static function provideValidBase64Values(): iterable
     {
         yield 'simple base64' => [base64_encode('Hello, World!')];
@@ -111,6 +114,7 @@ class Base64ValidatorTest extends ConstraintValidatorTestCase
         })->expose($value);
     }
 
+    /** @return iterable<string, array{string}> */
     public static function provideInvalidBase64Values(): iterable
     {
         yield 'contains spaces' => ['SGVsbG8g V29ybGQ='];
