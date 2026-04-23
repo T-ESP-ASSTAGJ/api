@@ -60,23 +60,21 @@ class PostRepository extends ServiceEntityRepository
     /** @return Post[] */
     public function searchByTrackTitle(string $query, int $offset, int $limit): array
     {
-        return $this->createQueryBuilder('p')
-            ->join('p.track', 't')
-            ->where('t.title LIKE :query')
-            ->setParameter('query', '%'.$query.'%')
-            ->orderBy('p.createdAt', 'DESC')
-            ->setFirstResult($offset)
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
+        return $this->searchByTrackField('title', $query, $offset, $limit);
     }
 
     /** @return Post[] */
     public function searchByArtistName(string $query, int $offset, int $limit): array
     {
+        return $this->searchByTrackField('artistName', $query, $offset, $limit);
+    }
+
+    /** @return Post[] */
+    private function searchByTrackField(string $field, string $query, int $offset, int $limit): array
+    {
         return $this->createQueryBuilder('p')
             ->join('p.track', 't')
-            ->where('t.artistName LIKE :query')
+            ->where('t.'.$field.' LIKE :query')
             ->setParameter('query', '%'.$query.'%')
             ->orderBy('p.createdAt', 'DESC')
             ->setFirstResult($offset)
