@@ -19,18 +19,19 @@ use Doctrine\ORM\Mapping as ORM;
             defaults: ['_api_receive' => false],
             input: false,
             name: 'follow',
-            processor: FollowProcessor::class
+            processor: FollowProcessor::class,
         ),
         new Delete(
             uriTemplate: '/users/{id}/unfollow',
             output: FollowOutput::class,
             read: false,
             name: 'unfollow',
-            processor: FollowProcessor::class
+            processor: FollowProcessor::class,
         ),
     ],
 )]
 #[ORM\Entity]
+#[ORM\HasLifecycleCallbacks]
 #[ORM\Table(name: 'follow')]
 class Follow implements TimeStampableInterface
 {

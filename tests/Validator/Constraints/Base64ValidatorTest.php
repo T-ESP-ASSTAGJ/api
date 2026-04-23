@@ -16,11 +16,6 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class Base64ValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator(): Base64Validator
-    {
-        return new Base64Validator();
-    }
-
     public function testThrowsOnWrongConstraintType(): void
     {
         $this->expectException(UnexpectedTypeException::class);
@@ -59,9 +54,13 @@ class Base64ValidatorTest extends ConstraintValidatorTestCase
     public static function provideNonStringValues(): iterable
     {
         yield 'integer' => [42];
+
         yield 'float' => [3.14];
+
         yield 'array' => [['foo']];
+
         yield 'object' => [new \stdClass()];
+
         yield 'bool' => [true];
     }
 
@@ -75,21 +74,33 @@ class Base64ValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /** @return iterable<string, array{0: string}> */
+    /**
+     * @return iterable<string, array{0: string}>
+     */
     public static function provideValidBase64Values(): iterable
     {
         yield 'simple base64' => [base64_encode('Hello, World!')];
+
         yield 'base64 with padding =' => [base64_encode('foo')];
+
         yield 'base64 with padding ==' => [base64_encode('fo')];
+
         yield 'base64 with no padding' => [base64_encode('foob')];
+
         yield 'base64 encoded binary-like data' => [base64_encode(random_bytes(32))];
+
         yield 'data URI image/png prefix' => ['data:image/png;base64,'.base64_encode('fakeimage')];
+
         yield 'data URI image/jpeg prefix' => ['data:image/jpeg;base64,'.base64_encode('fakejpeg')];
+
         yield 'data URI application/pdf prefix' => ['data:application/pdf;base64,'.base64_encode('fakepdf')];
+
         yield 'empty base64 (zero bytes)' => [''];
     }
 
-    /** @dataProvider provideInvalidBase64Values */
+    /**
+     * @dataProvider provideInvalidBase64Values
+     */
     public function testInvalidBase64RaisesViolation(string $value): void
     {
         $constraint = new Base64();
@@ -99,7 +110,8 @@ class Base64ValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation($constraint->message)
             ->setParameter('{{ value }}', $this->formatValue($value))
             ->setCode('INVALID_BASE64_ERROR')
-            ->assertRaised();
+            ->assertRaised()
+        ;
     }
 
     /**
@@ -108,9 +120,13 @@ class Base64ValidatorTest extends ConstraintValidatorTestCase
     public static function provideInvalidBase64Values(): iterable
     {
         yield 'contains spaces' => ['SGVsbG8g V29ybGQ='];
+
         yield 'contains special chars' => ['SGVsbG8!V29ybGQ='];
+
         yield 'contains newlines' => ["SGVsbG8\nV29ybGQ="];
+
         yield 'too many padding chars' => ['SGVsbG8==='];
+
         yield 'invalid characters only' => ['!!!'];
     }
 
@@ -124,7 +140,13 @@ class Base64ValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation($constraint->message)
             ->setParameter('{{ value }}', $this->formatValue($value))
             ->setCode('INVALID_BASE64_ERROR')
-            ->assertRaised();
+            ->assertRaised()
+        ;
+    }
+
+    protected function createValidator(): Base64Validator
+    {
+        return new Base64Validator();
     }
 
     private function formatValue(mixed $value): string

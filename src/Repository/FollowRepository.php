@@ -30,13 +30,14 @@ class FollowRepository extends ServiceEntityRepository
             ->where('f.followedUser = :userId')
             ->setParameter('userId', $userId)
             ->getQuery()
-            ->getResult();
+            ->getResult()
+        ;
 
         return array_map(
             static fn (array $data) => new UserFollowOutput(
                 $data['id'],
                 $data['username'],
-                $data['profilePicture']
+                $data['profilePicture'],
             ),
             $result,
         );
@@ -53,13 +54,14 @@ class FollowRepository extends ServiceEntityRepository
             ->where('f.follower = :userId')
             ->setParameter('userId', $userId)
             ->getQuery()
-            ->getResult();
+            ->getResult()
+        ;
 
         return array_map(
             static fn (array $data) => new UserFollowOutput(
                 $data['id'],
                 $data['username'],
-                $data['profilePicture']
+                $data['profilePicture'],
             ),
             $result,
         );

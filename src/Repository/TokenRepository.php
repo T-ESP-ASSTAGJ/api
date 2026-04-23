@@ -27,25 +27,32 @@ class TokenRepository extends ServiceEntityRepository
         ]);
     }
 
-    /** @return Token[] */
+    /**
+     * @return Token[]
+     */
     public function findAllByUser(User $user): array
     {
         return $this->findBy(['user' => $user]);
     }
 
-    /** @return Token[] */
+    /**
+     * @return Token[]
+     */
     public function findAllByPlatform(string $platform): array
     {
         return $this->findBy(['platform' => $platform]);
     }
 
-    /** @return Token[] */
+    /**
+     * @return Token[]
+     */
     public function findExpiredTokens(): array
     {
         return $this->createQueryBuilder('t')
             ->where('t.expiresAt < :now')
             ->setParameter('now', new \DateTime())
             ->getQuery()
-            ->getResult();
+            ->getResult()
+        ;
     }
 }

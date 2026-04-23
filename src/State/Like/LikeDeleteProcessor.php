@@ -20,7 +20,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 final readonly class LikeDeleteProcessor implements ProcessorInterface
 {
     public function __construct(
-        /** @var ProcessorInterface<Like, void> */
+        /**
+         * @var ProcessorInterface<Like, void>
+         */
         #[Autowire(service: 'api_platform.doctrine.orm.state.remove_processor')]
         private ProcessorInterface $removeProcessor,
         private LikeRepository $likeRepository,
@@ -29,8 +31,8 @@ final readonly class LikeDeleteProcessor implements ProcessorInterface
     }
 
     /**
-     * @param LikeCreateInput      $data
-     * @param Operation|null       $operation
+     * @param LikeCreateInput $data
+     * @param Operation|null $operation
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      */
@@ -54,7 +56,7 @@ final readonly class LikeDeleteProcessor implements ProcessorInterface
             $like,
             $operation,
             $uriVariables,
-            $context
+            $context,
         );
     }
 }

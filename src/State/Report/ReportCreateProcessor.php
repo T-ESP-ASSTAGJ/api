@@ -22,7 +22,9 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 final readonly class ReportCreateProcessor implements ProcessorInterface
 {
     public function __construct(
-        /** @var ProcessorInterface<Report, void> */
+        /**
+         * @var ProcessorInterface<Report, void>
+         */
         #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
         private ProcessorInterface $persistProcessor,
         private EntityManagerInterface $em,
@@ -31,7 +33,7 @@ final readonly class ReportCreateProcessor implements ProcessorInterface
     }
 
     /**
-     * @param ReportCreateInput    $data
+     * @param ReportCreateInput $data
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      */
@@ -45,7 +47,7 @@ final readonly class ReportCreateProcessor implements ProcessorInterface
         $entity = $this->em->getRepository($entityClass)->find($data->entityId);
 
         if (!$entity) {
-            throw new NotFoundHttpException(sprintf('Entity %s with id %d not found.', $entityClass, $data->entityId));
+            throw new NotFoundHttpException(\sprintf('Entity %s with id %d not found.', $entityClass, $data->entityId));
         }
 
         $user = $this->security->getUser();
@@ -60,7 +62,8 @@ final readonly class ReportCreateProcessor implements ProcessorInterface
             ->setEntityId($data->entityId)
             ->setEntityClass($data->entityClass)
             ->setReason($data->reason)
-            ->setMessage($data->message);
+            ->setMessage($data->message)
+        ;
 
         try {
             $this->persistProcessor->process($report, $operation, $uriVariables, $context);

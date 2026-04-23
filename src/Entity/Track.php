@@ -21,23 +21,23 @@ use Symfony\Component\Serializer\Annotation\Groups;
     shortName: 'Track',
     operations: [
         new Get(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]]
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
         ),
         new GetCollection(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ]]
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ]],
         ),
         new ApiPost(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
             input: TrackInput::class,
-            processor: TrackCreateProcessor::class
+            processor: TrackCreateProcessor::class,
         ),
         new Patch(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
             input: TrackInput::class,
-            processor: TrackUpdateProcessor::class
+            processor: TrackUpdateProcessor::class,
         ),
         new Delete(output: false),
-    ]
+    ],
 )]
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]

@@ -25,7 +25,7 @@ final readonly class ArtistCreateProcessor implements ProcessorInterface
     }
 
     /**
-     * @param ArtistCreateInput    $data
+     * @param ArtistCreateInput $data
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *

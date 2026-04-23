@@ -18,7 +18,7 @@ class ArtistDTOTest extends TestCase
             imageUrl: 'https://example.com/artist.jpg',
             externalUrl: 'https://open.spotify.com/artist/123',
             followers: 1000000,
-            popularity: 90
+            popularity: 90,
         );
 
         $this->assertSame('spotify-artist-123', $artist->id);
@@ -39,7 +39,7 @@ class ArtistDTOTest extends TestCase
             imageUrl: null,
             externalUrl: 'https://open.spotify.com/artist/456',
             followers: 0,
-            popularity: 0
+            popularity: 0,
         );
 
         $this->assertSame('spotify-artist-456', $artist->id);
@@ -60,7 +60,7 @@ class ArtistDTOTest extends TestCase
             imageUrl: null,
             externalUrl: 'https://example.com',
             followers: 100,
-            popularity: 50
+            popularity: 50,
         );
 
         $reflection = new \ReflectionClass($artist);

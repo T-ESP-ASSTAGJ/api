@@ -29,8 +29,8 @@ final readonly class FollowProcessor implements ProcessorInterface
     }
 
     /**
-     * @param null                 $data
-     * @param Operation|null       $operation
+     * @param null $data
+     * @param Operation|null $operation
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      */
@@ -78,9 +78,9 @@ final readonly class FollowProcessor implements ProcessorInterface
             $this->em->flush();
             $this->bus->dispatch(
                 new FollowCreatedMessage(
-                    $currentUser,
-                    $userToFollow,
-                )
+                    $currentUser->getId(),
+                    $userToFollow->getId(),
+                ),
             );
 
             $output->message = 'Successfully followed the user.';

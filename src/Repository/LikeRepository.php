@@ -28,7 +28,7 @@ class LikeRepository extends ServiceEntityRepository
         /** @var LikeableInterface|null $resource */
         $resource = $this->getEntityManager()->find(
             $entityClass,
-            $like->getEntityId()
+            $like->getEntityId(),
         );
 
         return $resource?->getUser();

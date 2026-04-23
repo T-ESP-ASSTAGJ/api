@@ -23,7 +23,7 @@ class ConversationCreateInputTest extends TestCase
         $input = new ConversationCreateInput(
             isGroup: true,
             groupName: 'Test Group',
-            participants: [1, 2, 3]
+            participants: [1, 2, 3],
         );
 
         $this->assertTrue($input->isGroup);
@@ -36,7 +36,7 @@ class ConversationCreateInputTest extends TestCase
         $input = new ConversationCreateInput(
             isGroup: false,
             groupName: null,
-            participants: [1]
+            participants: [1],
         );
 
         $this->assertFalse($input->isGroup);

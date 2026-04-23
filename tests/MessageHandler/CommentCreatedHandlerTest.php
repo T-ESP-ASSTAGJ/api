@@ -8,23 +8,41 @@ use App\Entity\Post;
 use App\Entity\User;
 use App\Message\CommentCreatedMessage;
 use App\MessageHandler\CommentCreatedHandler;
+use App\Repository\PostRepository;
+use App\Repository\UserRepository;
 use App\Service\PushNotificationService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class CommentCreatedHandlerTest extends TestCase
 {
-    /** @var PushNotificationService&MockObject */
+    /**
+     * @var PushNotificationService&MockObject
+     */
     private PushNotificationService $pushNotificationService;
+
+    /**
+     * @var PostRepository&MockObject
+     */
+    private PostRepository $postRepository;
+
+    /**
+     * @var UserRepository&MockObject
+     */
+    private UserRepository $userRepository;
 
     private CommentCreatedHandler $handler;
 
     protected function setUp(): void
     {
         $this->pushNotificationService = $this->createMock(PushNotificationService::class);
+        $this->postRepository = $this->createMock(PostRepository::class);
+        $this->userRepository = $this->createMock(UserRepository::class);
 
         $this->handler = new CommentCreatedHandler(
-            $this->pushNotificationService
+            $this->pushNotificationService,
+            $this->postRepository,
+            $this->userRepository,
         );
     }
 
@@ -35,6 +53,7 @@ class CommentCreatedHandlerTest extends TestCase
         $commenterPic = 'https://example.com/jane.jpg';
 
         $postOwnerId = 99;
+        $postId = 1;
 
         $commenter = $this->createMock(User::class);
         $commenter->method('getId')->willReturn($commenterId);
@@ -47,7 +66,10 @@ class CommentCreatedHandlerTest extends TestCase
         $post = $this->createMock(Post::class);
         $post->method('getUser')->willReturn($postOwner);
 
-        $message = new CommentCreatedMessage($post, $commenter);
+        $this->postRepository->method('find')->with($postId)->willReturn($post);
+        $this->userRepository->method('find')->with($commenterId)->willReturn($commenter);
+
+        $message = new CommentCreatedMessage($postId, $commenterId);
 
         $this->pushNotificationService
             ->expects($this->once())
@@ -59,8 +81,23 @@ class CommentCreatedHandlerTest extends TestCase
                 [
                     'userId' => $commenterId,
                     'profilePicture' => $commenterPic,
-                ]
-            );
+                ],
+            )
+        ;
+
+        ($this->handler)($message);
+    }
+
+    public function testInvokeDoesNothingIfEntityNotFound(): void
+    {
+        $this->postRepository->method('find')->willReturn(null);
+        $this->userRepository->method('find')->willReturn(null);
+
+        $message = new CommentCreatedMessage(1, 1);
+
+        $this->pushNotificationService->expects($this->never())
+            ->method('sendToUser')
+        ;
 
         ($this->handler)($message);
     }

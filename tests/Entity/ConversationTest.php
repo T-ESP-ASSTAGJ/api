@@ -226,7 +226,7 @@ class ConversationTest extends TestCase
 
         $lastMessage = $conversation->getLastMessage();
 
-        $this->assertSame('Vous a partagé une musique', $lastMessage->getMessagePreview());
+        $this->assertSame('Just shared a track', $lastMessage->getMessagePreview());
     }
 
     public function testGetParticipantForUser(): void

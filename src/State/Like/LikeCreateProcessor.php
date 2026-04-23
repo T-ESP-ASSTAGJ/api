@@ -32,8 +32,8 @@ final readonly class LikeCreateProcessor implements ProcessorInterface
     }
 
     /**
-     * @param LikeCreateInput      $data
-     * @param Operation|null       $operation
+     * @param LikeCreateInput $data
+     * @param Operation|null $operation
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      */
@@ -45,7 +45,7 @@ final readonly class LikeCreateProcessor implements ProcessorInterface
         $entityToLike = $this->entityManager->getRepository($entityClass)->find($data->entityId);
 
         if (!$entityToLike) {
-            throw new NotFoundHttpException(sprintf('Likeable Entity %s with id %d not found.', $entityClass, $data->entityId));
+            throw new NotFoundHttpException(\sprintf('Likeable Entity %s with id %d not found.', $entityClass, $data->entityId));
         }
 
         /** @var User $user */
@@ -60,7 +60,8 @@ final readonly class LikeCreateProcessor implements ProcessorInterface
         $like
             ->setEntityClass($data->entityClass)
             ->setEntityId($data->entityId)
-            ->setUser($user);
+            ->setUser($user)
+        ;
 
         $content = null;
 
@@ -75,7 +76,12 @@ final readonly class LikeCreateProcessor implements ProcessorInterface
         try {
             $this->entityManager->persist($like);
             $this->entityManager->flush();
-            $this->bus->dispatch(new LikeCreatedMessage($user, $owner, $like, $content));
+            $this->bus->dispatch(new LikeCreatedMessage(
+                $user->getId(),
+                $owner->getId(),
+                $like->getId(),
+                $content->getId(),
+            ));
         } catch (\Throwable) {
             throw new BadRequestHttpException('You have already liked this entity.');
         }

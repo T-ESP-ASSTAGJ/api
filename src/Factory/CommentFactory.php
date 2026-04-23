@@ -39,8 +39,7 @@ final class CommentFactory extends PersistentObjectFactory
     #[\Override]
     protected function initialize(): static
     {
-        return $this
-            // ->afterInstantiate(function(Comment $comment): void {})
-        ;
+        return $this;
+        // ->afterInstantiate(function(Comment $comment): void {})
     }
 }

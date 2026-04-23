@@ -32,7 +32,7 @@ final readonly class PostCreateProcessor implements ProcessorInterface
     }
 
     /**
-     * @param PostCreateInput      $data
+     * @param PostCreateInput $data
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *

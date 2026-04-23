@@ -18,13 +18,16 @@ class PostRepository extends ServiceEntityRepository
         parent::__construct($registry, Post::class);
     }
 
-    /** @return Post[] */
+    /**
+     * @return Post[]
+     */
     public function getPaginatedPosts(int $offset, int $limit): array
     {
         $queryBuilder = $this->createQueryBuilder('p')
             ->orderBy('p.createdAt', 'DESC')
             ->setFirstResult($offset)
-            ->setMaxResults($limit);
+            ->setMaxResults($limit)
+        ;
 
         return $queryBuilder->getQuery()->getResult();
     }
@@ -41,7 +44,8 @@ class PostRepository extends ServiceEntityRepository
             ->setParameter('followingUserIds', $followingUserIds)
             ->orderBy('p.createdAt', 'DESC')
             ->setFirstResult($offset)
-            ->setMaxResults($limit);
+            ->setMaxResults($limit)
+        ;
 
         return $queryBuilder->getQuery()->getResult();
     }
@@ -55,6 +59,7 @@ class PostRepository extends ServiceEntityRepository
             ->setParameter('count', $count)
             ->setParameter('id', $postId)
             ->getQuery()
-            ->execute();
+            ->execute()
+        ;
     }
 }

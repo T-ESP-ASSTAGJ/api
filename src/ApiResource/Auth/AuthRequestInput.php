@@ -17,9 +17,9 @@ use Symfony\Component\Validator\Constraints as Assert;
             input: AuthRequestInput::class,
             output: AuthRequestOutput::class,
             provider: null,
-            processor: AuthRequestProcessor::class
+            processor: AuthRequestProcessor::class,
         ),
-    ]
+    ],
 )]
 readonly class AuthRequestInput
 {

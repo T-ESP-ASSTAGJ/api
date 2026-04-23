@@ -115,7 +115,7 @@ final readonly class AddParticipantsProcessor implements ProcessorInterface
                 $conversation->addParticipant($participant);
             }
 
-            ++$addedCount;
+            $addedCount++;
         }
 
         if (0 === $addedCount) {
@@ -126,7 +126,7 @@ final readonly class AddParticipantsProcessor implements ProcessorInterface
                     [],
                     $data,
                     'userIds',
-                    null
+                    null,
                 ),
             ]);
             throw new ValidationException($violations);

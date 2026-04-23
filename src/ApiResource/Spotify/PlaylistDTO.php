@@ -14,7 +14,9 @@ readonly class PlaylistDTO
         public int $totalTracks,
         public ?string $imageUrl,
         public string $externalUrl,
-        /** @var array<string> */
+        /**
+         * @var array<string>
+         */
         public array $owner,
     ) {
     }

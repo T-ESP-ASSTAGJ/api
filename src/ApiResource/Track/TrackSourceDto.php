@@ -12,7 +12,7 @@ class TrackSourceDto
     #[Assert\NotBlank]
     #[Assert\Choice(
         choices: ['spotify', 'deezer', 'soundcloud', 'apple_music'],
-        message: 'Invalid platform. Allowed: spotify, deezer, soundcloud, apple_music'
+        message: 'Invalid platform. Allowed: spotify, deezer, soundcloud, apple_music',
     )]
     #[ApiProperty(example: 'spotify')]
     public string $platform;

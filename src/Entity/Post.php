@@ -33,7 +33,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 User::SERIALIZATION_GROUP_READ,
                 self::LIKE_SERIALIZATION_GROUP_READ,
             ]],
-            provider: IsLikedProvider::class
+            provider: IsLikedProvider::class,
         ),
         new GetCollection(
             normalizationContext: ['groups' => [
@@ -41,7 +41,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 User::SERIALIZATION_GROUP_READ,
                 self::LIKE_SERIALIZATION_GROUP_READ,
             ]],
-            provider: IsLikedProvider::class
+            provider: IsLikedProvider::class,
         ),
         new ApiPost(
             normalizationContext: ['groups' => [
@@ -50,7 +50,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 self::LIKE_SERIALIZATION_GROUP_READ,
             ]],
             input: PostCreateInput::class,
-            processor: PostCreateProcessor::class
+            processor: PostCreateProcessor::class,
         ),
         new Put(
             normalizationContext: ['groups' => [
@@ -61,7 +61,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new Delete(
             security: 'object.getUser() == user',
-            output: false
+            output: false,
         ),
         new Patch(
             uriTemplate: '/posts/{id}/view',
@@ -76,7 +76,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
             name: 'increment_view',
             processor: PostViewIncrementProcessor::class,
         ),
-    ]
+    ],
 )]
 #[ApiFilter(SearchFilter::class, properties: ['user' => 'exact'])]
 #[ORM\Entity]

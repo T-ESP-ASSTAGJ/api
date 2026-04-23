@@ -27,7 +27,7 @@ final readonly class PostViewIncrementProcessor implements ProcessorInterface
     }
 
     /**
-     * @param Post                 $data
+     * @param Post $data
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *

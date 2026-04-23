@@ -11,7 +11,7 @@ class ArtistSourceDto
     #[Assert\NotBlank]
     #[Assert\Choice(
         choices: ['spotify', 'deezer', 'soundcloud'],
-        message: 'Invalid platform. Allowed: spotify, deezer, soundcloud'
+        message: 'Invalid platform. Allowed: spotify, deezer, soundcloud',
     )]
     public string $platform;
 

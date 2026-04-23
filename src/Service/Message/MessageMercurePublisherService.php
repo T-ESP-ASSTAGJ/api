@@ -24,12 +24,12 @@ final readonly class MessageMercurePublisherService
         $payload = $this->serializer->serialize(
             new MercureMessageOutput(MercureTypeEnum::Message, $message),
             'json',
-            ['groups' => Message::SERIALIZATION_GROUP_MERCURE]
+            ['groups' => Message::SERIALIZATION_GROUP_MERCURE],
         );
 
         $this->hub->publish(new Update(
             $message->getConversation()->getMercureTopic(),
-            $payload
+            $payload,
         ));
     }
 }

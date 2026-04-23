@@ -24,7 +24,7 @@ final readonly class TrackCreateProcessor implements ProcessorInterface
     }
 
     /**
-     * @param TrackInput           $data
+     * @param TrackInput $data
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *

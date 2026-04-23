@@ -11,8 +11,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class RequestLoggerSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private LoggerInterface $logger)
-    {
+    public function __construct(
+        private LoggerInterface $logger,
+    ) {
     }
 
     public function onKernelResponse(ResponseEvent $event): void
@@ -26,7 +27,7 @@ class RequestLoggerSubscriber implements EventSubscriberInterface
                 'method' => $req->getMethod(),
                 'path' => $req->getPathInfo(),
                 'status' => $res->getStatusCode(),
-            ]
+            ],
         );
     }
 
