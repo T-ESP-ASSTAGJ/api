@@ -61,21 +61,12 @@ final readonly class SearchProvider implements ProviderInterface
             return $this->userRepository->searchByQuery($query, $offset, $limit);
         }
 
-        if (SearchTypeEnum::Tracks === $type) {
-            $posts = $this->postRepository->searchByTrackTitle($query, $offset, $limit);
-            $this->isLikedEnricher->enrich($posts, Post::class);
+        $posts = match ($type) {
+            SearchTypeEnum::Tracks => $this->postRepository->searchByTrackTitle($query, $offset, $limit),
+            SearchTypeEnum::Artists => $this->postRepository->searchByArtistName($query, $offset, $limit),
+            default => $this->postRepository->searchByQuery($query, $offset, $limit),
+        };
 
-            return $posts;
-        }
-
-        if (SearchTypeEnum::Artists === $type) {
-            $posts = $this->postRepository->searchByArtistName($query, $offset, $limit);
-            $this->isLikedEnricher->enrich($posts, Post::class);
-
-            return $posts;
-        }
-
-        $posts = $this->postRepository->searchByQuery($query, $offset, $limit);
         $this->isLikedEnricher->enrich($posts, Post::class);
 
         return $posts;
