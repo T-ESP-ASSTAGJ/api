@@ -9,7 +9,9 @@ use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Search\SearchTypeEnum;
 use App\Entity\Post;
+use App\Repository\ArtistRepository;
 use App\Repository\PostRepository;
+use App\Repository\TrackRepository;
 use App\Repository\UserRepository;
 use App\Service\isLikedEnricher;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -25,6 +27,8 @@ final readonly class SearchProvider implements ProviderInterface
         private Pagination $pagination,
         private PostRepository $postRepository,
         private UserRepository $userRepository,
+        private TrackRepository $trackRepository,
+        private ArtistRepository $artistRepository,
         private isLikedEnricher $isLikedEnricher,
     ) {
     }
@@ -49,21 +53,27 @@ final readonly class SearchProvider implements ProviderInterface
         $offset = $this->pagination->getOffset($operation, $context);
         $limit = $this->pagination->getLimit($operation, $context);
 
+        return $this->resolveResults($type, $sanitizedQuery, $offset, $limit);
+    }
+
+    /**
+     * @return array<object>
+     */
+    private function resolveResults(SearchTypeEnum $type, string $query, int $offset, int $limit): array
+    {
         if (SearchTypeEnum::Users === $type) {
-            return $this->userRepository->searchByQuery($sanitizedQuery, $offset, $limit);
+            return $this->userRepository->searchByQuery($query, $offset, $limit);
         }
 
         if (SearchTypeEnum::Tracks === $type) {
-            // TODO: implement track search
-            return [];
+            return $this->trackRepository->searchByQuery($query, $offset, $limit);
         }
 
         if (SearchTypeEnum::Artists === $type) {
-            // TODO: implement artist search
-            return [];
+            return $this->artistRepository->searchByQuery($query, $offset, $limit);
         }
 
-        $posts = $this->postRepository->searchByQuery($sanitizedQuery, $offset, $limit);
+        $posts = $this->postRepository->searchByQuery($query, $offset, $limit);
         $this->isLikedEnricher->enrich($posts, Post::class);
 
         return $posts;
