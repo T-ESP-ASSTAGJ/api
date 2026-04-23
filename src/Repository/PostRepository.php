@@ -57,6 +57,34 @@ class PostRepository extends ServiceEntityRepository
         return $this->buildSearchQuery('caption', $query, $offset, $limit, 'createdAt', 'DESC')->getResult();
     }
 
+    /** @return Post[] */
+    public function searchByTrackTitle(string $query, int $offset, int $limit): array
+    {
+        return $this->createQueryBuilder('p')
+            ->join('p.track', 't')
+            ->where('t.title LIKE :query')
+            ->setParameter('query', '%'.$query.'%')
+            ->orderBy('p.createdAt', 'DESC')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /** @return Post[] */
+    public function searchByArtistName(string $query, int $offset, int $limit): array
+    {
+        return $this->createQueryBuilder('p')
+            ->join('p.track', 't')
+            ->where('t.artistName LIKE :query')
+            ->setParameter('query', '%'.$query.'%')
+            ->orderBy('p.createdAt', 'DESC')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function updateViewsCount(int $postId, int $count): void
     {
         $this->createQueryBuilder('p')

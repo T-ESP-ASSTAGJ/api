@@ -5,11 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\State\Search;
 
 use ApiPlatform\Metadata\GetCollection;
-use App\Entity\Artist;
 use App\Entity\Post;
-use App\Entity\Track;
 use App\Entity\User;
-use App\Factory\ArtistFactory;
 use App\Factory\PostFactory;
 use App\Factory\TrackFactory;
 use App\Factory\UserFactory;
@@ -31,7 +28,7 @@ class SearchProviderTest extends KernelTestCase
         $this->provider = self::getContainer()->get(SearchProvider::class);
         $this->operation = new GetCollection(uriTemplate: '/search');
     }
-// test with query and type posts
+
     public function testSearchPostsByQuery(): void
     {
         UserFactory::createOne();
@@ -103,34 +100,22 @@ class SearchProviderTest extends KernelTestCase
 
     public function testSearchTracksByTitle(): void
     {
-        TrackFactory::createOne(['title' => 'bohemian rhapsody', 'artistName' => 'queen']);
-        TrackFactory::createOne(['title' => 'hotel california', 'artistName' => 'eagles']);
+        UserFactory::createOne();
+        PostFactory::createOne(['track' => TrackFactory::createOne(['title' => 'bohemian rhapsody'])]);
+        PostFactory::createOne(['track' => TrackFactory::createOne(['title' => 'hotel california'])]);
 
         $results = $this->provider->provide($this->operation, [], [
             'filters' => ['query' => 'bohemian', 'type' => 'tracks'],
         ]);
 
         $this->assertCount(1, $results);
-        $this->assertInstanceOf(Track::class, $results[0]);
-    }
-
-    public function testSearchTracksByArtistName(): void
-    {
-        TrackFactory::createOne(['title' => 'bohemian rhapsody', 'artistName' => 'queen']);
-        TrackFactory::createOne(['title' => 'somebody to love', 'artistName' => 'queen']);
-        TrackFactory::createOne(['title' => 'hotel california', 'artistName' => 'eagles']);
-
-        $results = $this->provider->provide($this->operation, [], [
-            'filters' => ['query' => 'queen', 'type' => 'tracks'],
-        ]);
-
-        $this->assertCount(2, $results);
-        $this->assertInstanceOf(Track::class, $results[0]);
+        $this->assertInstanceOf(Post::class, $results[0]);
     }
 
     public function testSearchTracksReturnsEmptyWhenNoMatch(): void
     {
-        TrackFactory::createOne(['title' => 'Bohemian Rhapsody', 'artistName' => 'Queen']);
+        UserFactory::createOne();
+        PostFactory::createOne(['track' => TrackFactory::createOne(['title' => 'bohemian rhapsody'])]);
 
         $results = $this->provider->provide($this->operation, [], [
             'filters' => ['query' => 'xyzabc123', 'type' => 'tracks'],
@@ -141,21 +126,23 @@ class SearchProviderTest extends KernelTestCase
 
     public function testSearchArtistsByName(): void
     {
-        ArtistFactory::createOne(['name' => 'pink floyd']);
-        ArtistFactory::createOne(['name' => 'pink panther']);
-        ArtistFactory::createOne(['name' => 'radiohead']);
+        UserFactory::createOne();
+        PostFactory::createOne(['track' => TrackFactory::createOne(['artistName' => 'pink floyd'])]);
+        PostFactory::createOne(['track' => TrackFactory::createOne(['artistName' => 'pink panther'])]);
+        PostFactory::createOne(['track' => TrackFactory::createOne(['artistName' => 'radiohead'])]);
 
         $results = $this->provider->provide($this->operation, [], [
             'filters' => ['query' => 'pink', 'type' => 'artists'],
         ]);
 
         $this->assertCount(2, $results);
-        $this->assertInstanceOf(Artist::class, $results[0]);
+        $this->assertInstanceOf(Post::class, $results[0]);
     }
 
     public function testSearchArtistsReturnsEmptyWhenNoMatch(): void
     {
-        ArtistFactory::createOne(['name' => 'Pink Floyd']);
+        UserFactory::createOne();
+        PostFactory::createOne(['track' => TrackFactory::createOne(['artistName' => 'pink floyd'])]);
 
         $results = $this->provider->provide($this->operation, [], [
             'filters' => ['query' => 'xyzabc123', 'type' => 'artists'],

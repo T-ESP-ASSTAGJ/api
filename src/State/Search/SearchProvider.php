@@ -9,9 +9,7 @@ use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Search\SearchTypeEnum;
 use App\Entity\Post;
-use App\Repository\ArtistRepository;
 use App\Repository\PostRepository;
-use App\Repository\TrackRepository;
 use App\Repository\UserRepository;
 use App\Service\isLikedEnricher;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -27,8 +25,6 @@ final readonly class SearchProvider implements ProviderInterface
         private Pagination $pagination,
         private PostRepository $postRepository,
         private UserRepository $userRepository,
-        private TrackRepository $trackRepository,
-        private ArtistRepository $artistRepository,
         private isLikedEnricher $isLikedEnricher,
     ) {
     }
@@ -66,11 +62,17 @@ final readonly class SearchProvider implements ProviderInterface
         }
 
         if (SearchTypeEnum::Tracks === $type) {
-            return $this->trackRepository->searchByQuery($query, $offset, $limit);
+            $posts = $this->postRepository->searchByTrackTitle($query, $offset, $limit);
+            $this->isLikedEnricher->enrich($posts, Post::class);
+
+            return $posts;
         }
 
         if (SearchTypeEnum::Artists === $type) {
-            return $this->artistRepository->searchByQuery($query, $offset, $limit);
+            $posts = $this->postRepository->searchByArtistName($query, $offset, $limit);
+            $this->isLikedEnricher->enrich($posts, Post::class);
+
+            return $posts;
         }
 
         $posts = $this->postRepository->searchByQuery($query, $offset, $limit);
