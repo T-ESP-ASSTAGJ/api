@@ -14,11 +14,16 @@ use PHPUnit\Framework\TestCase;
 
 class PersistPostViewsMessageHandlerTest extends TestCase
 {
-    /** @var EntityManagerInterface&MockObject */
+    /**
+     * @var EntityManagerInterface&MockObject
+     */
     private EntityManagerInterface $entityManager;
 
     private PersistPostViewsMessageHandler $handler;
-    /** @var PostViewsPersistenceServiceInterface&MockObject */
+
+    /**
+     * @var PostViewsPersistenceServiceInterface&MockObject
+     */
     private PostViewsPersistenceServiceInterface $postViewsPersistenceService;
 
     protected function setUp(): void
@@ -29,7 +34,7 @@ class PersistPostViewsMessageHandlerTest extends TestCase
 
         $this->handler = new PersistPostViewsMessageHandler(
             $this->entityManager,
-            $this->postViewsPersistenceService
+            $this->postViewsPersistenceService,
         );
     }
 
@@ -45,12 +50,14 @@ class PersistPostViewsMessageHandlerTest extends TestCase
             ->expects($this->once())
             ->method('find')
             ->with(Post::class, $postId)
-            ->willReturn($post);
+            ->willReturn($post)
+        ;
 
         $this->postViewsPersistenceService
             ->expects($this->once())
             ->method('persistViews')
-            ->with($postId);
+            ->with($postId)
+        ;
 
         ($this->handler)($message);
     }
@@ -64,11 +71,13 @@ class PersistPostViewsMessageHandlerTest extends TestCase
             ->expects($this->once())
             ->method('find')
             ->with(Post::class, $postId)
-            ->willReturn(null);
+            ->willReturn(null)
+        ;
 
         $this->postViewsPersistenceService
             ->expects($this->never())
-            ->method('persistViews');
+            ->method('persistViews')
+        ;
 
         ($this->handler)($message);
     }

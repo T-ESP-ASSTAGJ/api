@@ -34,15 +34,15 @@ final readonly class ConversationCreateProcessor implements ProcessorInterface
 
     /**
      * @param ConversationCreateInput $data
-     * @param array<string, mixed>    $uriVariables
-     * @param array<string, mixed>    $context
+     * @param array<string, mixed> $uriVariables
+     * @param array<string, mixed> $context
      */
     public function process($data, ?Operation $operation = null, array $uriVariables = [], array $context = []): Conversation
     {
         /** @var User $currentUser */
         $currentUser = $this->security->getUser();
 
-        if (!$data->isGroup && 1 !== count($data->participants)) {
+        if (!$data->isGroup && 1 !== \count($data->participants)) {
             throw new BadRequestException('A private conversation must have exactly one other participant.');
         }
 

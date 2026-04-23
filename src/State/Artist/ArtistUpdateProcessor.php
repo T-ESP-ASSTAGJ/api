@@ -26,7 +26,7 @@ final readonly class ArtistUpdateProcessor implements ProcessorInterface
     }
 
     /**
-     * @param ArtistUpdateInput    $data
+     * @param ArtistUpdateInput $data
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *

@@ -27,11 +27,13 @@ class MessageRepository extends ServiceEntityRepository
             ->where('m.conversation = :conversation')
             ->andWhere('m.author != :user')
             ->setParameter('conversation', $conversation)
-            ->setParameter('user', $user);
+            ->setParameter('user', $user)
+        ;
 
         if ($lastReadAt) {
             $qb->andWhere('m.createdAt > :lastReadAt')
-                ->setParameter('lastReadAt', $lastReadAt);
+                ->setParameter('lastReadAt', $lastReadAt)
+            ;
         }
 
         return (int) $qb->getQuery()->getSingleScalarResult();

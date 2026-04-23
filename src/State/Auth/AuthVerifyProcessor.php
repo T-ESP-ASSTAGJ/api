@@ -31,9 +31,9 @@ readonly class AuthVerifyProcessor implements ProcessorInterface
 
     /**
      * @param AuthVerificationInput $data
-     * @param Operation|null        $operation
-     * @param array<string, mixed>  $uriVariables
-     * @param array<string, mixed>  $context
+     * @param Operation|null $operation
+     * @param array<string, mixed> $uriVariables
+     * @param array<string, mixed> $context
      */
     public function process(mixed $data, $operation = null, array $uriVariables = [], array $context = []): AuthVerificationOutput
     {
@@ -43,7 +43,8 @@ readonly class AuthVerifyProcessor implements ProcessorInterface
 
         $verificationUser = $this->entityManager
             ->getRepository(VerificationUser::class)
-            ->findOneBy(['email' => $data->email]);
+            ->findOneBy(['email' => $data->email])
+        ;
 
         if (
             !$verificationUser

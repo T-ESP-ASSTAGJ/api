@@ -7,23 +7,33 @@ namespace App\Tests\MessageHandler;
 use App\Entity\User;
 use App\Message\FollowCreatedMessage;
 use App\MessageHandler\FollowCreatedHandler;
+use App\Repository\UserRepository;
 use App\Service\PushNotificationService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class FollowCreatedHandlerTest extends TestCase
 {
-    /** @var PushNotificationService&MockObject */
+    /**
+     * @var PushNotificationService&MockObject
+     */
     private PushNotificationService $pushNotificationService;
+
+    /**
+     * @var UserRepository&MockObject
+     */
+    private UserRepository $userRepository;
 
     private FollowCreatedHandler $handler;
 
     protected function setUp(): void
     {
         $this->pushNotificationService = $this->createMock(PushNotificationService::class);
+        $this->userRepository = $this->createMock(UserRepository::class);
 
         $this->handler = new FollowCreatedHandler(
-            $this->pushNotificationService
+            $this->pushNotificationService,
+            $this->userRepository,
         );
     }
 
@@ -43,7 +53,12 @@ class FollowCreatedHandlerTest extends TestCase
         $currentUser->method('getUsername')->willReturn($followerUsername);
         $currentUser->method('getProfilePicture')->willReturn($followerPic);
 
-        $message = new FollowCreatedMessage($currentUser, $userToFollow);
+        $this->userRepository->method('find')->willReturnMap([
+            [$followedId, null, null, $userToFollow],
+            [$followerId, null, null, $currentUser],
+        ]);
+
+        $message = new FollowCreatedMessage($followerId, $followedId);
 
         $this->pushNotificationService
             ->expects($this->once())
@@ -51,12 +66,26 @@ class FollowCreatedHandlerTest extends TestCase
             ->with(
                 $followedId,
                 $followerUsername,
-                'just followed you! 🤤',
+                'just followed you',
                 [
                     'userId' => $followerId,
                     'profilePicture' => $followerPic,
-                ]
-            );
+                ],
+            )
+        ;
+
+        ($this->handler)($message);
+    }
+
+    public function testInvokeDoesNothingIfUserNotFound(): void
+    {
+        $this->userRepository->method('find')->willReturn(null);
+
+        $message = new FollowCreatedMessage(1, 42);
+
+        $this->pushNotificationService->expects($this->never())
+            ->method('sendToUser')
+        ;
 
         ($this->handler)($message);
     }

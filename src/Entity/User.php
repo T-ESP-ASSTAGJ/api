@@ -69,11 +69,11 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Patch(
             uriTemplate: '/users/me',
             input: UserPatchInput::class,
-            processor: UserPatchProcessor::class
+            processor: UserPatchProcessor::class,
         ),
         new Delete(
             security: "is_granted('ROLE_USER') and object == user",
-            output: false
+            output: false,
         ),
     ],
 )]
@@ -184,18 +184,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     private ?string $deviceToken = null;
 
     // List of users THIS USER follows
-    /** @var Collection<int, Follow> */
+    /**
+     * @var Collection<int, Follow>
+     */
     #[Ignore]
     #[ORM\OneToMany(targetEntity: Follow::class, mappedBy: 'follower')]
     private Collection $following;
 
     // List of users WHO FOLLOW this user
-    /** @var Collection<int, Follow> */
+    /**
+     * @var Collection<int, Follow>
+     */
     #[Ignore]
     #[ORM\OneToMany(targetEntity: Follow::class, mappedBy: 'followedUser')]
     private Collection $followers;
 
-    /** @var Collection<int, Like> */
+    /**
+     * @var Collection<int, Like>
+     */
     #[ORM\OneToMany(targetEntity: Like::class, mappedBy: 'user')]
     private Collection $likes;
 
@@ -362,14 +368,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
         return $this->followers->count();
     }
 
-    /** @return Collection<int, Follow> */
+    /**
+     * @return Collection<int, Follow>
+     */
     #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
     public function getFollowing(): Collection
     {
         return $this->following;
     }
 
-    /** @return Collection<int, Follow> */
+    /**
+     * @return Collection<int, Follow>
+     */
     #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
     public function getFollowers(): Collection
     {

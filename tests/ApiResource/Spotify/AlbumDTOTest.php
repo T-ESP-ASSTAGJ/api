@@ -21,7 +21,7 @@ class AlbumDTOTest extends TestCase
             imageUrl: 'https://example.com/album.jpg',
             externalUrl: 'https://open.spotify.com/album/123',
             genres: ['pop', 'rock'],
-            popularity: 85
+            popularity: 85,
         );
 
         $this->assertSame('spotify-album-123', $album->id);
@@ -48,7 +48,7 @@ class AlbumDTOTest extends TestCase
             imageUrl: null,
             externalUrl: 'https://open.spotify.com/album/456',
             genres: [],
-            popularity: 0
+            popularity: 0,
         );
 
         $this->assertSame('spotify-album-456', $album->id);
@@ -75,7 +75,7 @@ class AlbumDTOTest extends TestCase
             imageUrl: null,
             externalUrl: 'https://example.com',
             genres: [],
-            popularity: 50
+            popularity: 50,
         );
 
         $reflection = new \ReflectionClass($album);

@@ -19,7 +19,7 @@ class PlaylistDTOTest extends TestCase
             totalTracks: 50,
             imageUrl: 'https://example.com/playlist.jpg',
             externalUrl: 'https://open.spotify.com/playlist/123',
-            owner: ['id' => 'user123', 'name' => 'Test User']
+            owner: ['id' => 'user123', 'name' => 'Test User'],
         );
 
         $this->assertSame('spotify-playlist-123', $playlist->id);
@@ -42,7 +42,7 @@ class PlaylistDTOTest extends TestCase
             totalTracks: 0,
             imageUrl: null,
             externalUrl: 'https://open.spotify.com/playlist/456',
-            owner: []
+            owner: [],
         );
 
         $this->assertSame('spotify-playlist-456', $playlist->id);
@@ -65,7 +65,7 @@ class PlaylistDTOTest extends TestCase
             totalTracks: 1,
             imageUrl: null,
             externalUrl: 'https://example.com',
-            owner: []
+            owner: [],
         );
 
         $reflection = new \ReflectionClass($playlist);

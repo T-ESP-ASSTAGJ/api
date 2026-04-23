@@ -50,7 +50,7 @@ final readonly class ConversationListProvider implements ProviderInterface
             $unreadCount = $this->messageRepository->countUnreadMessages(
                 $conversation,
                 $user,
-                $lastReadAt
+                $lastReadAt,
             );
 
             $conversation->setUnreadCount($unreadCount);

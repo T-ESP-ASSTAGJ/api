@@ -32,12 +32,12 @@ readonly class SpotifyAuthService
 
     public function getRedirectUri(string $state): string
     {
-        return self::SPOTIFY_AUTH_URL.
-            '?response_type=code'.
-            '&client_id='.$this->clientId.
-            '&scope=user-read-email user-read-private playlist-read-private'.
-            '&redirect_uri='.$this->redirectUri.
-            '&state='.urlencode($state);
+        return self::SPOTIFY_AUTH_URL
+            .'?response_type=code'
+            .'&client_id='.$this->clientId
+            .'&scope=user-read-email user-read-private playlist-read-private'
+            .'&redirect_uri='.$this->redirectUri
+            .'&state='.urlencode($state);
     }
 
     public function exchangeCodeForToken(string $code, User $user): Token
@@ -72,7 +72,8 @@ readonly class SpotifyAuthService
                 ->setAccessToken($tokenData['access_token'])
                 ->setRefreshToken($tokenData['refresh_token'] ?? null)
                 ->setExpiresAt(new \DateTime('+'.($tokenData['expires_in'] ?? 3600).' seconds'))
-                ->setScopes(explode(' ', $tokenData['scope'] ?? ''));
+                ->setScopes(explode(' ', $tokenData['scope'] ?? ''))
+            ;
 
             // Get user profile to set platform user ID
             $userProfile = $this->getUserProfile($tokenData['access_token']);
@@ -108,7 +109,8 @@ readonly class SpotifyAuthService
             $tokenData = $response->toArray();
 
             $token->setAccessToken($tokenData['access_token'])
-                ->setExpiresAt(new \DateTime('+'.($tokenData['expires_in'] ?? 3600).' seconds'));
+                ->setExpiresAt(new \DateTime('+'.($tokenData['expires_in'] ?? 3600).' seconds'))
+            ;
 
             if (isset($tokenData['refresh_token'])) {
                 $token->setRefreshToken($tokenData['refresh_token']);
@@ -127,7 +129,20 @@ readonly class SpotifyAuthService
         }
     }
 
-    /** @return array<string> */
+    public function validateToken(string $accessToken): bool
+    {
+        try {
+            $this->getUserProfile($accessToken);
+
+            return true;
+        } catch (\Exception) {
+            return false;
+        }
+    }
+
+    /**
+     * @return array<string>
+     */
     private function getUserProfile(string $accessToken): array
     {
         try {
@@ -140,17 +155,6 @@ readonly class SpotifyAuthService
             return $response->toArray();
         } catch (\Throwable $e) {
             throw new \RuntimeException('Failed to get user profile: '.$e->getMessage());
-        }
-    }
-
-    public function validateToken(string $accessToken): bool
-    {
-        try {
-            $this->getUserProfile($accessToken);
-
-            return true;
-        } catch (\Exception) {
-            return false;
         }
     }
 }

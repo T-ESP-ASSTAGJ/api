@@ -4,17 +4,13 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Entity\Like;
-use App\Entity\Post;
-use App\Entity\User;
-
 readonly class LikeCreatedMessage
 {
     public function __construct(
-        public User $user,
-        public User $owner,
-        public Like $like,
-        public Post $content,
+        public int $userId,
+        public int $ownerId,
+        public int $likeId,
+        public int $postId,
     ) {
     }
 }

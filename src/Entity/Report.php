@@ -30,11 +30,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new GetCollection(
             uriTemplate: '/report-reasons',
-            output: ReportReasonOutput::class,
             normalizationContext: ['groups' => [ReportReasonOutput::SERIALIZATION_GROUP_READ]],
+            output: ReportReasonOutput::class,
             provider: ReportReasonsProvider::class,
         ),
-    ]
+    ],
 )]
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]

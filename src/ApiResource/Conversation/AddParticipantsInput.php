@@ -20,7 +20,7 @@ readonly class AddParticipantsInput
             openapiContext: [
                 'type' => 'array',
                 'items' => ['type' => 'integer'],
-            ]
+            ],
         )]
         public array $userIds = [],
     ) {

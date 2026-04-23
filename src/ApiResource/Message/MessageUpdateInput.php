@@ -16,7 +16,7 @@ class MessageUpdateInput
 {
     #[ApiProperty(
         description: 'The new content of the message',
-        example: 'Hello, this is my updated message!'
+        example: 'Hello, this is my updated message!',
     )]
     #[Groups([Message::SERIALIZATION_GROUP_UPDATE])]
     #[Assert\Length(max: 1000)]

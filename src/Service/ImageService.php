@@ -59,7 +59,7 @@ final readonly class ImageService
         }
 
         $allowedExtensions = ['jpg', 'png', 'gif', 'webp'];
-        if (!in_array($extension, $allowedExtensions, true)) {
+        if (!\in_array($extension, $allowedExtensions, true)) {
             throw new BadRequestHttpException('Unsupported image format. Allowed: '.implode(', ', $allowedExtensions));
         }
 
@@ -71,7 +71,7 @@ final readonly class ImageService
 
         // Validate actual file size (after decoding)
         $maxSize = 5 * 1024 * 1024; // 5MB
-        if (strlen($imageData) > $maxSize) {
+        if (\strlen($imageData) > $maxSize) {
             throw new BadRequestHttpException('Image exceeds maximum size of 5MB');
         }
 
@@ -83,11 +83,11 @@ final readonly class ImageService
 
         // Generate unique filename using Symfony's UUID
         $filename = Uuid::v4()->toRfc4122().'.'.$extension;
-        $uploadPath = sprintf('%s/public/uploads/%s', $this->projectDir, $directory);
+        $uploadPath = \sprintf('%s/public/uploads/%s', $this->projectDir, $directory);
 
         // Ensure directory exists using Symfony Filesystem
         if (!$this->filesystem->exists($uploadPath)) {
-            $this->filesystem->mkdir($uploadPath, 0755);
+            $this->filesystem->mkdir($uploadPath, 0o755);
         }
 
         // Save file using Symfony Filesystem
@@ -95,7 +95,7 @@ final readonly class ImageService
         $this->filesystem->dumpFile($filePath, $imageData);
 
         // Return public URL
-        return sprintf('/uploads/%s/%s', $directory, $filename);
+        return \sprintf('/uploads/%s/%s', $directory, $filename);
     }
 
     public function deleteImage(?string $imageUrl): void

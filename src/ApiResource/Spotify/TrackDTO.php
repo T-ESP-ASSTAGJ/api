@@ -9,7 +9,9 @@ readonly class TrackDTO
     public function __construct(
         public string $id,
         public string $name,
-        /** @var array<string> */
+        /**
+         * @var array<string>
+         */
         public array $artists,
         public ?string $albumId,
         public ?string $albumName,

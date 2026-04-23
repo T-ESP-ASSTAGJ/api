@@ -11,6 +11,7 @@ use App\Entity\Conversation;
 use App\Entity\Enum\MessageTypeEnum;
 use App\Entity\Message;
 use App\Entity\User;
+use App\Message\MessageCreatedMessage;
 use App\Service\ImageService;
 use App\Service\Message\MessageMercurePublisherService;
 use App\Service\Track\TrackService;
@@ -18,6 +19,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * @implements ProcessorInterface<MessageCreateInput, Message>
@@ -30,11 +32,12 @@ final readonly class MessageProcessor implements ProcessorInterface
         private TrackService $trackService,
         private MessageMercurePublisherService $mercurePublisher,
         private ImageService $imageService,
+        private MessageBusInterface $bus,
     ) {
     }
 
     /**
-     * @param MessageCreateInput   $data
+     * @param MessageCreateInput $data
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *
@@ -53,7 +56,8 @@ final readonly class MessageProcessor implements ProcessorInterface
         }
 
         $conversation = $this->entityManager->getRepository(Conversation::class)
-            ->findOneBy(['id' => $data->conversationId]);
+            ->findOneBy(['id' => $data->conversationId])
+        ;
 
         if (null === $conversation) {
             throw new NotFoundHttpException('Invalid conversation');
@@ -79,6 +83,13 @@ final readonly class MessageProcessor implements ProcessorInterface
         $this->entityManager->flush();
 
         $this->mercurePublisher->publish($message);
+        $this->bus->dispatch(
+            new MessageCreatedMessage(
+                $conversation->getId(),
+                $user->getId(),
+                $message->getId(),
+            ),
+        );
 
         return $message;
     }

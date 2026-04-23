@@ -18,7 +18,7 @@ class UserProfileDTOTest extends TestCase
             country: 'US',
             followers: 500,
             imageUrl: 'https://example.com/user.jpg',
-            product: 'premium'
+            product: 'premium',
         );
 
         $this->assertSame('spotify-user-123', $userProfile->id);
@@ -39,7 +39,7 @@ class UserProfileDTOTest extends TestCase
             country: 'FR',
             followers: 0,
             imageUrl: null,
-            product: 'free'
+            product: 'free',
         );
 
         $this->assertSame('spotify-user-456', $userProfile->id);
@@ -60,7 +60,7 @@ class UserProfileDTOTest extends TestCase
             country: 'US',
             followers: 100,
             imageUrl: null,
-            product: 'premium'
+            product: 'premium',
         );
 
         $reflection = new \ReflectionClass($userProfile);

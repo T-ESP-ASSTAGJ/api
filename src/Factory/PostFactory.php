@@ -50,8 +50,7 @@ final class PostFactory extends PersistentObjectFactory
     #[\Override]
     protected function initialize(): static
     {
-        return $this
-            // ->afterInstantiate(function(Post $post): void {})
-        ;
+        return $this;
+        // ->afterInstantiate(function(Post $post): void {})
     }
 }

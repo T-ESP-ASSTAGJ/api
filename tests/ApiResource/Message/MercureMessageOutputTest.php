@@ -36,8 +36,35 @@ class MercureMessageOutputTest extends TestCase
                 new BackedEnumNormalizer(),
                 $normalizer,
             ],
-            [new JsonEncoder()]
+            [new JsonEncoder()],
         );
+    }
+
+    public function testSerializationMatchesExpectedStructure(): void
+    {
+        $message = $this->createMessageWithDependencies();
+        $output = new MercureMessageOutput(MercureTypeEnum::Message, $message);
+
+        $json = $this->serializer->serialize(
+            $output,
+            'json',
+            ['groups' => [Message::SERIALIZATION_GROUP_MERCURE]],
+        );
+
+        $data = json_decode($json, true, 512, \JSON_THROW_ON_ERROR);
+
+        $this->assertArrayHasKey('type', $data);
+        $this->assertArrayHasKey('message', $data);
+        $this->assertSame(MercureTypeEnum::Message->value, $data['type']);
+
+        $msgData = $data['message'];
+        $this->assertSame(99, $msgData['id']);
+        $this->assertSame('Hello world!', $msgData['content']);
+
+        $this->assertArrayHasKey('author', $msgData);
+        $this->assertSame(42, $msgData['author']['id']);
+        $this->assertSame('sergio', $msgData['author']['username']);
+        $this->assertSame('https://example.com/pic.jpg', $msgData['author']['profilePicture']);
     }
 
     private function createMessageWithDependencies(): Message
@@ -59,32 +86,5 @@ class MercureMessageOutputTest extends TestCase
         $message->setCreatedAt(new \DateTimeImmutable('2024-01-01 12:00:00'));
 
         return $message;
-    }
-
-    public function testSerializationMatchesExpectedStructure(): void
-    {
-        $message = $this->createMessageWithDependencies();
-        $output = new MercureMessageOutput(MercureTypeEnum::Message, $message);
-
-        $json = $this->serializer->serialize(
-            $output,
-            'json',
-            ['groups' => [Message::SERIALIZATION_GROUP_MERCURE]]
-        );
-
-        $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
-
-        $this->assertArrayHasKey('type', $data);
-        $this->assertArrayHasKey('message', $data);
-        $this->assertSame(MercureTypeEnum::Message->value, $data['type']);
-
-        $msgData = $data['message'];
-        $this->assertSame(99, $msgData['id']);
-        $this->assertSame('Hello world!', $msgData['content']);
-
-        $this->assertArrayHasKey('author', $msgData);
-        $this->assertSame(42, $msgData['author']['id']);
-        $this->assertSame('sergio', $msgData['author']['username']);
-        $this->assertSame('https://example.com/pic.jpg', $msgData['author']['profilePicture']);
     }
 }

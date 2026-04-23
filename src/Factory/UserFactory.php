@@ -22,6 +22,17 @@ final class UserFactory extends PersistentObjectFactory
         return User::class;
     }
 
+    public function testUser(): static
+    {
+        return $this->with([
+            'email' => 'test@example.com',
+            'username' => 'testuser',
+            'password' => 'password123',
+            'bio' => 'This is a test user',
+            'isVerified' => true,
+        ]);
+    }
+
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      *
@@ -52,19 +63,7 @@ final class UserFactory extends PersistentObjectFactory
     #[\Override]
     protected function initialize(): static
     {
-        return $this
-            // ->afterInstantiate(function(User $user): void {})
-        ;
-    }
-
-    public function testUser(): static
-    {
-        return $this->with([
-            'email' => 'test@example.com',
-            'username' => 'testuser',
-            'password' => 'password123',
-            'bio' => 'This is a test user',
-            'isVerified' => true,
-        ]);
+        return $this;
+        // ->afterInstantiate(function(User $user): void {})
     }
 }

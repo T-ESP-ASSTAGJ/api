@@ -30,23 +30,23 @@ use Symfony\Component\Serializer\Annotation\Groups;
     shortName: 'Artist',
     operations: [
         new Get(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]]
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
         ),
         new GetCollection(
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ]]
+            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_READ]],
         ),
         new ApiPost(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
             input: ArtistCreateInput::class,
-            processor: ArtistCreateProcessor::class
+            processor: ArtistCreateProcessor::class,
         ),
         new Patch(
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
             input: ArtistUpdateInput::class,
-            processor: ArtistUpdateProcessor::class
+            processor: ArtistUpdateProcessor::class,
         ),
         new Delete(output: false),
-    ]
+    ],
 )]
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]

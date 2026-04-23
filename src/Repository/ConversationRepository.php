@@ -35,7 +35,8 @@ class ConversationRepository extends ServiceEntityRepository
             ->setParameter(':userB', $userB)
             ->setMaxResults(1)
             ->getQuery()
-            ->getOneOrNullResult();
+            ->getOneOrNullResult()
+        ;
     }
 
     /**
@@ -52,6 +53,7 @@ class ConversationRepository extends ServiceEntityRepository
             ->setParameter('user', $user)
             ->orderBy('c.updatedAt', 'DESC')
             ->getQuery()
-            ->getResult();
+            ->getResult()
+        ;
     }
 }

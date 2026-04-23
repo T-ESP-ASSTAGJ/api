@@ -9,12 +9,14 @@ use PHPUnit\Framework\TestCase;
 
 class MockObject
 {
-    /** @phpstan-ignore-next-line -- Property is read via Reflection in tests */
-    private mixed $privateProperty = 'initial_private';
+    public mixed $publicProperty = 'initial_public';
 
     protected mixed $protectedProperty = 'initial_protected';
 
-    public mixed $publicProperty = 'initial_public';
+    /**
+     * @phpstan-ignore-next-line -- Property is read via Reflection in tests
+     */
+    private mixed $privateProperty = 'initial_private';
 }
 
 class ReflectionUtilTest extends TestCase

@@ -19,7 +19,9 @@ readonly class SpotifyService
     ) {
     }
 
-    /** @return PlaylistDTO[] */
+    /**
+     * @return PlaylistDTO[]
+     */
     public function getUserPlaylists(string $accessToken, int $limit = 20): array
     {
         try {
@@ -40,7 +42,9 @@ readonly class SpotifyService
         }
     }
 
-    /** @return TrackDTO[] */
+    /**
+     * @return TrackDTO[]
+     */
     public function searchMusic(string $accessToken, string $query, string $type = 'track', int $limit = 20): array
     {
         try {

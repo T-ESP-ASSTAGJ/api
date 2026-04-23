@@ -74,7 +74,8 @@ final readonly class isLikedEnricher
             ->setParameter('class', $enum->value)
             ->setParameter('ids', $ids)
             ->getQuery()
-            ->getSingleColumnResult();
+            ->getSingleColumnResult()
+        ;
 
         foreach ($likedIds as $id) {
             if (isset($entities[$id])) {

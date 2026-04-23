@@ -25,12 +25,12 @@ final class AzureStorageService
 
         // 2. Determine extension and path
         $extension = $this->extensionFromMime($mimeType);
-        $path = sprintf(
+        $path = \sprintf(
             '%s/%s/%s.%s',
             trim($folder, '/'),
             date('Y-m-d'),
             bin2hex(random_bytes(16)),
-            $extension
+            $extension,
         );
 
         try {

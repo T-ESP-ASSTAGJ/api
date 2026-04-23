@@ -26,16 +26,16 @@ use Symfony\Component\Validator\Constraints as Assert;
             status: 204,
             input: LikeCreateInput::class,
             output: false,
-            processor: LikeCreateProcessor::class
+            processor: LikeCreateProcessor::class,
         ),
         new Post(
             uriTemplate: '/likes/delete',
             status: 204,
             input: LikeCreateInput::class,
             output: false,
-            processor: LikeDeleteProcessor::class
+            processor: LikeDeleteProcessor::class,
         ),
-    ]
+    ],
 )]
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
@@ -138,10 +138,11 @@ class Like implements TimeStampableInterface
         $objectManager = $event->getObjectManager();
         $className = $this->entityClass->value;
 
-        $objectManager->createQuery(sprintf('UPDATE %s e SET e.likesCount = e.likesCount + :diff WHERE e.id = :id', $className))
+        $objectManager->createQuery(\sprintf('UPDATE %s e SET e.likesCount = e.likesCount + :diff WHERE e.id = :id', $className))
             ->setParameter('diff', $diff)
             ->setParameter('id', $this->entityId)
-            ->execute();
+            ->execute()
+        ;
 
         // If entity is currently loaded in memory, refresh it or update the value
         $entity = $objectManager->getUnitOfWork()->tryGetById($this->entityId, $className);

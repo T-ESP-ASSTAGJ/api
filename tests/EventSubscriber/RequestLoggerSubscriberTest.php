@@ -34,7 +34,7 @@ class RequestLoggerSubscriberTest extends TestCase
             $kernel,
             $request,
             HttpKernelInterface::MAIN_REQUEST,
-            $response
+            $response,
         );
 
         $logger->expects($this->once())
@@ -45,8 +45,9 @@ class RequestLoggerSubscriberTest extends TestCase
                     'method' => 'POST',
                     'path' => '/api/test',
                     'status' => 201,
-                ]
-            );
+                ],
+            )
+        ;
 
         $subscriber = new RequestLoggerSubscriber($logger);
         $subscriber->onKernelResponse($event);
