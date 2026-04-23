@@ -30,4 +30,23 @@ trait SearchQueryTrait
             ->setMaxResults($limit)
             ->getQuery();
     }
+
+    /**
+     * Builds a search query across multiple fields joined with OR.
+     *
+     * @param string[] $searchFields Fields to search on
+     * @return \Doctrine\ORM\Query<mixed>
+     */
+    protected function buildMultiFieldSearchQuery(array $searchFields, string $query, int $offset, int $limit, string $orderField, string $direction): \Doctrine\ORM\Query
+    {
+        $conditions = array_map(fn (string $field) => 'e.'.$field.' LIKE :query', $searchFields);
+
+        return $this->createQueryBuilder('e')
+            ->where(implode(' OR ', $conditions))
+            ->setParameter('query', '%'.$query.'%')
+            ->orderBy('e.'.$orderField, $direction)
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+            ->getQuery();
+    }
 }

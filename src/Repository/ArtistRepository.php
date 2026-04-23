@@ -13,6 +13,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ArtistRepository extends ServiceEntityRepository
 {
+    use SearchQueryTrait;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Artist::class);
@@ -21,13 +23,6 @@ class ArtistRepository extends ServiceEntityRepository
     /** @return Artist[] */
     public function searchByQuery(string $query, int $offset, int $limit): array
     {
-        return $this->createQueryBuilder('a')
-            ->where('a.name LIKE :query')
-            ->setParameter('query', '%'.$query.'%')
-            ->orderBy('a.name', 'ASC')
-            ->setFirstResult($offset)
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
+        return $this->buildSearchQuery('name', $query, $offset, $limit, 'name', 'ASC')->getResult();
     }
 }
