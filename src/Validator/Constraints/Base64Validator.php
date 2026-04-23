@@ -21,7 +21,7 @@ class Base64Validator extends ConstraintValidator
             return;
         }
 
-        if (!is_string($value)) {
+        if (!\is_string($value)) {
             throw new UnexpectedValueException($value, 'string');
         }
 
@@ -31,7 +31,8 @@ class Base64Validator extends ConstraintValidator
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode('INVALID_BASE64_ERROR')
-                ->addViolation();
+                ->addViolation()
+            ;
 
             return;
         }
@@ -40,7 +41,8 @@ class Base64Validator extends ConstraintValidator
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode('INVALID_BASE64_ERROR')
-                ->addViolation();
+                ->addViolation()
+            ;
         }
     }
 }

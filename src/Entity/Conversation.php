@@ -112,11 +112,15 @@ class Conversation implements TimeStampableInterface
     ])]
     private ?string $groupName = null;
 
-    /** @var Collection<int, ConversationParticipant> */
+    /**
+     * @var Collection<int, ConversationParticipant>
+     */
     #[ORM\OneToMany(targetEntity: ConversationParticipant::class, mappedBy: 'conversation', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $participants;
 
-    /** @var Collection<int, Message> */
+    /**
+     * @var Collection<int, Message>
+     */
     #[Groups([
         self::SERIALIZATION_GROUP_DETAIL,
     ])]
@@ -160,7 +164,9 @@ class Conversation implements TimeStampableInterface
         return $this;
     }
 
-    /** @return Collection<int, ConversationParticipant> */
+    /**
+     * @return Collection<int, ConversationParticipant>
+     */
     public function getParticipants(): Collection
     {
         return $this->participants;
@@ -187,7 +193,9 @@ class Conversation implements TimeStampableInterface
         return $this;
     }
 
-    /** @return Collection<int, Message> */
+    /**
+     * @return Collection<int, Message>
+     */
     public function getMessages(): Collection
     {
         return $this->messages;
@@ -213,7 +221,7 @@ class Conversation implements TimeStampableInterface
     public function hasUser(User $user): bool
     {
         return $this->participants->exists(
-            fn ($_, ConversationParticipant $p) => $p->getUser() === $user
+            static fn ($_, ConversationParticipant $p) => $p->getUser() === $user,
         );
     }
 
@@ -221,15 +229,17 @@ class Conversation implements TimeStampableInterface
     public function getMemberCount(): int
     {
         return $this->participants->filter(
-            fn (ConversationParticipant $p) => null === $p->getLeftAt()
+            static fn (ConversationParticipant $p) => null === $p->getLeftAt(),
         )->count();
     }
 
-    /** @return Collection<int, ConversationParticipant> */
+    /**
+     * @return Collection<int, ConversationParticipant>
+     */
     public function getActiveParticipants(): Collection
     {
         return $this->participants->filter(
-            fn (ConversationParticipant $p) => null === $p->getLeftAt()
+            static fn (ConversationParticipant $p) => null === $p->getLeftAt(),
         );
     }
 
@@ -247,7 +257,7 @@ class Conversation implements TimeStampableInterface
     public function isAdmin(User $user): bool
     {
         return $this->participants->exists(
-            fn (int $key, ConversationParticipant $p) => $p->getUser() === $user && $p->isAdmin()
+            static fn (int $key, ConversationParticipant $p) => $p->getUser() === $user && $p->isAdmin(),
         );
     }
 
@@ -257,8 +267,9 @@ class Conversation implements TimeStampableInterface
     public function getLastMessage(): ?Message
     {
         $lastMessage = $this->messages
-            ->filter(fn (Message $m) => null !== $m->getId())
-            ->last();
+            ->filter(static fn (Message $m) => null !== $m->getId())
+            ->last()
+        ;
 
         if (!$lastMessage) {
             return null;
@@ -293,7 +304,7 @@ class Conversation implements TimeStampableInterface
     #[SerializedName('participants')]
     public function getFlattenedParticipants(): Collection
     {
-        return $this->participants->map(fn (ConversationParticipant $p) => $p->getUser());
+        return $this->participants->map(static fn (ConversationParticipant $p) => $p->getUser());
     }
 
     #[Groups([

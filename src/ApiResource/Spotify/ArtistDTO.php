@@ -9,7 +9,9 @@ readonly class ArtistDTO
     public function __construct(
         public string $id,
         public string $name,
-        /** @var array<string> */
+        /**
+         * @var array<string>
+         */
         public array $genres,
         public ?string $imageUrl,
         public string $externalUrl,

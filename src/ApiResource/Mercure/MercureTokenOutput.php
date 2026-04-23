@@ -17,17 +17,17 @@ use App\State\Mercure\MercureTokenProvider;
     operations: [
         new Get(
             uriTemplate: '/mercure/token',
-            shortName: 'Mercure',
-            output: MercureTokenOutput::class,
-            provider: MercureTokenProvider::class,
             openapi: new Operation(
-                summary: 'Get Mercure JWT token',
-                description: 'Retrieves a JWT token for subscribing to Mercure real-time updates on user conversations.',
                 responses: [
                     '200' => new Response(description: 'Mercure token retrieved successfully'),
                     '401' => new Response(description: 'Authentication required'),
-                ]
-            )
+                ],
+                summary: 'Get Mercure JWT token',
+                description: 'Retrieves a JWT token for subscribing to Mercure real-time updates on user conversations.',
+            ),
+            shortName: 'Mercure',
+            output: MercureTokenOutput::class,
+            provider: MercureTokenProvider::class,
         ),
     ],
 )]
@@ -35,6 +35,8 @@ class MercureTokenOutput
 {
     public string $token;
 
-    /** @var array<string> */
+    /**
+     * @var array<string>
+     */
     public array $topics = [];
 }

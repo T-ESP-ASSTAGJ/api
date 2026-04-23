@@ -40,8 +40,8 @@ final readonly class MercureTokenProvider implements ProviderInterface
         $conversations = $this->conversationRepository->findByUser($user);
 
         $topics = array_map(
-            fn ($conversation) => '/conversations/'.$conversation->getId(),
-            $conversations
+            static fn ($conversation) => '/conversations/'.$conversation->getId(),
+            $conversations,
         );
 
         $output = new MercureTokenOutput();
@@ -59,17 +59,17 @@ final readonly class MercureTokenProvider implements ProviderInterface
         $header = $this->base64UrlEncode(json_encode([
             'alg' => 'HS256',
             'typ' => 'JWT',
-        ], JSON_THROW_ON_ERROR));
+        ], \JSON_THROW_ON_ERROR));
 
         $payload = $this->base64UrlEncode(json_encode([
             'mercure' => [
                 'subscribe' => $subscribeTopics,
             ],
             'exp' => time() + 3600,
-        ], JSON_THROW_ON_ERROR));
+        ], \JSON_THROW_ON_ERROR));
 
         $signature = $this->base64UrlEncode(
-            hash_hmac('sha256', $header.'.'.$payload, $this->mercureSecret, true)
+            hash_hmac('sha256', $header.'.'.$payload, $this->mercureSecret, true),
         );
 
         return $header.'.'.$payload.'.'.$signature;

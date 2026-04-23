@@ -21,7 +21,7 @@ class TrackDTOTest extends TestCase
             popularity: 85,
             previewUrl: 'https://example.com/preview.mp3',
             imageUrl: 'https://example.com/track.jpg',
-            externalUrl: 'https://open.spotify.com/track/123'
+            externalUrl: 'https://open.spotify.com/track/123',
         );
 
         $this->assertSame('spotify-track-123', $track->id);
@@ -48,7 +48,7 @@ class TrackDTOTest extends TestCase
             popularity: 0,
             previewUrl: null,
             imageUrl: null,
-            externalUrl: 'https://open.spotify.com/track/456'
+            externalUrl: 'https://open.spotify.com/track/456',
         );
 
         $this->assertSame('spotify-track-456', $track->id);
@@ -75,7 +75,7 @@ class TrackDTOTest extends TestCase
             popularity: 50,
             previewUrl: null,
             imageUrl: null,
-            externalUrl: 'https://example.com'
+            externalUrl: 'https://example.com',
         );
 
         $reflection = new \ReflectionClass($track);

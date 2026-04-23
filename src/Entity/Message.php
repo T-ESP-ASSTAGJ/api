@@ -38,7 +38,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
             denormalizationContext: ['groups' => [self::SERIALIZATION_GROUP_UPDATE]],
             input: MessageUpdateInput::class,
-            processor: MessageUpdateProcessor::class
+            processor: MessageUpdateProcessor::class,
         ),
         new Delete(
             output: false,
@@ -207,7 +207,7 @@ class Message implements TimeStampableInterface
     public function getMessagePreview(): string
     {
         if ($this->isMusicMessage()) {
-            return 'Vous a partagé une musique';
+            return 'Just shared a track';
         }
 
         return $this->getContent() ?? '';

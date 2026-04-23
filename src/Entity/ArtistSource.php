@@ -27,8 +27,8 @@ class ArtistSource implements TimeStampableInterface
     #[ORM\Column(name: 'id', type: 'integer')]
     #[Groups([
         Artist::SERIALIZATION_GROUP_READ,
-        Artist::SERIALIZATION_GROUP_DETAIL]
-    )]
+        Artist::SERIALIZATION_GROUP_DETAIL,
+    ])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Artist::class, inversedBy: 'artistSources')]
@@ -45,10 +45,11 @@ class ArtistSource implements TimeStampableInterface
     private string $platform;
 
     #[ORM\Column(name: 'platform_artist_id', type: 'string', length: 255)]
-    #[Groups([
-        Artist::SERIALIZATION_GROUP_READ,
-        Artist::SERIALIZATION_GROUP_DETAIL,
-        Artist::SERIALIZATION_GROUP_WRITE]
+    #[Groups(
+        [
+            Artist::SERIALIZATION_GROUP_READ,
+            Artist::SERIALIZATION_GROUP_DETAIL,
+            Artist::SERIALIZATION_GROUP_WRITE],
     )]
     private string $platformArtistId;
 

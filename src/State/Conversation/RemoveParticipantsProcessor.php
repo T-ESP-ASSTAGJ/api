@@ -31,8 +31,8 @@ final readonly class RemoveParticipantsProcessor implements ProcessorInterface
 
     /**
      * @param RemoveParticipantsInput $data
-     * @param array<string, mixed>    $uriVariables
-     * @param array<string, mixed>    $context
+     * @param array<string, mixed> $uriVariables
+     * @param array<string, mixed> $context
      *
      * @return Conversation|JsonResponse
      */
@@ -94,7 +94,7 @@ final readonly class RemoveParticipantsProcessor implements ProcessorInterface
             }
 
             $participantToRemove->leave();
-            ++$removedCount;
+            $removedCount++;
         }
 
         if (0 === $removedCount) {
@@ -105,7 +105,7 @@ final readonly class RemoveParticipantsProcessor implements ProcessorInterface
                     [],
                     $data,
                     'userIds',
-                    null
+                    null,
                 ),
             ]);
             throw new ValidationException($violations);

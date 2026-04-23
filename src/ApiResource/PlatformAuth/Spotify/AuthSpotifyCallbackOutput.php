@@ -18,19 +18,26 @@ use App\State\Spotify\AuthSpotifyCallbackProvider;
             uriTemplate: '/spotify/callback',
             shortName: 'Spotify',
             output: AuthSpotifyCallbackOutput::class,
-            provider: AuthSpotifyCallbackProvider::class
+            provider: AuthSpotifyCallbackProvider::class,
         ),
     ],
-    provider: null
+    provider: null,
 )]
 class AuthSpotifyCallbackOutput
 {
     public bool $success;
+
     public string $platform = Token::PLATFORM_SPOTIFY;
+
     public ?string $expires_at = null;
+
     public ?string $message = null;
+
     public ?string $error = null;
+
     public ?string $details = null;
+
     public ?string $token = null;
+
     public ?string $refresh_token = null;
 }

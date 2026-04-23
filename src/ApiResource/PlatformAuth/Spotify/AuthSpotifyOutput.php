@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             shortName: 'Spotify',
             input: false,
             output: AuthSpotifyOutput::class,
-            processor: AuthSpotifyProcessor::class
+            processor: AuthSpotifyProcessor::class,
         ),
     ],
 )]

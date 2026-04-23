@@ -40,7 +40,9 @@ class Token
     #[ORM\Column(name: 'platform_user_id', type: 'string', length: 255)]
     private string $platformUserId;
 
-    /** @var array<string> */
+    /**
+     * @var array<string>
+     */
     #[ORM\Column(name: 'scopes', type: 'json')]
     private array $scopes = [];
 
@@ -121,13 +123,17 @@ class Token
         return $this;
     }
 
-    /** @return array<string> */
+    /**
+     * @return array<string>
+     */
     public function getScopes(): array
     {
         return $this->scopes;
     }
 
-    /** @param array<string> $scopes */
+    /**
+     * @param array<string> $scopes
+     */
     public function setScopes(array $scopes): static
     {
         $this->scopes = $scopes;

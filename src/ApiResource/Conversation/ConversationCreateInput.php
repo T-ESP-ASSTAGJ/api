@@ -12,7 +12,6 @@ readonly class ConversationCreateInput
     public function __construct(
         #[Assert\NotNull]
         public bool $isGroup = false,
-
         public ?string $groupName = null,
 
         /**
@@ -24,7 +23,7 @@ readonly class ConversationCreateInput
             openapiContext: [
                 'type' => 'array',
                 'items' => ['type' => 'integer'],
-            ]
+            ],
         )]
         public ?array $participants = null,
     ) {

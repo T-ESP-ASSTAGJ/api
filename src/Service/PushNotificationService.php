@@ -40,12 +40,13 @@ class PushNotificationService
                 ApnsConfig::new()
                     ->withSound('default')
                     ->withBadge(1)
+                    ->withApsField('mutable-content', 1),
             )
         ;
 
         try {
             $this->messaging->send(
-                $message->toToken($token)
+                $message->toToken($token),
             );
 
             $this->logger->info('Push sent', ['userId' => $userId]);

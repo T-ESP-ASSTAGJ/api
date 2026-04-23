@@ -9,13 +9,6 @@ use PHPUnit\Framework\TestCase;
 
 class TimeStampableTraitTest extends TestCase
 {
-    private function createTraitInstance(): object
-    {
-        return new class {
-            use TimeStampableTrait;
-        };
-    }
-
     public function testOnPrePersistSetsBothTimestamps(): void
     {
         $entity = $this->createTraitInstance();
@@ -66,5 +59,12 @@ class TimeStampableTraitTest extends TestCase
         $entity->setUpdatedAt($newUpdate);
         $this->assertSame($customDate, $entity->getCreatedAt());
         $this->assertSame($newUpdate, $entity->getUpdatedAt());
+    }
+
+    private function createTraitInstance(): object
+    {
+        return new class {
+            use TimeStampableTrait;
+        };
     }
 }

@@ -39,8 +39,7 @@ final class ArtistFactory extends PersistentObjectFactory
     #[\Override]
     protected function initialize(): static
     {
-        return $this
-            // ->afterInstantiate(function(User $user): void {})
-        ;
+        return $this;
+        // ->afterInstantiate(function(User $user): void {})
     }
 }

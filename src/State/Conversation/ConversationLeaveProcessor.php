@@ -27,7 +27,7 @@ final readonly class ConversationLeaveProcessor implements ProcessorInterface
     }
 
     /**
-     * @param Conversation         $data
+     * @param Conversation $data
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *
@@ -46,7 +46,7 @@ final readonly class ConversationLeaveProcessor implements ProcessorInterface
         }
 
         $participant = $data->getParticipants()->filter(
-            fn (ConversationParticipant $p) => $p->getUser() === $currentUser && null === $p->getLeftAt()
+            static fn (ConversationParticipant $p) => $p->getUser() === $currentUser && null === $p->getLeftAt(),
         )->first();
 
         if (!$participant) {

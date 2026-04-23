@@ -14,7 +14,7 @@ class UserFollowOutputTest extends TestCase
         $output = new UserFollowOutput(
             id: 1,
             username: 'testuser',
-            profilePicture: 'https://example.com/profile.jpg'
+            profilePicture: 'https://example.com/profile.jpg',
         );
 
         $this->assertSame(1, $output->id);
@@ -27,7 +27,7 @@ class UserFollowOutputTest extends TestCase
         $output = new UserFollowOutput(
             id: null,
             username: null,
-            profilePicture: null
+            profilePicture: null,
         );
 
         $this->assertNull($output->id);
@@ -40,7 +40,7 @@ class UserFollowOutputTest extends TestCase
         $output = new UserFollowOutput(
             id: 1,
             username: 'testuser',
-            profilePicture: null
+            profilePicture: null,
         );
 
         $reflection = new \ReflectionClass($output);

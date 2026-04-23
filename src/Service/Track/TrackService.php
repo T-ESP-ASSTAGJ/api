@@ -30,7 +30,7 @@ final readonly class TrackService
 
             if ($trackCreateInput->coverImage) {
                 $track->setCoverImage(
-                    $this->imageService->saveBase64ToStorage($trackCreateInput->coverImage, 'covers')
+                    $this->imageService->saveBase64ToStorage($trackCreateInput->coverImage, 'covers'),
                 );
             }
 

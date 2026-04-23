@@ -31,7 +31,7 @@ final readonly class MessageUpdateProcessor implements ProcessorInterface
     }
 
     /**
-     * @param MessageUpdateInput   $data
+     * @param MessageUpdateInput $data
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      */

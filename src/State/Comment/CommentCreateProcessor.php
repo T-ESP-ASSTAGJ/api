@@ -32,7 +32,7 @@ final readonly class CommentCreateProcessor implements ProcessorInterface
     }
 
     /**
-     * @param CommentCreateInput   $data
+     * @param CommentCreateInput $data
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *
@@ -76,9 +76,9 @@ final readonly class CommentCreateProcessor implements ProcessorInterface
 
         $this->bus->dispatch(
             new CommentCreatedMessage(
-                $post,
-                $user,
-            )
+                $post->getId(),
+                $user->getId(),
+            ),
         );
 
         return $comment;

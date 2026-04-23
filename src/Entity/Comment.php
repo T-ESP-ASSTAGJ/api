@@ -29,11 +29,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 User::SERIALIZATION_GROUP_READ,
                 self::LIKE_SERIALIZATION_GROUP_READ,
             ]],
-            provider: IsLikedProvider::class
+            provider: IsLikedProvider::class,
         ),
         new Delete(
             security: "is_granted('ROLE_USER') and object.getUser() == user",
-            output: false
+            output: false,
         ),
         new GetCollection(
             uriTemplate: '/posts/{postId}/comments',
@@ -46,7 +46,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     self::LIKE_SERIALIZATION_GROUP_READ,
                 ],
             ],
-            provider: IsLikedProvider::class
+            provider: IsLikedProvider::class,
         ),
         new ApiPost(
             uriTemplate: '/posts/{postId}/comments',
@@ -55,9 +55,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
             security: "is_granted('ROLE_USER')",
             input: CommentCreateInput::class,
             read: false,
-            processor: CommentCreateProcessor::class
+            processor: CommentCreateProcessor::class,
         ),
-    ]
+    ],
 )]
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
@@ -169,7 +169,8 @@ class Comment implements LikeableInterface, TimeStampableInterface
         $event->getObjectManager()->createQuery('UPDATE App\Entity\Post p SET p.commentsCount = p.commentsCount + :diff WHERE p.id = :id')
             ->setParameter('diff', $diff)
             ->setParameter('id', $post->getId())
-            ->execute();
+            ->execute()
+        ;
 
         $post->setCommentsCount($post->getCommentsCount() + $diff);
     }

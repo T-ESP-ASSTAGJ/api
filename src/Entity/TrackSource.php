@@ -94,7 +94,7 @@ class TrackSource implements TimeStampableInterface
     public function setPlatform(string $platform): static
     {
         if (!\in_array($platform, self::PLATFORMS, true)) {
-            throw new \InvalidArgumentException(sprintf('Invalid platform "%s". Allowed platforms: %s', $platform, implode(', ', self::PLATFORMS)));
+            throw new \InvalidArgumentException(\sprintf('Invalid platform "%s". Allowed platforms: %s', $platform, implode(', ', self::PLATFORMS)));
         }
 
         $this->platform = $platform;

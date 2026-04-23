@@ -108,6 +108,6 @@ class MessageTest extends TestCase
         $musicMessage = new Message();
         $musicMessage->setContent('music message');
         $musicMessage->setType(MessageTypeEnum::Music);
-        $this->assertSame('Vous a partagé une musique', $musicMessage->getMessagePreview());
+        $this->assertSame('Just shared a track', $musicMessage->getMessagePreview());
     }
 }

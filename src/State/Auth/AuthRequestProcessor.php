@@ -30,8 +30,8 @@ readonly class AuthRequestProcessor implements ProcessorInterface
     }
 
     /**
-     * @param AuthRequestInput     $data
-     * @param Operation|null       $operation
+     * @param AuthRequestInput $data
+     * @param Operation|null $operation
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *
@@ -44,7 +44,7 @@ readonly class AuthRequestProcessor implements ProcessorInterface
         }
 
         $rawCode = (string) random_int(100000, 999999);
-        $hashedCode = password_hash($rawCode, PASSWORD_DEFAULT);
+        $hashedCode = password_hash($rawCode, \PASSWORD_DEFAULT);
         $expiresAt = new \DateTime('+10 minutes');
 
         /** @var VerificationUser|null $existingVerificationUser */
@@ -68,11 +68,12 @@ readonly class AuthRequestProcessor implements ProcessorInterface
             throw new BadRequestHttpException('Could not process the request.'.$e->getMessage());
         }
 
-        $this->logger->debug(sprintf('Verification code for %s is: %s', $data->email, $rawCode));
+        $this->logger->debug(\sprintf('Verification code for %s is: %s', $data->email, $rawCode));
         $email = (new Email())
                 ->to($data->email)
                 ->subject('Your verification code')
-                ->text('Your verification code is : '.$rawCode);
+                ->text('Your verification code is : '.$rawCode)
+        ;
 
         $this->mailer->send($email);
 

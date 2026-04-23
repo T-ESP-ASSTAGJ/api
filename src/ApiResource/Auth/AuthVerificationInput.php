@@ -32,16 +32,16 @@ use Symfony\Component\Validator\Constraints as Assert;
                                     'code' => '123456',
                                 ],
                             ],
-                        ]
-                    )
-                )
+                        ],
+                    ),
+                ),
             ),
             shortName: 'Auth',
             input: AuthVerificationInput::class,
             output: AuthVerificationOutput::class,
-            processor: AuthVerifyProcessor::class
+            processor: AuthVerifyProcessor::class,
         ),
-    ]
+    ],
 )]
 readonly class AuthVerificationInput
 {
@@ -49,7 +49,6 @@ readonly class AuthVerificationInput
         #[Assert\NotBlank]
         #[Assert\Email]
         public ?string $email = null,
-
         #[Assert\NotBlank]
         #[Assert\Regex('/^[0-9]{6}$/')]
         public ?string $code = null,

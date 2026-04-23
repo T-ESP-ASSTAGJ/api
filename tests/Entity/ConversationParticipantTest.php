@@ -85,7 +85,7 @@ class ConversationParticipantTest extends TestCase
         $this->assertEqualsWithDelta(
             new \DateTimeImmutable(),
             $participant->getLeftAt(),
-            1
+            1,
         );
     }
 
