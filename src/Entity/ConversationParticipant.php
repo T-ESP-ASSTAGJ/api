@@ -36,7 +36,7 @@ class ConversationParticipant
         Conversation::SERIALIZATION_GROUP_READ,
     ])]
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private User $user;
 
     #[ORM\Column(name: 'role', type: 'string', length: 20, options: ['default' => self::ROLE_MEMBER])]

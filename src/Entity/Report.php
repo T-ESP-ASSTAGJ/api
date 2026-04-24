@@ -54,7 +54,7 @@ class Report implements TimeStampableInterface
 
     #[Groups([self::SERIALIZATION_GROUP_READ])]
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private User $user;
 
     #[ORM\Column(name: 'entity_id', type: 'integer', nullable: false)]

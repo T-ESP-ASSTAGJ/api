@@ -54,6 +54,8 @@ final class UserFactory extends PersistentObjectFactory
             'profile_picture' => $faker->picsumStaticRandomUrl(1920, 1080),
             'phone_number' => self::faker()->unique()->phoneNumber(),
             'roles' => [],
+            'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
+            'updatedAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
         ];
     }
 

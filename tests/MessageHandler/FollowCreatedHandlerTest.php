@@ -45,8 +45,12 @@ class FollowCreatedHandlerTest extends TestCase
 
         $followedId = 42;
 
+        $followedParameters = $this->createMock(\App\Entity\UserParameter::class);
+        $followedParameters->method('getNotifNewFollower')->willReturn(true);
+
         $userToFollow = $this->createMock(User::class);
         $userToFollow->method('getId')->willReturn($followedId);
+        $userToFollow->method('getParameters')->willReturn($followedParameters);
 
         $currentUser = $this->createMock(User::class);
         $currentUser->method('getId')->willReturn($followerId);
@@ -72,6 +76,33 @@ class FollowCreatedHandlerTest extends TestCase
                     'profilePicture' => $followerPic,
                 ],
             )
+        ;
+
+        ($this->handler)($message);
+    }
+
+    public function testInvokeDoesNotSendPushNotificationIfDisabled(): void
+    {
+        $followerId = 1;
+        $followedId = 42;
+
+        $followedParameters = $this->createMock(\App\Entity\UserParameter::class);
+        $followedParameters->method('getNotifNewFollower')->willReturn(false);
+
+        $userToFollow = $this->createMock(User::class);
+        $userToFollow->method('getParameters')->willReturn($followedParameters);
+
+        $currentUser = $this->createMock(User::class);
+
+        $this->userRepository->method('find')->willReturnMap([
+            [$followedId, null, null, $userToFollow],
+            [$followerId, null, null, $currentUser],
+        ]);
+
+        $message = new FollowCreatedMessage($followerId, $followedId);
+
+        $this->pushNotificationService->expects($this->never())
+            ->method('sendToUser')
         ;
 
         ($this->handler)($message);

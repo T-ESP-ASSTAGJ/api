@@ -1,0 +1,49 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Factory;
+
+use App\Entity\UserParameter;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
+
+/**
+ * @extends PersistentObjectFactory<UserParameter>
+ *
+ * @codeCoverageIgnore
+ */
+final class UserParameterFactory extends PersistentObjectFactory
+{
+    #[\Override]
+    public static function class(): string
+    {
+        return UserParameter::class;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    #[\Override]
+    protected function defaults(): array
+    {
+        return [
+            'isFollowersPublic' => true,
+            'isFollowingPublic' => true,
+            'isStatsPublic' => true,
+            'isPlaylistPublic' => true,
+            'isLikesPublic' => true,
+            'notifNewFollower' => true,
+            'notifNewLike' => true,
+            'notifNewComment' => true,
+            'notifNewMessage' => true,
+            'createdAt' => new \DateTimeImmutable(),
+            'updatedAt' => new \DateTimeImmutable(),
+        ];
+    }
+
+    #[\Override]
+    protected function initialize(): static
+    {
+        return $this;
+    }
+}
