@@ -67,8 +67,12 @@ class LikeCreatedHandlerTest extends TestCase
         $liker->method('getId')->willReturn($likerId);
         $liker->method('getProfilePicture')->willReturn('pic.jpg');
 
+        $ownerParameters = $this->createMock(\App\Entity\UserParameter::class);
+        $ownerParameters->method('getNotifNewLike')->willReturn(true);
+
         $owner = $this->createMock(User::class);
         $owner->method('getId')->willReturn($ownerId);
+        $owner->method('getParameters')->willReturn($ownerParameters);
 
         $like = $this->createMock(Like::class);
         $like->method('getId')->willReturn($likeId);
@@ -103,6 +107,39 @@ class LikeCreatedHandlerTest extends TestCase
                     'postImage' => 'https://toto.fr/image',
                 ],
             )
+        ;
+
+        ($this->handler)($message);
+    }
+
+    public function testInvokeDoesNotSendPushNotificationIfDisabled(): void
+    {
+        $likerId = 1;
+        $ownerId = 99;
+        $likeId = 777;
+        $postId = 1;
+
+        $liker = $this->createMock(User::class);
+        $ownerParameters = $this->createMock(\App\Entity\UserParameter::class);
+        $ownerParameters->method('getNotifNewLike')->willReturn(false);
+
+        $owner = $this->createMock(User::class);
+        $owner->method('getParameters')->willReturn($ownerParameters);
+
+        $like = $this->createMock(Like::class);
+        $content = $this->createMock(Post::class);
+
+        $this->userRepository->method('find')->willReturnMap([
+            [$likerId, null, null, $liker],
+            [$ownerId, null, null, $owner],
+        ]);
+        $this->likeRepository->method('find')->with($likeId)->willReturn($like);
+        $this->postRepository->method('find')->with($postId)->willReturn($content);
+
+        $message = new LikeCreatedMessage($likerId, $ownerId, $likeId, $postId);
+
+        $this->pushNotificationService->expects($this->never())
+            ->method('sendToUser')
         ;
 
         ($this->handler)($message);

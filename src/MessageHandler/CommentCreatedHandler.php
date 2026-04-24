@@ -11,7 +11,7 @@ use App\Service\PushNotificationService;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-class CommentCreatedHandler
+readonly class CommentCreatedHandler
 {
     public function __construct(
         private PushNotificationService $push,
@@ -24,13 +24,17 @@ class CommentCreatedHandler
     {
         $post = $this->postRepository->find($message->postId);
         $user = $this->userRepository->find($message->userId);
+        $owner = $post?->getUser();
 
-        if (!$post || !$user) {
+        if (!$post
+            || !$user
+            || !$owner->getParameters()?->getNotifNewComment()
+        ) {
             return;
         }
 
         $this->push->sendToUser(
-            userId: $post->getUser()->getId(),
+            userId: $owner->getId(),
             title: $user->getUsername(),
             body: 'just commented your post',
             data: [

@@ -43,11 +43,11 @@ class Follow implements TimeStampableInterface
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'following')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?User $follower = null;  // The user who follows
 
     #[ORM\ManyToOne(inversedBy: 'followers')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?User $followedUser = null;  // The user being followed
 
     public function getId(): ?int

@@ -60,8 +60,12 @@ class CommentCreatedHandlerTest extends TestCase
         $commenter->method('getUsername')->willReturn($commenterUsername);
         $commenter->method('getProfilePicture')->willReturn($commenterPic);
 
+        $postOwnerParameters = $this->createMock(\App\Entity\UserParameter::class);
+        $postOwnerParameters->method('getNotifNewComment')->willReturn(true);
+
         $postOwner = $this->createMock(User::class);
         $postOwner->method('getId')->willReturn($postOwnerId);
+        $postOwner->method('getParameters')->willReturn($postOwnerParameters);
 
         $post = $this->createMock(Post::class);
         $post->method('getUser')->willReturn($postOwner);
@@ -83,6 +87,35 @@ class CommentCreatedHandlerTest extends TestCase
                     'profilePicture' => $commenterPic,
                 ],
             )
+        ;
+
+        ($this->handler)($message);
+    }
+
+    public function testInvokeDoesNotSendPushNotificationIfDisabledByOwner(): void
+    {
+        $commenterId = 10;
+        $postOwnerId = 99;
+        $postId = 1;
+
+        $commenter = $this->createMock(User::class);
+
+        $postOwnerParameters = $this->createMock(\App\Entity\UserParameter::class);
+        $postOwnerParameters->method('getNotifNewComment')->willReturn(false);
+
+        $postOwner = $this->createMock(User::class);
+        $postOwner->method('getParameters')->willReturn($postOwnerParameters);
+
+        $post = $this->createMock(Post::class);
+        $post->method('getUser')->willReturn($postOwner);
+
+        $this->postRepository->method('find')->with($postId)->willReturn($post);
+        $this->userRepository->method('find')->with($commenterId)->willReturn($commenter);
+
+        $message = new CommentCreatedMessage($postId, $commenterId);
+
+        $this->pushNotificationService->expects($this->never())
+            ->method('sendToUser')
         ;
 
         ($this->handler)($message);

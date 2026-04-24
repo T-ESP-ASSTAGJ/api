@@ -38,7 +38,10 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Get(
             uriTemplate: '/users/me',
-            normalizationContext: ['groups' => [self::SERIALIZATION_GROUP_DETAIL]],
+            normalizationContext: ['groups' => [
+                self::SERIALIZATION_GROUP_DETAIL,
+                UserParameter::SERIALIZATION_GROUP_READ,
+            ]],
             provider: UserMeProvider::class,
         ),
         new GetCollection(
@@ -182,6 +185,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
 
     #[ORM\Column(name: 'device_token', type: 'string', length: 255, nullable: true)]
     private ?string $deviceToken = null;
+
+    #[ORM\OneToOne(targetEntity: UserParameter::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
+    #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
+    private ?UserParameter $parameters = null;
 
     // List of users THIS USER follows
     /**
@@ -356,6 +363,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
         return $this;
     }
 
+    public function getParameters(): ?UserParameter
+    {
+        return $this->parameters;
+    }
+
+    public function setParameters(UserParameter $parameters): static
+    {
+        $this->parameters = $parameters;
+
+        return $this;
+    }
+
     #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
     public function getFollowingCount(): int
     {
@@ -392,15 +411,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
         if (empty($this->roles)) {
             $this->roles = ['ROLE_USER'];
         }
-    }
 
-    //    public function __serialize(): array
-    //    {
-    //        $data = (array) $this;
-    //        $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
-    //
-    //        return $data;
-    //    }
+        // Only create parameters if they don't exist yet
+        if (null === $this->parameters) {
+            $parameters = new UserParameter();
+            $parameters->setUser($this);
+            $this->parameters = $parameters;
+        }
+    }
 
     /**
      * @codeCoverageIgnore
