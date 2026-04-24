@@ -23,7 +23,10 @@ class FollowCreatedHandler
         $userToFollow = $this->userRepository->find($message->userToFollowId);
         $currentUser = $this->userRepository->find($message->currentUserId);
 
-        if (!$userToFollow || !$currentUser) {
+        if (!$userToFollow
+            || !$currentUser
+            || !$userToFollow->getParameters()?->getNotifNewFollower()
+        ) {
             return;
         }
 

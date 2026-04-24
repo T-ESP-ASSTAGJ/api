@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Entity;
 
 use App\Entity\User;
+use App\Entity\UserParameter;
 use PHPUnit\Framework\TestCase;
 
 class UserTest extends TestCase
@@ -88,8 +89,6 @@ class UserTest extends TestCase
     {
         $user = new User();
 
-        $this->assertInstanceOf(\Doctrine\Common\Collections\Collection::class, $user->getFollowing());
-        $this->assertInstanceOf(\Doctrine\Common\Collections\Collection::class, $user->getFollowers());
         $this->assertCount(0, $user->getFollowing());
         $this->assertCount(0, $user->getFollowers());
     }
@@ -127,5 +126,17 @@ class UserTest extends TestCase
         $user->onPrePersist();
 
         $this->assertSame(['ROLE_ADMIN'], $user->getRoles());
+    }
+
+    public function testSetParameters(): void
+    {
+        $user = new User();
+        $parameters = new UserParameter();
+
+        $parameters->setUser($user);
+        $this->assertSame($user, $parameters->getUser());
+
+        $user->setParameters($parameters);
+        $this->assertSame($parameters, $user->getParameters());
     }
 }

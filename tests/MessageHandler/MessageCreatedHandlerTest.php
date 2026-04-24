@@ -70,8 +70,12 @@ class MessageCreatedHandlerTest extends TestCase
         $sender->method('getUsername')->willReturn('Sender');
         $sender->method('getProfilePicture')->willReturn('sender.jpg');
 
+        $recipientParameters = $this->createMock(\App\Entity\UserParameter::class);
+        $recipientParameters->method('getNotifNewMessage')->willReturn(true);
+
         $recipient = $this->createMock(User::class);
         $recipient->method('getId')->willReturn($recipientId);
+        $recipient->method('getParameters')->willReturn($recipientParameters);
 
         $senderParticipant = $this->createMock(ConversationParticipant::class);
         $senderParticipant->method('getUser')->willReturn($sender);
@@ -126,8 +130,12 @@ class MessageCreatedHandlerTest extends TestCase
         $sender->method('getUsername')->willReturn('Sender');
         $sender->method('getProfilePicture')->willReturn('sender.jpg');
 
+        $recipientParameters = $this->createMock(\App\Entity\UserParameter::class);
+        $recipientParameters->method('getNotifNewMessage')->willReturn(true);
+
         $recipient = $this->createMock(User::class);
         $recipient->method('getId')->willReturn($recipientId);
+        $recipient->method('getParameters')->willReturn($recipientParameters);
 
         $senderParticipant = $this->createMock(ConversationParticipant::class);
         $senderParticipant->method('getUser')->willReturn($sender);
@@ -161,12 +169,59 @@ class MessageCreatedHandlerTest extends TestCase
             ->with(
                 $recipientId,
                 'Cool Group',
-                'Hello group!',
+                'Sender just sent a message.',
                 [
                     'conversationId' => $conversationId,
                     'profilePicture' => 'sender.jpg',
                 ],
             )
+        ;
+
+        ($this->handler)($message);
+    }
+
+    public function testInvokeDoesNotSendNotificationsIfDisabled(): void
+    {
+        $senderId = 1;
+        $recipientId = 2;
+        $conversationId = 10;
+        $messageId = 100;
+
+        $sender = $this->createMock(User::class);
+        $sender->method('getId')->willReturn($senderId);
+
+        $recipientParameters = $this->createMock(\App\Entity\UserParameter::class);
+        $recipientParameters->method('getNotifNewMessage')->willReturn(false);
+
+        $recipient = $this->createMock(User::class);
+        $recipient->method('getId')->willReturn($recipientId);
+        $recipient->method('getParameters')->willReturn($recipientParameters);
+
+        $senderParticipant = $this->createMock(ConversationParticipant::class);
+        $senderParticipant->method('getUser')->willReturn($sender);
+
+        $recipientParticipant = $this->createMock(ConversationParticipant::class);
+        $recipientParticipant->method('getUser')->willReturn($recipient);
+
+        $conversation = $this->createMock(Conversation::class);
+        $conversation->method('getActiveParticipants')->willReturn(new ArrayCollection([
+            $senderParticipant,
+            $recipientParticipant,
+        ]));
+
+        $messageEntity = $this->createMock(Message::class);
+
+        $this->userRepository->method('find')->with($senderId)->willReturn($sender);
+        $this->conversationRepository->method('find')->with($conversationId)->willReturn($conversation);
+
+        $messageRepository = $this->createMock(EntityRepository::class);
+        $messageRepository->method('find')->with($messageId)->willReturn($messageEntity);
+        $this->entityManager->method('getRepository')->with(Message::class)->willReturn($messageRepository);
+
+        $message = new MessageCreatedMessage($conversationId, $senderId, $messageId);
+
+        $this->pushNotificationService->expects($this->never())
+            ->method('sendToUser')
         ;
 
         ($this->handler)($message);

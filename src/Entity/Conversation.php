@@ -116,6 +116,7 @@ class Conversation implements TimeStampableInterface
      * @var Collection<int, ConversationParticipant>
      */
     #[ORM\OneToMany(targetEntity: ConversationParticipant::class, mappedBy: 'conversation', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private Collection $participants;
 
     /**
@@ -125,6 +126,7 @@ class Conversation implements TimeStampableInterface
         self::SERIALIZATION_GROUP_DETAIL,
     ])]
     #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'conversation', cascade: ['remove'], orphanRemoval: true)]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private Collection $messages;
 
     private ?int $unreadCount = null;

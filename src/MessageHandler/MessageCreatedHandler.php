@@ -38,7 +38,9 @@ class MessageCreatedHandler
 
         foreach ($participants as $participant) {
             $user = $participant->getUser();
-            if ($user->getId() === $sender->getId()) {
+            if ($user->getId() === $sender->getId()
+                || !$user->getParameters()?->getNotifNewMessage()
+            ) {
                 continue;
             }
 
