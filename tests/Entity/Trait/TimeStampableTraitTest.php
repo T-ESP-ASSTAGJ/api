@@ -13,7 +13,7 @@ class TimeStampableTraitTest extends TestCase
     {
         $entity = $this->createTraitInstance();
 
-        $entity->onPrePersist();
+        $entity->initCreatedAt();
 
         $this->assertInstanceOf(\DateTimeImmutable::class, $entity->getCreatedAt());
         $this->assertInstanceOf(\DateTimeImmutable::class, $entity->getUpdatedAt());
@@ -27,7 +27,7 @@ class TimeStampableTraitTest extends TestCase
 
         $entity->setCreatedAt($pastDate);
 
-        $entity->onPrePersist();
+        $entity->initCreatedAt();
 
         $this->assertSame($pastDate, $entity->getCreatedAt());
     }
@@ -39,7 +39,7 @@ class TimeStampableTraitTest extends TestCase
         $pastDate = new \DateTimeImmutable('2020-01-01 10:00:00');
         $entity->setCreatedAt($pastDate);
 
-        $entity->onPreUpdate();
+        $entity->initUpdatedAt();
 
         $this->assertSame($pastDate, $entity->getCreatedAt());
         $this->assertNotSame($pastDate, $entity->getUpdatedAt());

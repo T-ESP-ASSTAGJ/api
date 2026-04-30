@@ -12,10 +12,10 @@ use App\Entity\VerificationUser;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Random\RandomException;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
+use Webmozart\Assert\Assert;
 
 /**
  * @implements ProcessorInterface<AuthRequestInput, AuthRequestOutput>
@@ -39,9 +39,7 @@ readonly class AuthRequestProcessor implements ProcessorInterface
      */
     public function process(mixed $data, $operation = null, array $uriVariables = [], array $context = []): AuthRequestOutput
     {
-        if (!$data instanceof AuthRequestInput) {
-            throw new BadRequestHttpException('Invalid data provided.');
-        }
+        Assert::isInstanceOf($data, AuthRequestInput::class);
 
         $rawCode = (string) random_int(100000, 999999);
         $hashedCode = password_hash($rawCode, \PASSWORD_DEFAULT);
@@ -65,7 +63,8 @@ readonly class AuthRequestProcessor implements ProcessorInterface
 
             $this->entityManager->flush();
         } catch (\Exception $e) {
-            throw new BadRequestHttpException('Could not process the request.'.$e->getMessage());
+            $this->logger->error('Could not process auth request: '.$e->getMessage());
+            throw new \RuntimeException('Could not process the request.', previous: $e);
         }
 
         $this->logger->debug(\sprintf('Verification code for %s is: %s', $data->email, $rawCode));

@@ -47,7 +47,7 @@ trait TimeStampableTrait
     }
 
     #[ORM\PrePersist]
-    public function onPrePersist(): void
+    public function initCreatedAt(): void
     {
         if (isset($this->createdAt)) {
             return;
@@ -63,7 +63,7 @@ trait TimeStampableTrait
     }
 
     #[ORM\PreUpdate]
-    public function onPreUpdate(): void
+    public function initUpdatedAt(): void
     {
         $this->setUpdatedAt(new \DateTimeImmutable());
     }
