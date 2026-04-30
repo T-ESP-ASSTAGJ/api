@@ -52,7 +52,7 @@ class PostRepository extends ServiceEntityRepository
     }
 
     /** @return Post[] */
-    public function searchByQuery(string $query, int $offset, int $limit): array
+    public function findByCaption(string $query, int $offset, int $limit): array
     {
         return $this->buildSearchQuery('caption', $query, $offset, $limit, 'createdAt', 'DESC')->getResult();
     }
