@@ -51,7 +51,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /** @return \App\Entity\User[] */
-    public function searchByQuery(string $query, int $offset, int $limit): array
+    public function findByUsername(string $query, int $offset, int $limit): array
     {
         return $this->buildSearchQuery('username', $query, $offset, $limit, 'username', 'ASC')->getResult();
     }
