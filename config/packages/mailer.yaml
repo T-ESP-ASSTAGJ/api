@@ -9,3 +9,9 @@ when@dev:
         mailer:
             envelope:
                 recipients: ['jamly.pro@gmail.com']
+
+when@test:
+    framework:
+        mailer:
+            dsn: 'null://null'
+            message_bus: false

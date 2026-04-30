@@ -17,6 +17,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Webmozart\Assert\Assert;
 
 /**
  * @implements ProcessorInterface<CommentCreateInput, Comment>
@@ -40,9 +41,8 @@ final readonly class CommentCreateProcessor implements ProcessorInterface
      */
     public function process(mixed $data, ?Operation $operation = null, array $uriVariables = [], array $context = []): mixed
     {
-        if (!$data instanceof CommentCreateInput) {
-            return $data;
-        }
+        Assert::isInstanceOf($data, CommentCreateInput::class);
+
         $postId = $uriVariables['postId'] ?? null;
 
         if (!$postId) {
