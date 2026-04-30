@@ -9,6 +9,7 @@
          failOnWarning="true"
          bootstrap="tests/bootstrap.php"
          cacheDirectory=".phpunit.cache"
+         displayDetailsOnTestsThatTriggerWarnings="true"
 >
     <php>
         <ini name="display_errors" value="1" />
@@ -36,7 +37,6 @@
             <!-- Exclude integration-only code from unit test coverage -->
             <directory>src/Factory</directory>
             <directory>src/Repository</directory>
-            <directory>src/State</directory>
             <directory>src/Service</directory>
             <directory>src/EventListener</directory>
             <directory>src/DataFixtures</directory>

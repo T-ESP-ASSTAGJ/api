@@ -16,6 +16,7 @@ use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Webmozart\Assert\Assert;
 
 /**
  * @implements ProcessorInterface<AuthVerificationInput, AuthVerificationOutput>
@@ -37,9 +38,7 @@ readonly class AuthVerifyProcessor implements ProcessorInterface
      */
     public function process(mixed $data, $operation = null, array $uriVariables = [], array $context = []): AuthVerificationOutput
     {
-        if (!$data instanceof AuthVerificationInput) {
-            throw new BadRequestHttpException('Invalid data provided.');
-        }
+        Assert::isInstanceOf($data, AuthVerificationInput::class);
 
         $verificationUser = $this->entityManager
             ->getRepository(VerificationUser::class)
@@ -74,8 +73,10 @@ readonly class AuthVerifyProcessor implements ProcessorInterface
 
             $this->entityManager->remove($verificationUser);
             $this->entityManager->flush();
+        } catch (ValidationException $e) {
+            throw $e;
         } catch (\Exception $e) {
-            throw new \RuntimeException('Failed to create or update user: '.$e->getMessage());
+            throw new \RuntimeException('Failed to verify user: '.$e->getMessage());
         }
 
         $token = $this->jwtManager->create($user);

@@ -14,7 +14,7 @@ interface TimeStampableInterface
 
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): void;
 
-    public function onPrePersist(): void;
+    public function initCreatedAt(): void;
 
-    public function onPreUpdate(): void;
+    public function initUpdatedAt(): void;
 }

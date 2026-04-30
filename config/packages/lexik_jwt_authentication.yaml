@@ -4,3 +4,11 @@ lexik_jwt_authentication:
     pass_phrase: '%env(JWT_PASSPHRASE)%'
     token_ttl: 86400
     user_id_claim: email
+
+when@test:
+    lexik_jwt_authentication:
+        secret_key: '%kernel.project_dir%/config/jwt/private-test.pem'
+        public_key: '%kernel.project_dir%/config/jwt/public-test.pem'
+        pass_phrase: 'testpassphrase'
+        token_ttl: 86400
+        user_id_claim: email

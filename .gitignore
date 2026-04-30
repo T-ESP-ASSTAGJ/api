@@ -36,7 +36,8 @@ phpstan.neon
 ###< phpstan/phpstan ###
 
 ###> lexik/jwt-authentication-bundle ###
-/config/jwt/
+/config/jwt/private.pem
+/config/jwt/public.pem
 ###< lexik/jwt-authentication-bundle ###
 
 ### clover ###
