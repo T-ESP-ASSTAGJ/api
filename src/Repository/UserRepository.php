@@ -16,6 +16,8 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
  */
 class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
+    use SearchQueryTrait;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, User::class);
@@ -47,6 +49,14 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         ;
 
         return $result['deviceToken'] ?? null;
+    }
+
+    /**
+     * @return User[]
+     */
+    public function findByUsername(string $query, int $offset, int $limit): array
+    {
+        return $this->buildSearchQuery('username', $query, $offset, $limit, 'username', 'ASC')->getResult();
     }
 
     public function deleteTokenByUserToken(string $deviceToken): void

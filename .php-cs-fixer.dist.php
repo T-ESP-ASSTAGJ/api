@@ -10,7 +10,6 @@ return (new PhpCsFixer\Config())
         '@Symfony' => true,
         '@Symfony:risky' => true,
         '@PSR2' => true,
-        '@PHP8x2Migration' => true,
         'declare_strict_types' => true,
         'no_useless_else' => true,
         'no_useless_return' => true,
@@ -49,7 +48,6 @@ return (new PhpCsFixer\Config())
         'phpdoc_line_span' => true,
         'nullable_type_declaration_for_default_null_value' => false,
         'multiline_whitespace_before_semicolons' => ['strategy' => 'new_line_for_chained_calls'],
-        'modifier_keywords' => true,
         'phpdoc_separation' => false,
         'global_namespace_import' => [
             'import_classes' => false,
