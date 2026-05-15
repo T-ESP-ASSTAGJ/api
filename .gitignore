@@ -38,3 +38,7 @@ phpstan.neon
 ###> lexik/jwt-authentication-bundle ###
 /config/jwt/
 ###< lexik/jwt-authentication-bundle ###
+
+### clover ###
+/coverage/clover.xml
+/build/logs/clover.xml
