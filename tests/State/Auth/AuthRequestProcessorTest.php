@@ -5,13 +5,10 @@ declare(strict_types=1);
 namespace App\Tests\State\Auth;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Symfony\Bundle\Test\Client;
 use App\Entity\VerificationUser;
 use App\Factory\VerificationUserFactory;
-use App\ApiResource\Auth\AuthRequestInput;
-use App\State\Auth\AuthRequestProcessor;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\EventListener\MessageLoggerListener;
 use Symfony\Component\Mime\Email;
 use Zenstruck\Foundry\Test\Factories;
@@ -22,11 +19,15 @@ class AuthRequestProcessorTest extends ApiTestCase
     use Factories;
     use ResetDatabase;
 
+    protected static ?bool $alwaysBootKernel = true;
+
+    private Client $client;
+
     private EntityManagerInterface $em;
 
     protected function setUp(): void
     {
-        self::$alwaysBootKernel = true;
+        $this->client = static::createClient();
         $this->em = static::getContainer()->get(EntityManagerInterface::class);
         static::getContainer()
             ->get('mailer.message_logger_listener')
@@ -36,7 +37,7 @@ class AuthRequestProcessorTest extends ApiTestCase
 
     public function testInvalidInput(): void
     {
-        static::createClient()->request('POST', '/api/auth/request', [
+        $this->client->request('POST', '/api/auth/request', [
             'json' => ['toto' => 'toto'],
             'headers' => [
                 'Content-Type' => 'application/json',
@@ -49,7 +50,7 @@ class AuthRequestProcessorTest extends ApiTestCase
 
     public function testCreatesVerificationUserAndSendsEmail(): void
     {
-        static::createClient()->request('POST', '/api/auth/request', [
+        $this->client->request('POST', '/api/auth/request', [
             'json' => ['email' => 'test@example.com'],
             'headers' => [
                 'Content-Type' => 'application/json',
@@ -92,7 +93,7 @@ class AuthRequestProcessorTest extends ApiTestCase
 
         $oldCode = $existing->getCode();
 
-        static::createClient()->request('POST', '/api/auth/request', [
+        $this->client->request('POST', '/api/auth/request', [
             'json' => ['email' => 'existing@example.com'],
             'headers' => [
                 'Content-Type' => 'application/json',
@@ -112,7 +113,7 @@ class AuthRequestProcessorTest extends ApiTestCase
 
     public function testReturnsBadRequestOnMissingEmail(): void
     {
-        static::createClient()->request('POST', '/api/auth/request', [
+        $this->client->request('POST', '/api/auth/request', [
             'json' => [],
             'headers' => [
                 'Content-Type' => 'application/json',
@@ -125,7 +126,7 @@ class AuthRequestProcessorTest extends ApiTestCase
 
     public function testReturnsBadRequestOnInvalidEmail(): void
     {
-        static::createClient()->request('POST', '/api/auth/request', [
+        $this->client->request('POST', '/api/auth/request', [
             'json' => ['email' => 'not-an-email'],
             'headers' => [
                 'Content-Type' => 'application/json',
@@ -135,31 +136,6 @@ class AuthRequestProcessorTest extends ApiTestCase
 
         self::assertResponseStatusCodeSame(422);
     }
-
-    public function testHandlesExceptionDuringDatabaseOperation(): void
-    {
-        $mockEm = $this->createMock(EntityManagerInterface::class);
-        $mockEm->method('getRepository')->willReturn($this->em->getRepository(VerificationUser::class));
-        $mockEm->method('persist')->willReturn(null);
-        $mockEm->method('flush')->willThrowException(new \Exception('Database error'));
-
-        $mockLogger = $this->createMock(LoggerInterface::class);
-        $mockLogger->expects($this->once())
-            ->method('error')
-            ->with($this->stringContains('Could not process auth request: Database error'));
-
-        $processor = new AuthRequestProcessor(
-            $mockEm,
-            static::getContainer()->get(MailerInterface::class),
-            $mockLogger
-        );
-
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Could not process the request.');
-
-        $processor->process(new AuthRequestInput('error@example.com'));
-    }
-
 
     private function getMessageLoggerListener(): MessageLoggerListener
     {

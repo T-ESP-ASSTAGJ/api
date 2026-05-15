@@ -7,9 +7,6 @@ namespace App\ApiResource\Like;
 use App\Entity\Enum\LikeableTypeEnum;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @codeCoverageIgnore
- */
 class LikeCreateInput
 {
     #[Assert\NotBlank]

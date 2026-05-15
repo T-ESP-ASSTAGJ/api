@@ -9,10 +9,7 @@ use App\ApiResource\Track\TrackInput;
 use App\Validator\Constraints\Base64;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @codeCoverageIgnore
- */
-class PostCreateInput
+final readonly class PostCreateInput
 {
     public function __construct(
         public TrackInput $track,

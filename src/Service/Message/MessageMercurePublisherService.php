@@ -11,7 +11,7 @@ use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Serializer\SerializerInterface;
 
-final readonly class MessageMercurePublisherService
+readonly class MessageMercurePublisherService
 {
     public function __construct(
         private HubInterface $hub,

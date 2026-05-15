@@ -35,6 +35,7 @@
 
         <exclude>
             <!-- Exclude integration-only code from unit test coverage -->
+            <directory>src/Constants</directory>
             <directory>src/Factory</directory>
             <directory>src/Repository</directory>
             <directory>src/Service</directory>

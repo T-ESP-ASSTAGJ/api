@@ -4,95 +4,155 @@ declare(strict_types=1);
 
 namespace App\Tests\State\Comment;
 
+use ApiPlatform\Metadata\Post as PostOperation;
+use ApiPlatform\Validator\Exception\ValidationException;
+use App\ApiResource\Comment\CommentCreateInput;
 use App\Entity\Comment;
-use App\Factory\PostFactory;
-use App\Factory\UserFactory;
-use App\Message\CommentCreatedMessage;
-use App\Tests\ApiTestCase;
-use Symfony\Component\Security\Core\User\InMemoryUser;
+use App\Entity\Post;
+use App\Entity\User;
+use App\State\Comment\CommentCreateProcessor;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
+use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class CommentCreateProcessorTest extends ApiTestCase
+class CommentCreateProcessorTest extends TestCase
 {
-    public function testCreateCommentSuccessful(): void
+    /**
+     * @var EntityManagerInterface&\PHPUnit\Framework\MockObject\MockObject
+     */
+    private EntityManagerInterface $em;
+
+    /**
+     * @var ValidatorInterface&\PHPUnit\Framework\MockObject\MockObject
+     */
+    private ValidatorInterface $validator;
+
+    /**
+     * @var Security&\PHPUnit\Framework\MockObject\MockObject
+     */
+    private Security $security;
+
+    /**
+     * @var MessageBusInterface&\PHPUnit\Framework\MockObject\MockObject
+     */
+    private MessageBusInterface $bus;
+
+    private CommentCreateProcessor $processor;
+
+    protected function setUp(): void
     {
-        $user = UserFactory::createOne(['roles' => ['ROLE_USER']]);
-        $post = PostFactory::createOne();
-        $client = $this->createAuthenticatedClient($user);
-
-        $client->request('POST', '/api/posts/'.$post->getId().'/comments', [
-            'json' => [
-                'content' => 'This is a test comment',
-            ],
-        ]);
-
-        self::assertResponseStatusCodeSame(201);
-        self::assertJsonContains([
-            'content' => 'This is a test comment',
-            'user' => [
-                'id' => $user->getId(),
-            ],
-        ]);
-
-        $comment = static::getContainer()->get('doctrine')->getRepository(Comment::class)->findOneBy([
-            'content' => 'This is a test comment',
-            'post' => $post,
-            'user' => $user,
-        ]);
-
-        self::assertNotNull($comment);
+        $this->em = $this->createMock(EntityManagerInterface::class);
+        $this->validator = $this->createMock(ValidatorInterface::class);
+        $this->security = $this->createMock(Security::class);
+        $this->bus = $this->createMock(MessageBusInterface::class);
+        $this->processor = new CommentCreateProcessor($this->em, $this->validator, $this->security, $this->bus);
     }
 
-    public function testCreateCommentPostNotFound(): void
+    public function testThrowsWhenPostIdMissing(): void
     {
-        $user = UserFactory::createOne(['roles' => ['ROLE_USER']]);
-        $client = $this->createAuthenticatedClient($user);
-
-        $client->request('POST', '/api/posts/9999/comments', [
-            'json' => [
-                'content' => 'This is a test comment',
-            ],
-        ]);
-
-        self::assertResponseStatusCodeSame(404);
+        $this->expectException(NotFoundHttpException::class);
+        $input = new CommentCreateInput();
+        $input->content = 'test';
+        $this->processor->process($input, new PostOperation(), []);
     }
 
-    public function testCreateCommentUnauthenticated(): void
+    public function testThrowsWhenPostNotFound(): void
     {
-        $post = PostFactory::createOne();
+        $repo = $this->createMock(EntityRepository::class);
+        $repo->method('find')->willReturn(null);
+        $this->em->method('getRepository')->willReturn($repo);
 
-        static::createClient()->request('POST', '/api/posts/'.$post->getId().'/comments', [
-            'json' => [
-                'content' => 'This is a test comment',
-            ],
-        ]);
+        $input = new CommentCreateInput();
+        $input->content = 'test';
 
-        self::assertResponseStatusCodeSame(401);
+        $this->expectException(NotFoundHttpException::class);
+        $this->processor->process($input, new PostOperation(), ['postId' => 999]);
     }
 
-    public function testCreateCommentInvalidContent(): void
+    public function testThrowsWhenUnauthenticated(): void
     {
-        $user = UserFactory::createOne(['roles' => ['ROLE_USER']]);
-        $post = PostFactory::createOne();
-        $client = $this->createAuthenticatedClient($user);
+        $post = $this->makePost(1);
+        $repo = $this->createMock(EntityRepository::class);
+        $repo->method('find')->willReturn($post);
+        $this->em->method('getRepository')->willReturn($repo);
+        $this->security->method('getUser')->willReturn(null);
 
-        $client->request('POST', '/api/posts/'.$post->getId().'/comments', [
-            'json' => [
-                'content' => '',
-            ],
-        ]);
+        $input = new CommentCreateInput();
+        $input->content = 'test';
 
-        self::assertResponseStatusCodeSame(422);
+        $this->expectException(\RuntimeException::class);
+        $this->processor->process($input, new PostOperation(), ['postId' => 1]);
     }
 
-    public function testCreateCommentThrowsNotFoundWhenPostIdIsMissing(): void
+    public function testCreatesComment(): void
     {
-        $user = UserFactory::createOne(['roles' => ['ROLE_USER']]);
-        $client = $this->createAuthenticatedClient($user);
+        $post = $this->makePost(5);
+        $user = $this->makeUser(42);
 
-        $client->request('POST', '/api/posts/toto/comments', [
-            'json' => ['content' => 'Valid content'],
-        ]);
+        $repo = $this->createMock(EntityRepository::class);
+        $repo->method('find')->willReturn($post);
+        $this->em->method('getRepository')->willReturn($repo);
+        $this->security->method('getUser')->willReturn($user);
+        $this->validator->method('validate')->willReturn(new ConstraintViolationList());
+        $this->em->expects($this->once())->method('persist');
+        $this->em->expects($this->once())->method('flush');
+        $this->bus->expects($this->once())->method('dispatch')
+            ->willReturn(new \Symfony\Component\Messenger\Envelope(new \stdClass()))
+        ;
 
-        self::assertResponseStatusCodeSame(404);
+        $input = new CommentCreateInput();
+        $input->content = 'Great song!';
+
+        $result = $this->processor->process($input, new PostOperation(), ['postId' => 5]);
+
+        $this->assertInstanceOf(Comment::class, $result);
+        $this->assertSame('Great song!', $result->getContent());
+    }
+
+    public function testThrowsOnValidationFailure(): void
+    {
+        $post = $this->makePost(5);
+        $user = $this->makeUser(42);
+
+        $repo = $this->createMock(EntityRepository::class);
+        $repo->method('find')->willReturn($post);
+        $this->em->method('getRepository')->willReturn($repo);
+        $this->security->method('getUser')->willReturn($user);
+
+        $violations = $this->createMock(ConstraintViolationListInterface::class);
+        $violations->method('count')->willReturn(1);
+        $this->validator->method('validate')->willReturn($violations);
+
+        $input = new CommentCreateInput();
+        $input->content = '';
+
+        $this->expectException(ValidationException::class);
+        $this->processor->process($input, new PostOperation(), ['postId' => 5]);
+    }
+
+    private function makeUser(int $id): User
+    {
+        $user = new User();
+        $ref = new \ReflectionProperty(User::class, 'id');
+        $ref->setAccessible(true);
+        $ref->setValue($user, $id);
+
+        return $user;
+    }
+
+    private function makePost(int $id): Post
+    {
+        $post = new Post();
+        $ref = new \ReflectionProperty(Post::class, 'id');
+        $ref->setAccessible(true);
+        $ref->setValue($post, $id);
+
+        return $post;
     }
 }

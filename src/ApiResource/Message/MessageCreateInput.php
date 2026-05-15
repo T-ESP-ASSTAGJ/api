@@ -10,9 +10,6 @@ use App\Validator\Constraints\Base64;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\GroupSequenceProviderInterface;
 
-/**
- * @codeCoverageIgnore
- */
 #[Assert\GroupSequenceProvider]
 final readonly class MessageCreateInput implements GroupSequenceProviderInterface
 {

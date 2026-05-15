@@ -4,21 +4,20 @@ declare(strict_types=1);
 
 namespace App\Tests\State\Auth;
 
-use ApiPlatform\Symfony\Bundle\Test\Client;
+use ApiPlatform\Validator\Exception\ValidationException;
 use App\ApiResource\Auth\AuthVerificationInput;
 use App\Entity\User;
 use App\Entity\VerificationUser;
+use App\Factory\UserFactory;
+use App\Factory\VerificationUserFactory;
 use App\State\Auth\AuthVerifyProcessor;
-use ApiPlatform\Validator\Exception\ValidationException;
+use App\Tests\ApiTestCase;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Doctrine\ORM\EntityRepository;
-use App\Factory\UserFactory;
-use App\Factory\VerificationUserFactory;
-use App\Tests\ApiTestCase;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class AuthVerifyProcessorTest extends ApiTestCase
@@ -166,14 +165,14 @@ class AuthVerifyProcessorTest extends ApiTestCase
         ]);
 
         $violations = new ConstraintViolationList([
-            $this->createMock(ConstraintViolationInterface::class)
+            $this->createMock(ConstraintViolationInterface::class),
         ]);
         $mockValidator->method('validate')->willReturn($violations);
 
         $processor = new AuthVerifyProcessor(
             $mockEm,
             $mockValidator,
-            $this->createMock(JWTTokenManagerInterface::class)
+            $this->createMock(JWTTokenManagerInterface::class),
         );
 
         $this->expectException(ValidationException::class);
@@ -212,7 +211,7 @@ class AuthVerifyProcessorTest extends ApiTestCase
         $processor = new AuthVerifyProcessor(
             $mockEm,
             $mockValidator,
-            $this->createMock(JWTTokenManagerInterface::class)
+            $this->createMock(JWTTokenManagerInterface::class),
         );
 
         $this->expectException(\RuntimeException::class);
@@ -222,9 +221,12 @@ class AuthVerifyProcessorTest extends ApiTestCase
         $processor->process($input);
     }
 
+    /**
+     * @param array<string, mixed> $json
+     */
     private function request(array $json): ResponseInterface
     {
-        return static::createClient()->request('POST', '/api/auth/verify', [
+        return $this->client->request('POST', '/api/auth/verify', [
             'json' => $json,
             'headers' => [
                 'Content-Type' => 'application/json',

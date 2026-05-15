@@ -10,7 +10,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Uid\Uuid;
 
-final readonly class ImageService
+readonly class ImageService
 {
     public function __construct(
         #[Autowire('%kernel.project_dir%')]

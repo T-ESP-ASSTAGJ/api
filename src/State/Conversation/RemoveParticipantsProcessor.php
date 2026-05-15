@@ -62,9 +62,9 @@ final readonly class RemoveParticipantsProcessor implements ProcessorInterface
             throw new \RuntimeException('User must be authenticated');
         }
 
-        // Check if current user is an active participant and is admin
+        // Check if current user is a participant (active or not) and is admin
         $currentParticipant = null;
-        foreach ($conversation->getActiveParticipants() as $participant) {
+        foreach ($conversation->getParticipants() as $participant) {
             if ($participant->getUser()->getId() === $currentUser->getId()) {
                 $currentParticipant = $participant;
                 break;
