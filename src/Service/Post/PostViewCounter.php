@@ -7,7 +7,7 @@ namespace App\Service\Post;
 use App\Constants\RedisKeys;
 use App\Entity\Post;
 
-final class PostViewCounter
+class PostViewCounter
 {
     private \Redis $redis;
 

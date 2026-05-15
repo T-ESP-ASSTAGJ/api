@@ -9,9 +9,6 @@ use ApiPlatform\Metadata\Post;
 use App\State\Spotify\AuthSpotifyProcessor;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @codeCoverageIgnore
- */
 #[ApiResource(
     operations: [
         new Post(

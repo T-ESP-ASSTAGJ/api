@@ -6,9 +6,6 @@ namespace App\ApiResource\Auth;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @codeCoverageIgnore
- */
 class AuthRequestOutput
 {
     #[Assert\NotBlank]

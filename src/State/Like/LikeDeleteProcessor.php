@@ -41,7 +41,6 @@ final readonly class LikeDeleteProcessor implements ProcessorInterface
         /** @var User $user */
         $user = $this->security->getUser();
 
-        dump($data, $user);
         $like = $this->likeRepository->findOneBy([
             'user' => $user,
             'entityClass' => $data->entityClass->value,
