@@ -11,7 +11,7 @@ use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
-final readonly class isLikedEnricher
+readonly class isLikedEnricher
 {
     public function __construct(
         private Security $security,

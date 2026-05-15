@@ -8,9 +8,6 @@ use App\Entity\Enum\ReportableTypeEnum;
 use App\Entity\Enum\ReportReasonEnum;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @codeCoverageIgnore
- */
 class ReportCreateInput
 {
     #[Assert\NotBlank]

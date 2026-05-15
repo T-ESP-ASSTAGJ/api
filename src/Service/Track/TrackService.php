@@ -9,7 +9,7 @@ use App\Entity\Track;
 use App\Service\ImageService;
 use Doctrine\ORM\EntityManagerInterface;
 
-final readonly class TrackService
+readonly class TrackService
 {
     public function __construct(
         private EntityManagerInterface $em,

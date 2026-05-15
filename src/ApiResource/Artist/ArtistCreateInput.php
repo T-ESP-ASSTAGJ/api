@@ -6,9 +6,6 @@ namespace App\ApiResource\Artist;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @codeCoverageIgnore
- */
 class ArtistCreateInput
 {
     #[Assert\NotBlank]

@@ -10,9 +10,6 @@ use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\Response;
 use App\State\Mercure\MercureTokenProvider;
 
-/**
- * @codeCoverageIgnore
- */
 #[ApiResource(
     operations: [
         new Get(

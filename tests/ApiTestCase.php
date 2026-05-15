@@ -16,12 +16,19 @@ abstract class ApiTestCase extends \ApiPlatform\Symfony\Bundle\Test\ApiTestCase
 {
     use Factories;
     use ResetDatabase;
+
+    protected static ?bool $alwaysBootKernel = true;
+
     protected Client $client;
+
+    protected EntityManagerInterface $em;
 
     protected function setUp(): void
     {
         $this->client = static::createClient();
-        $this->em = static::getContainer()->get(EntityManagerInterface::class);
+        /** @var EntityManagerInterface $em */
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $this->em = $em;
     }
 
     protected function createAuthenticatedClient(User $user): HttpClientInterface

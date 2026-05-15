@@ -8,10 +8,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use App\Validator\Constraints\Base64;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @codeCoverageIgnore
- */
-class TrackInput
+final readonly class TrackInput
 {
     public function __construct(
         #[Assert\NotBlank]

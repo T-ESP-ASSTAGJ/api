@@ -7,9 +7,6 @@ namespace App\ApiResource\User;
 use ApiPlatform\Metadata\ApiProperty;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @codeCoverageIgnore
- */
 class UserPatchInput
 {
     public ?string $username = null;

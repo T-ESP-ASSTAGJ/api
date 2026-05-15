@@ -8,7 +8,7 @@ use App\Entity\Enum\MercureTypeEnum;
 use App\Entity\Message;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-class MercureMessageOutput
+final readonly class MercureMessageOutput
 {
     public function __construct(
         #[Groups([Message::SERIALIZATION_GROUP_MERCURE])]
