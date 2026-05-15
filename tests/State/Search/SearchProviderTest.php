@@ -20,6 +20,7 @@ class SearchProviderTest extends KernelTestCase
     use ResetDatabase;
 
     private SearchProvider $provider;
+
     private GetCollection $operation;
 
     protected function setUp(): void

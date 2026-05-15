@@ -20,7 +20,7 @@ final readonly class UserParameterProvider implements ProviderInterface
     ) {
     }
 
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): UserParameter|null
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?UserParameter
     {
         /** @var User|null $user */
         $user = $this->security->getUser();

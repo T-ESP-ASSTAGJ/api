@@ -27,7 +27,7 @@ use App\State\Search\SearchProvider;
                 'type' => new QueryParameter(required: false, description: 'Type de contenu : users (défaut), posts, tracks ou artists'),
             ],
         ),
-    ]
+    ],
 )]
 class Search
 {

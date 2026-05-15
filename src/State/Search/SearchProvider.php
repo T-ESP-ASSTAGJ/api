@@ -58,13 +58,13 @@ final readonly class SearchProvider implements ProviderInterface
     private function resolveResults(SearchTypeEnum $type, string $query, int $offset, int $limit): array
     {
         if (SearchTypeEnum::Users === $type) {
-            return $this->userRepository->searchByQuery($query, $offset, $limit);
+            return $this->userRepository->findByUsername($query, $offset, $limit);
         }
 
         $posts = match ($type) {
             SearchTypeEnum::Tracks => $this->postRepository->searchByTrackTitle($query, $offset, $limit),
             SearchTypeEnum::Artists => $this->postRepository->searchByArtistName($query, $offset, $limit),
-            default => $this->postRepository->searchByQuery($query, $offset, $limit),
+            default => $this->postRepository->findByCaption($query, $offset, $limit),
         };
 
         $this->isLikedEnricher->enrich($posts, Post::class);

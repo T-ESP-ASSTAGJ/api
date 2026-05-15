@@ -28,7 +28,7 @@ trait SearchQueryTrait
             ->orderBy('e.'.$orderField, $direction)
             ->setFirstResult($offset)
             ->setMaxResults($limit)
-            ->getQuery();
+            ->getQuery()
+        ;
     }
-
 }
