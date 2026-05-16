@@ -76,4 +76,35 @@ class FollowRepositoryTest extends KernelTestCase
 
         $this->assertSame([], $this->repo->findFollowing($user->getId()));
     }
+
+    public function testIsMutualFollowReturnsTrueWhenBothFollowEachOther(): void
+    {
+        $userA = UserFactory::createOne();
+        $userB = UserFactory::createOne();
+
+        $this->em->persist((new Follow())->setFollower($userA)->setFollowedUser($userB));
+        $this->em->persist((new Follow())->setFollower($userB)->setFollowedUser($userA));
+        $this->em->flush();
+
+        $this->assertTrue($this->repo->isMutualFollow($userA->getId(), $userB->getId()));
+    }
+
+    public function testIsMutualFollowReturnsFalseWhenOnlyOneFollows(): void
+    {
+        $userA = UserFactory::createOne();
+        $userB = UserFactory::createOne();
+
+        $this->em->persist((new Follow())->setFollower($userA)->setFollowedUser($userB));
+        $this->em->flush();
+
+        $this->assertFalse($this->repo->isMutualFollow($userA->getId(), $userB->getId()));
+    }
+
+    public function testIsMutualFollowReturnsFalseWhenNoFollowExists(): void
+    {
+        $userA = UserFactory::createOne();
+        $userB = UserFactory::createOne();
+
+        $this->assertFalse($this->repo->isMutualFollow($userA->getId(), $userB->getId()));
+    }
 }
