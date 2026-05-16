@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\MessageHandler;
 
+use App\Entity\Enum\VisibilityEnum;
 use App\Entity\User;
 use App\Message\FollowCreatedMessage;
 use App\MessageHandler\FollowCreatedHandler;
@@ -42,11 +43,10 @@ class FollowCreatedHandlerTest extends TestCase
         $followerId = 1;
         $followerUsername = 'JohnDoe';
         $followerPic = 'https://example.com/photo.jpg';
-
         $followedId = 42;
 
         $followedParameters = $this->createMock(\App\Entity\UserParameter::class);
-        $followedParameters->method('getNotifNewFollower')->willReturn(true);
+        $followedParameters->method('getNotifNewFollower')->willReturn(VisibilityEnum::Public);
 
         $userToFollow = $this->createMock(User::class);
         $userToFollow->method('getId')->willReturn($followedId);
@@ -62,8 +62,6 @@ class FollowCreatedHandlerTest extends TestCase
             [$followerId, null, null, $currentUser],
         ]);
 
-        $message = new FollowCreatedMessage($followerId, $followedId);
-
         $this->pushNotificationService
             ->expects($this->once())
             ->method('sendToUser')
@@ -78,16 +76,38 @@ class FollowCreatedHandlerTest extends TestCase
             )
         ;
 
-        ($this->handler)($message);
+        ($this->handler)(new FollowCreatedMessage($followerId, $followedId));
     }
 
-    public function testInvokeDoesNotSendPushNotificationIfDisabled(): void
+    public function testInvokeSendsPushNotificationIfFriends(): void
     {
-        $followerId = 1;
-        $followedId = 42;
-
         $followedParameters = $this->createMock(\App\Entity\UserParameter::class);
-        $followedParameters->method('getNotifNewFollower')->willReturn(false);
+        $followedParameters->method('getNotifNewFollower')->willReturn(VisibilityEnum::Friends);
+
+        $userToFollow = $this->createMock(User::class);
+        $userToFollow->method('getId')->willReturn(42);
+        $userToFollow->method('getUsername')->willReturn('Followed');
+        $userToFollow->method('getParameters')->willReturn($followedParameters);
+
+        $currentUser = $this->createMock(User::class);
+        $currentUser->method('getId')->willReturn(1);
+        $currentUser->method('getUsername')->willReturn('Follower');
+        $currentUser->method('getProfilePicture')->willReturn('pic.jpg');
+
+        $this->userRepository->method('find')->willReturnMap([
+            [42, null, null, $userToFollow],
+            [1, null, null, $currentUser],
+        ]);
+
+        $this->pushNotificationService->expects($this->once())->method('sendToUser');
+
+        ($this->handler)(new FollowCreatedMessage(1, 42));
+    }
+
+    public function testInvokeDoesNotSendPushNotificationIfPrivate(): void
+    {
+        $followedParameters = $this->createMock(\App\Entity\UserParameter::class);
+        $followedParameters->method('getNotifNewFollower')->willReturn(VisibilityEnum::Private);
 
         $userToFollow = $this->createMock(User::class);
         $userToFollow->method('getParameters')->willReturn($followedParameters);
@@ -95,29 +115,21 @@ class FollowCreatedHandlerTest extends TestCase
         $currentUser = $this->createMock(User::class);
 
         $this->userRepository->method('find')->willReturnMap([
-            [$followedId, null, null, $userToFollow],
-            [$followerId, null, null, $currentUser],
+            [42, null, null, $userToFollow],
+            [1, null, null, $currentUser],
         ]);
 
-        $message = new FollowCreatedMessage($followerId, $followedId);
+        $this->pushNotificationService->expects($this->never())->method('sendToUser');
 
-        $this->pushNotificationService->expects($this->never())
-            ->method('sendToUser')
-        ;
-
-        ($this->handler)($message);
+        ($this->handler)(new FollowCreatedMessage(1, 42));
     }
 
     public function testInvokeDoesNothingIfUserNotFound(): void
     {
         $this->userRepository->method('find')->willReturn(null);
 
-        $message = new FollowCreatedMessage(1, 42);
+        $this->pushNotificationService->expects($this->never())->method('sendToUser');
 
-        $this->pushNotificationService->expects($this->never())
-            ->method('sendToUser')
-        ;
-
-        ($this->handler)($message);
+        ($this->handler)(new FollowCreatedMessage(1, 42));
     }
 }

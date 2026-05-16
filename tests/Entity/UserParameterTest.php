@@ -64,25 +64,25 @@ final class UserParameterTest extends TestCase
 
     public function testSetNotifNewFollower(): void
     {
-        $this->userParameter->setNotifNewFollower(false);
-        self::assertFalse($this->userParameter->getNotifNewFollower());
+        $this->userParameter->setNotifNewFollower(VisibilityEnum::Friends);
+        self::assertSame(VisibilityEnum::Friends, $this->userParameter->getNotifNewFollower());
     }
 
     public function testSetNotifNewLike(): void
     {
-        $this->userParameter->setNotifNewLike(false);
-        self::assertFalse($this->userParameter->getNotifNewLike());
+        $this->userParameter->setNotifNewLike(VisibilityEnum::Private);
+        self::assertSame(VisibilityEnum::Private, $this->userParameter->getNotifNewLike());
     }
 
     public function testSetNotifNewComment(): void
     {
-        $this->userParameter->setNotifNewComment(false);
-        self::assertFalse($this->userParameter->getNotifNewComment());
+        $this->userParameter->setNotifNewComment(VisibilityEnum::Friends);
+        self::assertSame(VisibilityEnum::Friends, $this->userParameter->getNotifNewComment());
     }
 
     public function testSetNotifNewMessage(): void
     {
-        $this->userParameter->setNotifNewMessage(false);
-        self::assertFalse($this->userParameter->getNotifNewMessage());
+        $this->userParameter->setNotifNewMessage(VisibilityEnum::Private);
+        self::assertSame(VisibilityEnum::Private, $this->userParameter->getNotifNewMessage());
     }
 }
