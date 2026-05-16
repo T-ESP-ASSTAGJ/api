@@ -29,7 +29,7 @@ final class VerificationUserFactory extends PersistentObjectFactory
         return [
             'email' => self::faker()->email(),
             'code' => self::faker()->randomNumber(5),
-            'expiresAt' => self::faker()->date(),
+            'expiresAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
         ];
     }
 }

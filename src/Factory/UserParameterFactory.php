@@ -9,8 +9,6 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
  * @extends PersistentObjectFactory<UserParameter>
- *
- * @codeCoverageIgnore
  */
 final class UserParameterFactory extends PersistentObjectFactory
 {

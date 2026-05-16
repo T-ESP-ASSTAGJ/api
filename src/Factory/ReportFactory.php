@@ -11,8 +11,6 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
  * @extends PersistentObjectFactory<Report>
- *
- * @codeCoverageIgnore
  */
 final class ReportFactory extends PersistentObjectFactory
 {
