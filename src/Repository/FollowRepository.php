@@ -43,6 +43,20 @@ class FollowRepository extends ServiceEntityRepository
         );
     }
 
+    public function isMutualFollow(int $userId1, int $userId2): bool
+    {
+        $count = (int) $this->createQueryBuilder('f')
+            ->select('COUNT(f.id)')
+            ->where('(f.follower = :u1 AND f.followedUser = :u2) OR (f.follower = :u2 AND f.followedUser = :u1)')
+            ->setParameter('u1', $userId1)
+            ->setParameter('u2', $userId2)
+            ->getQuery()
+            ->getSingleScalarResult()
+        ;
+
+        return 2 === $count;
+    }
+
     /**
      * @return UserFollowOutput[]
      */

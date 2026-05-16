@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Factory;
 
 use App\Entity\Artist;
-use App\Entity\Comment;
 use App\Entity\Post;
 use App\Entity\Report;
 use App\Entity\Track;
@@ -13,7 +12,6 @@ use App\Entity\User;
 use App\Entity\UserParameter;
 use App\Entity\VerificationUser;
 use App\Factory\ArtistFactory;
-use App\Factory\CommentFactory;
 use App\Factory\PostFactory;
 use App\Factory\ReportFactory;
 use App\Factory\TrackFactory;
