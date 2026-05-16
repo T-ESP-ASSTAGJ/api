@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Service\Azure\AzureStorageService;
+use App\Service\Azure\AzureStorageServiceInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -16,7 +16,7 @@ readonly class ImageService
         #[Autowire('%kernel.project_dir%')]
         private string $projectDir,
         private Filesystem $filesystem,
-        private AzureStorageService $azureStorage,
+        private AzureStorageServiceInterface $azureStorage,
     ) {
     }
 

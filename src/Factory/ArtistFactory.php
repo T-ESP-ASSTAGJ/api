@@ -9,8 +9,6 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
  * @extends PersistentObjectFactory<Artist>
- *
- * @codeCoverageIgnore
  */
 final class ArtistFactory extends PersistentObjectFactory
 {

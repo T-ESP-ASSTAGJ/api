@@ -7,7 +7,7 @@ namespace App\Service\Azure;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
 
-final class AzureStorageService
+final class AzureStorageService implements AzureStorageServiceInterface
 {
     public function __construct(
         private readonly FilesystemOperator $azureStorage,
