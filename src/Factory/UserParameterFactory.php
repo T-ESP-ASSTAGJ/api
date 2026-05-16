@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Factory;
 
+use App\Entity\Enum\VisibilityEnum;
 use App\Entity\UserParameter;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
@@ -25,11 +26,11 @@ final class UserParameterFactory extends PersistentObjectFactory
     protected function defaults(): array
     {
         return [
-            'isFollowersPublic' => true,
-            'isFollowingPublic' => true,
-            'isStatsPublic' => true,
-            'isPlaylistPublic' => true,
-            'isLikesPublic' => true,
+            'followersVisibility' => VisibilityEnum::Public,
+            'followingVisibility' => VisibilityEnum::Public,
+            'statsVisibility' => VisibilityEnum::Public,
+            'playlistVisibility' => VisibilityEnum::Public,
+            'likesVisibility' => VisibilityEnum::Public,
             'notifNewFollower' => true,
             'notifNewLike' => true,
             'notifNewComment' => true,
