@@ -7,6 +7,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Patch;
+use App\Entity\Enum\VisibilityEnum;
 use App\Entity\Interface\TimeStampableInterface;
 use App\Repository\UserParameterRepository;
 use App\State\User\UserParameterProcessor;
@@ -54,25 +55,25 @@ class UserParameter implements TimeStampableInterface
     #[ORM\JoinColumn(nullable: false)]
     private User $user;
 
-    #[ORM\Column(type: 'boolean', options: ['default' => true])]
+    #[ORM\Column(type: 'string', enumType: VisibilityEnum::class, options: ['default' => 'public'])]
     #[Groups([self::SERIALIZATION_GROUP_READ, self::SERIALIZATION_GROUP_WRITE, User::SERIALIZATION_GROUP_DETAIL])]
-    private bool $isFollowersPublic = true;
+    private VisibilityEnum $followersVisibility = VisibilityEnum::Public;
 
-    #[ORM\Column(type: 'boolean', options: ['default' => true])]
+    #[ORM\Column(type: 'string', enumType: VisibilityEnum::class, options: ['default' => 'public'])]
     #[Groups([self::SERIALIZATION_GROUP_READ, self::SERIALIZATION_GROUP_WRITE, User::SERIALIZATION_GROUP_DETAIL])]
-    private bool $isFollowingPublic = true;
+    private VisibilityEnum $followingVisibility = VisibilityEnum::Public;
 
-    #[ORM\Column(type: 'boolean', options: ['default' => true])]
+    #[ORM\Column(type: 'string', enumType: VisibilityEnum::class, options: ['default' => 'public'])]
     #[Groups([self::SERIALIZATION_GROUP_READ, self::SERIALIZATION_GROUP_WRITE, User::SERIALIZATION_GROUP_DETAIL])]
-    private bool $isStatsPublic = true;
+    private VisibilityEnum $statsVisibility = VisibilityEnum::Public;
 
-    #[ORM\Column(type: 'boolean', options: ['default' => true])]
+    #[ORM\Column(type: 'string', enumType: VisibilityEnum::class, options: ['default' => 'public'])]
     #[Groups([self::SERIALIZATION_GROUP_READ, self::SERIALIZATION_GROUP_WRITE, User::SERIALIZATION_GROUP_DETAIL])]
-    private bool $isPlaylistPublic = true;
+    private VisibilityEnum $playlistVisibility = VisibilityEnum::Public;
 
-    #[ORM\Column(type: 'boolean', options: ['default' => true])]
+    #[ORM\Column(type: 'string', enumType: VisibilityEnum::class, options: ['default' => 'public'])]
     #[Groups([self::SERIALIZATION_GROUP_READ, self::SERIALIZATION_GROUP_WRITE, User::SERIALIZATION_GROUP_DETAIL])]
-    private bool $isLikesPublic = true;
+    private VisibilityEnum $likesVisibility = VisibilityEnum::Public;
 
     #[ORM\Column(type: 'boolean', options: ['default' => true])]
     #[Groups([self::SERIALIZATION_GROUP_READ, self::SERIALIZATION_GROUP_WRITE, User::SERIALIZATION_GROUP_DETAIL])]
@@ -107,62 +108,62 @@ class UserParameter implements TimeStampableInterface
         return $this;
     }
 
-    public function getIsFollowersPublic(): bool
+    public function getFollowersVisibility(): VisibilityEnum
     {
-        return $this->isFollowersPublic;
+        return $this->followersVisibility;
     }
 
-    public function setIsFollowersPublic(bool $isFollowersPublic): static
+    public function setFollowersVisibility(VisibilityEnum $followersVisibility): static
     {
-        $this->isFollowersPublic = $isFollowersPublic;
+        $this->followersVisibility = $followersVisibility;
 
         return $this;
     }
 
-    public function getIsFollowingPublic(): bool
+    public function getFollowingVisibility(): VisibilityEnum
     {
-        return $this->isFollowingPublic;
+        return $this->followingVisibility;
     }
 
-    public function setIsFollowingPublic(bool $isFollowingPublic): static
+    public function setFollowingVisibility(VisibilityEnum $followingVisibility): static
     {
-        $this->isFollowingPublic = $isFollowingPublic;
+        $this->followingVisibility = $followingVisibility;
 
         return $this;
     }
 
-    public function getIsStatsPublic(): bool
+    public function getStatsVisibility(): VisibilityEnum
     {
-        return $this->isStatsPublic;
+        return $this->statsVisibility;
     }
 
-    public function setIsStatsPublic(bool $isStatsPublic): static
+    public function setStatsVisibility(VisibilityEnum $statsVisibility): static
     {
-        $this->isStatsPublic = $isStatsPublic;
+        $this->statsVisibility = $statsVisibility;
 
         return $this;
     }
 
-    public function getIsPlaylistPublic(): bool
+    public function getPlaylistVisibility(): VisibilityEnum
     {
-        return $this->isPlaylistPublic;
+        return $this->playlistVisibility;
     }
 
-    public function setIsPlaylistPublic(bool $isPlaylistPublic): static
+    public function setPlaylistVisibility(VisibilityEnum $playlistVisibility): static
     {
-        $this->isPlaylistPublic = $isPlaylistPublic;
+        $this->playlistVisibility = $playlistVisibility;
 
         return $this;
     }
 
-    public function getIsLikesPublic(): bool
+    public function getLikesVisibility(): VisibilityEnum
     {
-        return $this->isLikesPublic;
+        return $this->likesVisibility;
     }
 
-    public function setIsLikesPublic(bool $isLikesPublic): static
+    public function setLikesVisibility(VisibilityEnum $likesVisibility): static
     {
-        $this->isLikesPublic = $isLikesPublic;
+        $this->likesVisibility = $likesVisibility;
 
         return $this;
     }
