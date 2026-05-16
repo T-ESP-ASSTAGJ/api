@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Entity;
 
+use App\Entity\Enum\VisibilityEnum;
 use App\Entity\User;
 use App\Entity\UserParameter;
 use App\Util\ReflectionUtil;
@@ -31,34 +32,34 @@ final class UserParameterTest extends TestCase
         self::assertSame($user, $this->userParameter->getUser());
     }
 
-    public function testSetIsFollowersPublic(): void
+    public function testSetFollowersVisibility(): void
     {
-        $this->userParameter->setIsFollowersPublic(false);
-        self::assertFalse($this->userParameter->getIsFollowersPublic());
+        $this->userParameter->setFollowersVisibility(VisibilityEnum::Friends);
+        self::assertSame(VisibilityEnum::Friends, $this->userParameter->getFollowersVisibility());
     }
 
-    public function testSetIsFollowingPublic(): void
+    public function testSetFollowingVisibility(): void
     {
-        $this->userParameter->setIsFollowingPublic(false);
-        self::assertFalse($this->userParameter->getIsFollowingPublic());
+        $this->userParameter->setFollowingVisibility(VisibilityEnum::Private);
+        self::assertSame(VisibilityEnum::Private, $this->userParameter->getFollowingVisibility());
     }
 
-    public function testSetIsStatsPublic(): void
+    public function testSetStatsVisibility(): void
     {
-        $this->userParameter->setIsStatsPublic(false);
-        self::assertFalse($this->userParameter->getIsStatsPublic());
+        $this->userParameter->setStatsVisibility(VisibilityEnum::Friends);
+        self::assertSame(VisibilityEnum::Friends, $this->userParameter->getStatsVisibility());
     }
 
-    public function testSetIsPlaylistPublic(): void
+    public function testSetPlaylistVisibility(): void
     {
-        $this->userParameter->setIsPlaylistPublic(false);
-        self::assertFalse($this->userParameter->getIsPlaylistPublic());
+        $this->userParameter->setPlaylistVisibility(VisibilityEnum::Private);
+        self::assertSame(VisibilityEnum::Private, $this->userParameter->getPlaylistVisibility());
     }
 
-    public function testSetIsLikesPublic(): void
+    public function testSetLikesVisibility(): void
     {
-        $this->userParameter->setIsLikesPublic(false);
-        self::assertFalse($this->userParameter->getIsLikesPublic());
+        $this->userParameter->setLikesVisibility(VisibilityEnum::Friends);
+        self::assertSame(VisibilityEnum::Friends, $this->userParameter->getLikesVisibility());
     }
 
     public function testSetNotifNewFollower(): void
