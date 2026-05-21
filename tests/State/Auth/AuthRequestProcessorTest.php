@@ -79,8 +79,8 @@ class AuthRequestProcessorTest extends ApiTestCase
         $this->assertInstanceOf(Email::class, $sentEmail);
 
         $this->assertSame('test@example.com', $sentEmail->getTo()[0]->getAddress());
-        $this->assertSame('Your verification code', $sentEmail->getSubject());
-        $this->assertStringContainsString('Your verification code is :', $sentEmail->getTextBody());
+        $this->assertSame('Your Jamly verification code', $sentEmail->getSubject());
+        $this->assertStringContainsString('Verify your identity', $sentEmail->getHtmlBody());
     }
 
     public function testUpdatesExistingVerificationUser(): void

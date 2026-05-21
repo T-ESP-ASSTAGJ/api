@@ -27,7 +27,9 @@ readonly class ImageService
     ) {
     }
 
-    /** Téléverse une image base64 directement vers Azure Blob Storage et retourne son URL publique. */
+    /**
+     * Téléverse une image base64 directement vers Azure Blob Storage et retourne son URL publique.
+     */
     public function saveBase64ToStorage(string $base64Image, string $folder): ?string
     {
         if (!$base64Image) {
@@ -114,7 +116,9 @@ readonly class ImageService
         return \sprintf('/uploads/%s/%s', $directory, $filename);
     }
 
-    /** Supprime une image stockée localement par son chemin d'URL publique. Sans effet pour les URLs distantes ou null. */
+    /**
+     * Supprime une image stockée localement par son chemin d'URL publique. Sans effet pour les URLs distantes ou null.
+     */
     public function deleteImage(?string $imageUrl): void
     {
         if (!$imageUrl || str_starts_with($imageUrl, 'http://') || str_starts_with($imageUrl, 'https://')) {

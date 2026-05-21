@@ -22,30 +22,38 @@ Jamly est une plateforme sociale de partage musical. Ce dépôt contient le back
 ### Vue d'ensemble
 
 ```
-                          ┌──────────────────────────────────────────────┐
-                          │               FrankenPHP / Caddy             │
-                          │    (serveur HTTP + Mercure hub + TLS auto)   │
-                          └────────────────────┬─────────────────────────┘
-                                               │
-                          ┌────────────────────▼─────────────────────────┐
-                          │               Symfony 7 / API Platform 4     │
-                          │                                              │
-                          │  Controllers → State Processors/Providers    │
-                          │       ↓               ↓                      │
-                          │   Services       Repositories                │
-                          │       ↓               ↓                      │
-                          │   Doctrine ORM   ← → PostgreSQL              │
-                          └──────┬────────────────┬──────────────────────┘
-                                 │                │
-              ┌──────────────────▼──┐   ┌─────────▼──────────────────────┐
-              │  Symfony Messenger  │   │           Redis                │
-              │  (async workers)    │   │   (transport + cache)          │
-              └──────────────────┬──┘   └────────────────────────────────┘
-                                 │
-              ┌──────────────────▼──────────────────────────────────────┐
-              │           Message Handlers (async)                      │
-              │  Notifications push · Compteur de vues · Emails         │
-              └─────────────────────────────────────────────────────────┘
+      ┌──────────────────────────────────────────────┐
+      │               FrankenPHP / Caddy             │
+      │    (serveur HTTP + Mercure hub + TLS auto)   │
+      └────────────────────┬─────────────────────────┘
+                           │ HTTP
+      ┌────────────────────▼─────────────────────────┐
+      │            Symfony 7 / API Platform 4        │
+      │                                              │
+      │         State Processors / Providers         │
+      │   (point d'entrée unique — pas de Controller │
+      │    sauf DevEmailPreviewController en dev)    │
+      │                    ↓                         │
+      │               Services                       │
+      │             ↓         ↓                      │
+      │       Repositories   (Azure, Firebase,       │
+      │            ↓          Spotify, Mercure…)     │
+      │       Doctrine ORM                           │
+      │            ↓                                 │
+      │        PostgreSQL                            │
+      └──────┬────────────────┬──────────────────────┘
+             │ bus messages   │ transport + cache + vues
+┌────────────▼────┐   ┌───────▼────────────────────────┐
+│Symfony Messenger│   │           Redis                │
+│(async workers)  │   │ • transport Messenger (async)  │
+└──────────────┬──┘   │ • cache applicatif             │
+               │      │ • compteur de vues + debounce  │
+               │      └────────────────────────────────┘
+               │
+┌──────────────▼──────────────────────────────────────────┐
+│           Message Handlers (async)                      │
+│  Notifications push · Compteur de vues · Emails         │
+└─────────────────────────────────────────────────────────┘
 ```
 
 ### Choix techniques et justifications
@@ -75,11 +83,18 @@ Avantages :
 
 PostgreSQL a été choisi pour ses types avancés (JSONB, tableaux, full-text search natif) et pour sa robustesse sur des schémas relationnels complexes (graphe social, conversations, etc.).
 
-#### Redis — pour le transport de messages et le cache
+#### Redis — trois usages distincts
 
-Redis est utilisé comme **transport Symfony Messenger** : les messages asynchrones (envoi de push notifications, comptage des vues, etc.) sont mis en file dans Redis et consommés par le conteneur `messenger-worker`.  
-Redis est aussi disponible comme couche de cache applicatif si nécessaire.  
-Le choix de Redis plutôt que RabbitMQ vient de sa légèreté et du fait qu'il sert déjà de store de cache, limitant le nombre de services à opérer.
+Redis joue trois rôles dans le projet :
+
+**1. Transport Symfony Messenger**  
+Le DSN `redis://jamly-redis:6379/messages` est configuré comme transport `async`. Les messages (like, follow, etc.) sont mis en file dans Redis et dépilés par le conteneur `messenger-worker`. L'alternative commentée dans `.env` était RabbitMQ (AMQP) — Redis a été retenu pour sa légèreté, sachant qu'il était déjà présent pour les deux autres rôles.
+
+**2. Cache applicatif**  
+L'adaptateur `cache.adapter.redis` est configuré dans `cache.yaml` comme cache par défaut de l'application.
+
+**3. Compteur de vues des posts avec anti-rebond**  
+Les vues sont incrémentées directement dans Redis via `PostViewCounter` (clé `post:views:{id}`) pour éviter une écriture en base à chaque scroll. Un mécanisme de debounce (clé `post:view:debounce:{postId}:{userId}` avec TTL) empêche de compter plusieurs vues du même utilisateur sur une courte fenêtre. Le `PersistPostViewsMessage` (traité en async) flush périodiquement le compteur Redis en base via `PostViewsPersistenceService`.
 
 #### Symfony Messenger (workers asynchrones) — plutôt qu'un traitement synchrone
 

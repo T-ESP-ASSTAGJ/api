@@ -9,6 +9,7 @@ use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
 use App\ApiResource\User\UserPatchInput;
 use App\Entity\User;
+use App\Service\ImageService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -23,6 +24,7 @@ class UserPatchProcessor implements ProcessorInterface
         private EntityManagerInterface $entityManager,
         private ValidatorInterface $validator,
         private Security $security,
+        private ImageService $imageService,
     ) {
     }
 
@@ -47,7 +49,8 @@ class UserPatchProcessor implements ProcessorInterface
             $user->setBio($data->bio);
         }
         if (isset($data->profilePicture)) {
-            $user->setProfilePicture($data->profilePicture);
+            $profilePicture = $this->imageService->saveBase64ToStorage($data->profilePicture, 'profile');
+            $user->setProfilePicture($profilePicture);
         }
 
         $violations = $this->validator->validate($user);
