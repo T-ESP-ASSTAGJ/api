@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Validator\Exception\ValidationException;
 use App\ApiResource\User\UserPatchInput;
 use App\Entity\User;
+use App\Service\ImageService;
 use App\State\User\UserPatchProcessor;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -33,6 +34,11 @@ class UserPatchProcessorTest extends TestCase
      */
     private Security $security;
 
+    /**
+     * @var ImageService&\PHPUnit\Framework\MockObject\MockObject
+     */
+    private ImageService $imageService;
+
     private UserPatchProcessor $processor;
 
     protected function setUp(): void
@@ -40,7 +46,8 @@ class UserPatchProcessorTest extends TestCase
         $this->em = $this->createMock(EntityManagerInterface::class);
         $this->validator = $this->createMock(ValidatorInterface::class);
         $this->security = $this->createMock(Security::class);
-        $this->processor = new UserPatchProcessor($this->em, $this->validator, $this->security);
+        $this->imageService = $this->createMock(ImageService::class);
+        $this->processor = new UserPatchProcessor($this->em, $this->validator, $this->security, $this->imageService);
     }
 
     public function testPatchesUserFields(): void
@@ -61,7 +68,7 @@ class UserPatchProcessorTest extends TestCase
         $this->assertSame('My bio', $user->getBio());
     }
 
-    public function testPatchesAllFields(): void
+    public function testPatchesPhoneNumber(): void
     {
         $user = new User();
         $this->security->method('getUser')->willReturn($user);
@@ -70,12 +77,46 @@ class UserPatchProcessorTest extends TestCase
 
         $input = new UserPatchInput();
         $input->phoneNumber = '+33612345678';
-        $input->profilePicture = '/uploads/profile.jpg';
 
         $this->processor->process($input, new Patch());
 
         $this->assertSame('+33612345678', $user->getPhoneNumber());
-        $this->assertSame('/uploads/profile.jpg', $user->getProfilePicture());
+    }
+
+    public function testPatchesProfilePictureViaImageService(): void
+    {
+        $user = new User();
+        $this->security->method('getUser')->willReturn($user);
+        $this->validator->method('validate')->willReturn(new ConstraintViolationList());
+        $this->em->expects($this->once())->method('flush');
+
+        $this->imageService
+            ->expects($this->once())
+            ->method('saveBase64ToStorage')
+            ->with('data:image/png;base64,abc==', 'profile')
+            ->willReturn('/uploads/profile/abc.png')
+        ;
+
+        $input = new UserPatchInput();
+        $input->profilePicture = 'data:image/png;base64,abc==';
+
+        $this->processor->process($input, new Patch());
+
+        $this->assertSame('/uploads/profile/abc.png', $user->getProfilePicture());
+    }
+
+    public function testImageServiceNotCalledWhenNoPicture(): void
+    {
+        $user = new User();
+        $this->security->method('getUser')->willReturn($user);
+        $this->validator->method('validate')->willReturn(new ConstraintViolationList());
+
+        $this->imageService->expects($this->never())->method('saveBase64ToStorage');
+
+        $input = new UserPatchInput();
+        $input->username = 'nochange';
+
+        $this->processor->process($input, new Patch());
     }
 
     public function testThrowsWhenUnauthenticated(): void

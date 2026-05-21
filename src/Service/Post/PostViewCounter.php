@@ -46,7 +46,9 @@ class PostViewCounter
         }
     }
 
-    /** Retourne le compteur de vues actuel depuis Redis, en l'initialisant depuis la BDD lorsque la clé est absente. */
+    /**
+     * Retourne le compteur de vues actuel depuis Redis, en l'initialisant depuis la BDD lorsque la clé est absente.
+     */
     public function getViews(Post $post): int
     {
         $postId = $post->getId();

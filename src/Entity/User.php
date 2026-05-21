@@ -159,7 +159,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     #[Assert\Regex('/\+?\d+/')]
     private ?string $phoneNumber = null;
 
-    #[ORM\Column(name: 'profile_picture', type: 'string', length: 255, nullable: true)]
+    #[ORM\Column(name: 'profile_picture', type: 'string', length: 500, nullable: true)]
     #[Groups([
         self::SERIALIZATION_GROUP_READ,
         self::SERIALIZATION_GROUP_DETAIL,
