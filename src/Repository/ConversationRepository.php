@@ -20,7 +20,7 @@ class ConversationRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find conversations where the user is an active participant.
+     * Recherche les conversations où l'utilisateur est un participant actif.
      */
     public function findPrivateConversation(User $userA, User $userB): ?Conversation
     {
@@ -40,7 +40,7 @@ class ConversationRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find conversations where the user is an active participant.
+     * Recherche les conversations où l'utilisateur est un participant actif.
      *
      * @return array<Conversation>
      */

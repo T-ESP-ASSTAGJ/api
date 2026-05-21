@@ -11,6 +11,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
+/**
+ * Gère le flux de code d'autorisation OAuth2 de Spotify.
+ *
+ * Responsabilités : construction de l'URL d'autorisation, échange du code de callback contre des jetons d'accès/rafraîchissement,
+ * persistance des jetons en base de données, et rafraîchissement des jetons expirés.
+ * Les jetons existants pour le même utilisateur et la même plateforme sont remplacés à chaque échange réussi.
+ */
 readonly class SpotifyAuthService
 {
     public const SPOTIFY_TOKEN_URL = 'https://accounts.spotify.com/api/token';
@@ -30,6 +37,7 @@ readonly class SpotifyAuthService
     ) {
     }
 
+    /** Construit l'URL d'autorisation OAuth2 Spotify avec les scopes requis et un jeton d'état CSRF. */
     public function getRedirectUri(string $state): string
     {
         return self::SPOTIFY_AUTH_URL
@@ -40,6 +48,13 @@ readonly class SpotifyAuthService
             .'&state='.urlencode($state);
     }
 
+    /**
+     * Échange un code d'autorisation OAuth2 contre des jetons d'accès/rafraîchissement et les persiste.
+     *
+     * Tout jeton Spotify préexistant pour cet utilisateur est supprimé avant la sauvegarde du nouveau.
+     *
+     * @throws \RuntimeException en cas d'échec de l'API Spotify ou d'absence d'access_token dans la réponse
+     */
     public function exchangeCodeForToken(string $code, User $user): Token
     {
         try {
@@ -59,13 +74,13 @@ readonly class SpotifyAuthService
                 throw new \RuntimeException('No access token received from Spotify');
             }
 
-            // Remove existing token for this user and platform
+            // Supprimer le token existant pour cet utilisateur et cette plateforme
             $existingToken = $this->tokenRepository->findByUserAndPlatform($user, Token::PLATFORM_SPOTIFY);
             if ($existingToken) {
                 $this->entityManager->remove($existingToken);
             }
 
-            // Create new token
+            // Créer le nouveau token
             $token = new Token();
             $token->setUser($user)
                 ->setPlatform(Token::PLATFORM_SPOTIFY)
@@ -75,7 +90,7 @@ readonly class SpotifyAuthService
                 ->setScopes(explode(' ', $tokenData['scope'] ?? ''))
             ;
 
-            // Get user profile to set platform user ID
+            // Récupérer le profil Spotify pour associer l'identifiant de la plateforme
             $userProfile = $this->getUserProfile($tokenData['access_token']);
             $token->setPlatformUserId($userProfile['id']);
 
@@ -88,6 +103,12 @@ readonly class SpotifyAuthService
         }
     }
 
+    /**
+     * Rafraîchit un jeton d'accès Spotify expiré en utilisant le jeton de rafraîchissement stocké.
+     *
+     * @throws \InvalidArgumentException si le jeton n'est pas pour la plateforme Spotify
+     * @throws \RuntimeException si aucun jeton de rafraîchissement n'est disponible ou si l'appel API échoue
+     */
     public function refreshToken(Token $token): Token
     {
         if (Token::PLATFORM_SPOTIFY !== $token->getPlatform()) {
@@ -129,6 +150,7 @@ readonly class SpotifyAuthService
         }
     }
 
+    /** Retourne true si le jeton d'accès est accepté par le point de terminaison Spotify /me. */
     public function validateToken(string $accessToken): bool
     {
         try {

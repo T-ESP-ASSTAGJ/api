@@ -48,6 +48,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Table(name: 'message')]
+/**
+ * Message au sein d'une Conversation, prenant en charge les types texte, image et musique (partage de piste).
+ *
+ * Pour les messages de type image, `content` contient l'URL CDN Azure téléversée par {@see MessageProcessor}.
+ * Pour les messages de type musique, `track` est obligatoire et `content` est null.
+ * `getConversationId()` est une propriété calculée sérialisée pour que les consommateurs n'aient pas à intégrer la Conversation entière.
+ * La livraison en temps réel est gérée par {@see MessageMercurePublisherService} après la persistance.
+ */
 class Message implements TimeStampableInterface
 {
     use Trait\TimeStampableTrait;

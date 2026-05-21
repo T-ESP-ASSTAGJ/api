@@ -1,3 +1,8 @@
 auth:
     path: /api/auth
     methods: ['POST']
+
+when@dev:
+    dev_controllers:
+        resource: ../src/Controller/
+        type: attribute

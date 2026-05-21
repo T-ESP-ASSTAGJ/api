@@ -7,6 +7,13 @@ namespace App\Service\Post;
 use App\Constants\RedisKeys;
 use App\Entity\Post;
 
+/**
+ * Suit le comptage des vues de publications dans Redis avec un anti-rebond par utilisateur pour éviter les doublons.
+ *
+ * Une vue n'est comptabilisée qu'une seule fois par utilisateur dans la fenêtre TTL d'anti-rebond définie dans {@see RedisKeys::DEBOUNCE_TTL}.
+ * Lorsque la clé Redis d'une publication n'existe pas encore, le compteur actuel en BDD est utilisé comme valeur initiale.
+ * Les compteurs sont écrits en base de données de manière asynchrone par {@see PostViewsPersistenceService}.
+ */
 class PostViewCounter
 {
     private \Redis $redis;
@@ -16,6 +23,12 @@ class PostViewCounter
         $this->redis = $redis;
     }
 
+    /**
+     * Enregistre une vue pour la publication et l'utilisateur donnés, sous réserve du TTL d'anti-rebond.
+     *
+     * Utilise NX (set-if-not-exists) sur la clé d'anti-rebond afin que chaque utilisateur soit compté au plus une fois par fenêtre TTL.
+     * Initialise le compteur Redis à partir de la valeur en BDD lorsque la clé n'existe pas encore.
+     */
     public function increment(Post $post, int $userId): void
     {
         $postId = $post->getId();
@@ -33,6 +46,7 @@ class PostViewCounter
         }
     }
 
+    /** Retourne le compteur de vues actuel depuis Redis, en l'initialisant depuis la BDD lorsque la clé est absente. */
     public function getViews(Post $post): int
     {
         $postId = $post->getId();

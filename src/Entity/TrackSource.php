@@ -9,8 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * @deprecated This entity is deprecated and will be removed in a future version.
- *             Track sources are no longer needed with Apple Music integration.
+ * @deprecated Cette entité est dépréciée et sera supprimée dans une future version.
+ *             Les sources de pistes ne sont plus nécessaires avec l'intégration Apple Music.
  */
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
@@ -60,7 +60,7 @@ class TrackSource implements TimeStampableInterface
     private string $platformTrackId;
 
     /**
-     * @var array<string, mixed> Contains: popularity, rank, explicit, preview_url
+     * @var array<string, mixed> Contient : popularity, rank, explicit, preview_url
      */
     #[ORM\Column(name: 'metadata', type: 'json')]
     #[Groups([

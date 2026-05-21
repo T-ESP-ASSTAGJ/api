@@ -62,7 +62,7 @@ final readonly class RemoveParticipantsProcessor implements ProcessorInterface
             throw new \RuntimeException('User must be authenticated');
         }
 
-        // Check if current user is a participant (active or not) and is admin
+        // Vérifier que l'utilisateur courant est participant (actif ou non) et administrateur
         $currentParticipant = null;
         foreach ($conversation->getParticipants() as $participant) {
             if ($participant->getUser()->getId() === $currentUser->getId()) {
@@ -77,7 +77,7 @@ final readonly class RemoveParticipantsProcessor implements ProcessorInterface
 
         $removedCount = 0;
         foreach ($data->userIds as $userId) {
-            // Prevent removing self - user should use /leave endpoint instead
+            // Empêcher de se retirer soi-même — utiliser l'endpoint /leave à la place
             if ($userId === $currentUser->getId()) {
                 continue;
             }
@@ -113,7 +113,7 @@ final readonly class RemoveParticipantsProcessor implements ProcessorInterface
 
         $this->em->flush();
 
-        // Check if group should be auto-deleted (last member left)
+        // Supprimer automatiquement le groupe si le dernier membre est parti
         if (0 === $conversation->getActiveParticipants()->count()) {
             $this->em->remove($conversation);
             $this->em->flush();

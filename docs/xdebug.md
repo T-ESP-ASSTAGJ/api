@@ -1,40 +1,38 @@
-# Using Xdebug
+# Débogage avec XDebug
 
-## PHP Interpreter
+## Configurer l'interpréteur PHP (PHPStorm)
 
+Aller dans `Settings | PHP` et cliquer sur `...` à côté de **CLI Interpreter**.
 
-Go to Settings | PHP and click on the ... next to CLI Interpreter.
-
-Then configure the remote PHP interpreter as below and validate:
+Configurer l'interpréteur PHP distant comme ci-dessous et valider :
 ![img.png](XDebug-1.png)
 
-You should see your PHP version and its config file appear:
+La version PHP et son fichier de configuration doivent apparaître :
 ![img.png](XDebug-2.png)
 
 ## Path mapping
 
-Click on the directory in Docker Container and create a volume between the Phoenix root and /application.
+Cliquer sur le répertoire dans **Docker Container** et créer un volume entre la racine du projet et `/app`.
 
+1. Dans `Settings/Preferences`, aller dans `PHP | Servers`
+2. Créer un nouveau serveur :
+   - **Name** : `symfony` (ou la valeur de `PHP_IDE_CONFIG`)
+   - **Host** : `localhost`
+   - **Port** : `443`
+   - **Debugger** : `Xdebug`
+   - Cocher **Use path mappings**
+   - Chemin absolu sur le serveur : `/app`
 
-1. In the `Settings/Preferences` dialog, go to `PHP | Servers`
-2. Create a new server:
-   * Name: `symfony` (or whatever you want to use for the variable `PHP_IDE_CONFIG`)
-   * Host: `localhost` (or the one defined using the `SERVER_NAME` environment variable)
-   * Port: `443`
-   * Debugger: `Xdebug`
-   * Check `Use path mappings`
-   * Absolute path on the server: `/app`
-You can now use the debugger!
+## Utiliser le débogueur
 
-1. In PHPStorm, open the `Run` menu and click on `Start Listening for PHP Debug Connections`
-2. Add the `XDEBUG_SESSION=PHPSTORM` query parameter to the URL of the page you want to debug, or use [other available triggers](https://xdebug.org/docs/step_debug#activate_debugger)
+1. Dans PHPStorm, ouvrir le menu `Run` → **Start Listening for PHP Debug Connections**
+2. Ajouter le paramètre `XDEBUG_SESSION=PHPSTORM` à l'URL, ou utiliser [l'extension navigateur XDebug](https://xdebug.org/docs/step_debug#browser-extensions)
+3. En ligne de commande, préciser le serveur de débogage via `PHP_IDE_CONFIG` :
 
-    Alternatively, you can use [the **Xdebug extension**](https://xdebug.org/docs/step_debug#browser-extensions) for your preferred web browser. 
+```bash
+XDEBUG_SESSION=1 PHP_IDE_CONFIG="serverName=symfony" php bin/console ...
+```
 
-3. On command line, we might need to tell PHPStorm which [path mapping configuration](https://www.jetbrains.com/help/phpstorm/zero-configuration-debugging-cli.html#configure-path-mappings) should be used, set the value of the PHP_IDE_CONFIG environment variable to `serverName=symfony`, where `symfony` is the name of the debug server configured higher.
+## Extension navigateur
 
-    Example:
-
-    ```console
-    XDEBUG_SESSION=1 PHP_IDE_CONFIG="serverName=symfony" php bin/console ...
-    ```
+[XDebug Helper for Firefox (JetBrains)](https://addons.mozilla.org/en-GB/firefox/addon/xdebug-helper-by-jetbrains/)

@@ -11,7 +11,7 @@ readonly class AddParticipantsInput
 {
     public function __construct(
         /**
-         * @var array<int> Array of user IDs to add
+         * @var array<int> Tableau des identifiants d'utilisateurs à ajouter
          */
         #[Assert\NotBlank(message: 'Vous devez fournir au moins un participant')]
         #[Assert\Type('array')]
