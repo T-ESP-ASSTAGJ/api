@@ -37,7 +37,9 @@ readonly class SpotifyAuthService
     ) {
     }
 
-    /** Construit l'URL d'autorisation OAuth2 Spotify avec les scopes requis et un jeton d'état CSRF. */
+    /**
+     * Construit l'URL d'autorisation OAuth2 Spotify avec les scopes requis et un jeton d'état CSRF.
+     */
     public function getRedirectUri(string $state): string
     {
         return self::SPOTIFY_AUTH_URL
@@ -150,7 +152,9 @@ readonly class SpotifyAuthService
         }
     }
 
-    /** Retourne true si le jeton d'accès est accepté par le point de terminaison Spotify /me. */
+    /**
+     * Retourne true si le jeton d'accès est accepté par le point de terminaison Spotify /me.
+     */
     public function validateToken(string $accessToken): bool
     {
         try {
