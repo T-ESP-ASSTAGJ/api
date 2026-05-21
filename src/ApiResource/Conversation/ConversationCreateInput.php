@@ -15,7 +15,7 @@ readonly class ConversationCreateInput
         public ?string $groupName = null,
 
         /**
-         * @var array<int>|null Array of user IDs
+         * @var array<int>|null Tableau des identifiants d'utilisateurs
          */
         #[Assert\Type('array')]
         #[Assert\NotBlank]

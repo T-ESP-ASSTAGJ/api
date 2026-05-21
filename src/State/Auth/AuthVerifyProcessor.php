@@ -18,6 +18,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Webmozart\Assert\Assert;
 
 /**
+ * Verifies an email verification code and issues a JWT token for the user.
+ *
+ * On success, the VerificationUser record is deleted. If no User exists for the email a new one is
+ * created with `needsProfile=true` so the client knows to prompt for profile setup.
+ * Throws AccessDeniedHttpException for invalid, expired, or missing codes.
+ *
  * @implements ProcessorInterface<AuthVerificationInput, AuthVerificationOutput>
  */
 readonly class AuthVerifyProcessor implements ProcessorInterface

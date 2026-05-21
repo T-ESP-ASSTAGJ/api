@@ -18,6 +18,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
+ * Crée une nouvelle publication pour l'utilisateur authentifié à partir d'un DTO PostCreateInput.
+ *
+ * Téléverse les images avant/arrière vers Azure, résout ou crée la piste associée via TrackService,
+ * puis persiste et retourne l'entité Post. Les violations de validation sont exposées sous forme de réponse 422.
+ *
  * @implements ProcessorInterface<PostCreateInput, Post>
  */
 final readonly class PostCreateProcessor implements ProcessorInterface
@@ -53,7 +58,7 @@ final readonly class PostCreateProcessor implements ProcessorInterface
 
         $track = $this->trackService->findOrCreate($data->track);
 
-        // Process and save images
+        // Traitement et sauvegarde des images
         $frontImageUrl = $this->imageService->saveBase64ToStorage($data->frontImage, 'posts');
         $backImageUrl = $this->imageService->saveBase64ToStorage($data->backImage, 'posts');
 

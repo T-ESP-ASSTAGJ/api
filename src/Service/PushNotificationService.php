@@ -11,6 +11,12 @@ use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Envoie des notifications push Firebase Cloud Messaging (FCM) aux utilisateurs via leur jeton d'appareil stocké.
+ *
+ * Ignore silencieusement les utilisateurs sans jeton d'appareil enregistré et journalise les erreurs sans les propager,
+ * de sorte qu'un échec de notification push ne brise jamais le flux appelant.
+ */
 class PushNotificationService
 {
     public function __construct(
@@ -21,7 +27,12 @@ class PushNotificationService
     }
 
     /**
-     * @param array<string, string|int|float|bool> $data
+     * Envoie une notification push à l'appareil enregistré de l'utilisateur.
+     *
+     * Ne fait rien et journalise un message d'information lorsque l'utilisateur n'a pas de jeton d'appareil.
+     * Les échecs FCM sont interceptés, journalisés comme erreurs et absorbés — les appelants ne sont pas affectés.
+     *
+     * @param array<string, string|int|float|bool> $data Paires clé/valeur supplémentaires transmises comme charge utile de données FCM
      */
     public function sendToUser(int $userId, string $title, string $body, array $data = []): void
     {

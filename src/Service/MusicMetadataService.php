@@ -9,6 +9,13 @@ use App\Entity\User;
 use App\Repository\TokenRepository;
 use App\Service\Spotify\SpotifyService;
 
+/**
+ * Résout les métadonnées enrichies d'une piste (pochette, URL d'aperçu, lien de plateforme) depuis la meilleure plateforme musicale disponible.
+ *
+ * Lorsqu'un destinataire est fourni, le service préfère la plateforme pour laquelle le destinataire possède un jeton OAuth valide,
+ * afin qu'il reçoive un lien qu'il peut réellement écouter. Repli sur la plateforme d'origine de la piste lorsqu'aucun
+ * jeton destinataire n'est disponible ou que la plateforme n'est pas encore prise en charge.
+ */
 readonly class MusicMetadataService
 {
     public function __construct(

@@ -11,6 +11,12 @@ use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Serializer\SerializerInterface;
 
+/**
+ * Publie un nouveau message sur le topic Mercure de sa conversation pour une livraison en temps réel.
+ *
+ * Le contenu est sérialisé sous le groupe `message:mercure` et publié sur le topic
+ * `/conversations/{id}`, auquel les clients s'abonnent pour les mises à jour en direct.
+ */
 readonly class MessageMercurePublisherService
 {
     public function __construct(

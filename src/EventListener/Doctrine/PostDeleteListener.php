@@ -31,7 +31,7 @@ final readonly class PostDeleteListener
 
         $entityManager = $event->getObjectManager();
 
-        // 1. Remove associated Likes (polymorphic)
+        // 1. Supprimer les Likes associés (relation polymorphique)
         $likes = $entityManager->getRepository(Like::class)->findBy([
             'entityId' => $postId,
             'entityClass' => LikeableTypeEnum::Post,
@@ -41,7 +41,7 @@ final readonly class PostDeleteListener
             $entityManager->remove($like);
         }
 
-        // 2. Remove associated Reports (polymorphic)
+        // 2. Supprimer les Signalements associés (relation polymorphique)
         $reports = $entityManager->getRepository(Report::class)->findBy([
             'entityId' => $postId,
             'entityClass' => ReportableTypeEnum::Post,
@@ -51,11 +51,11 @@ final readonly class PostDeleteListener
             $entityManager->remove($report);
         }
 
-        // 3. Remove Redis views count key
+        // 3. Supprimer la clé Redis du compteur de vues
         $viewsKey = RedisKeys::POST_VIEWS_PREFIX.$postId;
         $this->redis->del($viewsKey);
 
-        // 4. Remove all Redis debounce keys for this post
+        // 4. Supprimer toutes les clés Redis de debounce liées à ce post
         $debouncePattern = RedisKeys::POST_VIEW_DEBOUNCE_PREFIX.$postId.':*';
         $keys = $this->redis->keys($debouncePattern);
         if (!empty($keys)) {

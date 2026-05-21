@@ -11,8 +11,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @deprecated This entity is deprecated and will be removed in a future version.
- *             Artist sources are no longer needed with Apple Music integration.
+ * @deprecated Cette entité est dépréciée et sera supprimée dans une future version.
+ *             Les sources d'artistes ne sont plus nécessaires avec l'intégration Apple Music.
  */
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]

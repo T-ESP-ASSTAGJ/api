@@ -46,7 +46,7 @@ final readonly class ConversationListProvider implements ProviderInterface
             $participant = $conversation->getParticipantForUser($user);
             $lastReadAt = $participant?->getLastReadAt();
 
-            // Calculate count of messages created AFTER lastReadAt
+            // Compter les messages créés APRÈS lastReadAt
             $unreadCount = $this->messageRepository->countUnreadMessages(
                 $conversation,
                 $user,

@@ -11,6 +11,13 @@ use App\ApiResource\Spotify\TrackDTO;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
+/**
+ * Wrapper léger autour de l'API Web Spotify.
+ *
+ * Toutes les méthodes requièrent un jeton d'accès Bearer valide obtenu via {@see SpotifyAuthService}.
+ * Les réponses de l'API sont mappées vers des DTOs typés à l'aide de Symfony ObjectMapper.
+ * Toute erreur HTTP est encapsulée dans une RuntimeException afin que les appelants n'aient qu'un seul type d'exception à gérer.
+ */
 readonly class SpotifyService
 {
     public function __construct(

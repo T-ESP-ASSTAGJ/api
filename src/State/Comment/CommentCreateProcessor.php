@@ -20,6 +20,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Webmozart\Assert\Assert;
 
 /**
+ * Crée un commentaire sur une publication et envoie un CommentCreatedMessage pour la livraison asynchrone de notifications push.
+ *
+ * Le postId est résolu à partir des variables d'URI (route sous-ressource `/posts/{postId}/comments`).
+ * Les violations de validation sont exposées sous forme de réponse 422.
+ *
  * @implements ProcessorInterface<CommentCreateInput, Comment>
  */
 final readonly class CommentCreateProcessor implements ProcessorInterface
