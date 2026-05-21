@@ -57,13 +57,13 @@ final readonly class ConversationLeaveProcessor implements ProcessorInterface
             $data->getActiveParticipants()->first()->setRole(ConversationParticipant::ROLE_ADMIN);
         }
 
-        // Mark as left
+        // Marquer le participant comme ayant quitté
         $participant->leave();
         $this->em->flush();
 
-        // Check if all participants have left (for groups)
+        // Vérifier si tous les participants ont quitté (groupes uniquement)
         if ($data->getIsGroup() && 0 === $data->getActiveParticipants()->count()) {
-            // Delete the conversation
+            // Supprimer la conversation si elle est vide
             $this->em->remove($data);
             $this->em->flush();
 

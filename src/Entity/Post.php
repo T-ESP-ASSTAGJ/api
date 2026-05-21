@@ -82,6 +82,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Table(name: 'post')]
+/**
+ * Publication sociale associant un utilisateur à une piste musicale, des images optionnelles et une légende.
+ *
+ * Les compteurs dénormalisés (`commentsCount`, `viewsCount`) sont maintenus par les hooks de cycle de vie Doctrine sur
+ * Comment et par le service PostViewCounter basé sur Redis. `likesCount` est maintenu par le hook de cycle de vie Like.
+ * La propriété virtuelle `isLiked` est injectée au moment de la requête par {@see IsLikedProvider}.
+ */
 class Post implements LikeableInterface, TimeStampableInterface
 {
     use Trait\LikeableTrait;

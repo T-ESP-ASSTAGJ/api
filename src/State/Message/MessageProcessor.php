@@ -22,6 +22,13 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
+ * Crée un nouveau message dans une conversation et déclenche la livraison en temps réel et par notification push.
+ *
+ * Pour les messages de type image, le contenu est téléversé vers Azure avant d'être stocké.
+ * Pour les messages de type musique, la piste est résolue via TrackService.
+ * Après la persistance, le message est publié sur Mercure et un MessageCreatedMessage
+ * est envoyé sur le bus pour le traitement asynchrone des notifications push.
+ *
  * @implements ProcessorInterface<MessageCreateInput, Message>
  */
 final readonly class MessageProcessor implements ProcessorInterface

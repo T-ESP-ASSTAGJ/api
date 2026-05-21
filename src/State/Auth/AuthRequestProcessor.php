@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
 use Random\RandomException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Webmozart\Assert\Assert;
 
 /**
@@ -68,10 +68,11 @@ readonly class AuthRequestProcessor implements ProcessorInterface
         }
 
         $this->logger->debug(\sprintf('Verification code for %s is: %s', $data->email, $rawCode));
-        $email = (new Email())
-                ->to($data->email)
-                ->subject('Your verification code')
-                ->text('Your verification code is : '.$rawCode)
+        $email = (new TemplatedEmail())
+            ->to($data->email)
+            ->subject('Your Jamly verification code')
+            ->htmlTemplate('emails/verification_code.html.twig')
+            ->context(['code' => $rawCode])
         ;
 
         $this->mailer->send($email);

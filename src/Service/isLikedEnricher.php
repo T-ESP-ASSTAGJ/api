@@ -11,6 +11,12 @@ use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
+/**
+ * Enrichit les entités Likeable avec un drapeau `isLiked` calculé pour l'utilisateur authentifié courant.
+ *
+ * Pour les collections, une seule requête groupée est utilisée pour éviter les requêtes N+1.
+ * Pour les requêtes non authentifiées ou les ressources non-Likeable, l'enrichissement est sans effet.
+ */
 readonly class isLikedEnricher
 {
     public function __construct(
@@ -27,7 +33,7 @@ readonly class isLikedEnricher
         /** @var User $user */
         $user = $this->security->getUser();
 
-        // If no user or resource is not Likeable, return
+        // Pas d'enrichissement si l'utilisateur n'est pas connecté ou si la ressource n'est pas Likeable
         if (!$user || !is_a($resourceClass, LikeableInterface::class, true)) {
             return;
         }
@@ -37,7 +43,7 @@ readonly class isLikedEnricher
             return;
         }
 
-        // Handle Collection or Item
+        // Traitement selon le type : collection ou élément unique
         if (is_iterable($data)) {
             $this->handleCollection($data, $user, $enum);
         } elseif ($data instanceof LikeableInterface) {

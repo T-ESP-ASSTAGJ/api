@@ -16,6 +16,11 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
+ * Fournit un fil d'actualité paginé et enrichi des "j'aime", composé des publications des utilisateurs suivis par l'utilisateur courant.
+ *
+ * Retourne un tableau vide si l'utilisateur courant ne suit personne. Requiert une authentification ;
+ * lève une RuntimeException dans le cas contraire (la route doit imposer IS_AUTHENTICATED_FULLY).
+ *
  * @implements ProviderInterface<Post>
  */
 final readonly class FeedPrivateProvider implements ProviderInterface

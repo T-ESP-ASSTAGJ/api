@@ -84,6 +84,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Table(name: '`user`')]
+/**
+ * Représente un utilisateur de l'application.
+ *
+ * L'authentification est sans mot de passe : les utilisateurs se connectent via un code de vérification par e-mail et reçoivent un JWT.
+ * Un enregistrement UserParameter est créé automatiquement lors du premier persist via le hook de cycle de vie PrePersist.
+ * Le drapeau `needsProfile` indique aux clients que l'utilisateur n'a pas encore complété la configuration de son profil.
+ */
 class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeStampableInterface
 {
     use Trait\TimeStampableTrait;
@@ -132,7 +139,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     private string $email;
 
     /**
-     * @var list<string> The user roles
+     * @var list<string> Les rôles de l'utilisateur
      */
     #[ORM\Column(name: 'roles', type: 'json')]
     #[Groups([
@@ -190,7 +197,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     #[Groups([self::SERIALIZATION_GROUP_DETAIL])]
     private ?UserParameter $parameters = null;
 
-    // List of users THIS USER follows
+    // Liste des utilisateurs que CET UTILISATEUR suit
     /**
      * @var Collection<int, Follow>
      */
@@ -198,7 +205,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     #[ORM\OneToMany(targetEntity: Follow::class, mappedBy: 'follower')]
     private Collection $following;
 
-    // List of users WHO FOLLOW this user
+    // Liste des utilisateurs QUI SUIVENT cet utilisateur
     /**
      * @var Collection<int, Follow>
      */
@@ -249,7 +256,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
     }
 
     /**
-     * A visual identifier that represents this user.
+     * Identifiant visuel représentant cet utilisateur.
      *
      * @see UserInterface
      */
@@ -412,7 +419,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TimeSta
             $this->roles = ['ROLE_USER'];
         }
 
-        // Only create parameters if they don't exist yet
+        // Créer les paramètres uniquement s'ils n'existent pas encore
         if (null === $this->parameters) {
             $parameters = new UserParameter();
             $parameters->setUser($this);

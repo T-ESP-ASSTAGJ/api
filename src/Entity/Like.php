@@ -144,7 +144,7 @@ class Like implements TimeStampableInterface
             ->execute()
         ;
 
-        // If entity is currently loaded in memory, refresh it or update the value
+        // Si l'entité est en mémoire, mettre à jour directement son compteur
         $entity = $objectManager->getUnitOfWork()->tryGetById($this->entityId, $className);
         if ($entity instanceof LikeableInterface) {
             $entity->setLikesCount($entity->getLikesCount() + $diff);

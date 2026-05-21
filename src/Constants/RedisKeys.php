@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Constants;
 
 /**
- * Defines constants for all Redis key patterns used in the application.
- * This centralizes Redis key management for improved maintainability and discoverability.
+ * Définit les constantes pour tous les schémas de clés Redis utilisés dans l'application.
+ * Centralise la gestion des clés Redis pour une meilleure maintenabilité et découvrabilité.
  */
 final readonly class RedisKeys
 {

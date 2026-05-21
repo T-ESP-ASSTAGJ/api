@@ -19,6 +19,11 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
+ * Crée une nouvelle conversation privée ou de groupe avec l'utilisateur courant comme administrateur.
+ *
+ * Règles appliquées : les conversations privées doivent avoir exactement un autre participant et ne pas déjà exister ;
+ * les conversations de groupe doivent avoir un nom. Les identifiants de participants en double et les utilisateurs inexistants sont silencieusement ignorés.
+ *
  * @implements ProcessorInterface<ConversationCreateInput, Conversation>
  */
 final readonly class ConversationCreateProcessor implements ProcessorInterface
@@ -57,7 +62,7 @@ final readonly class ConversationCreateProcessor implements ProcessorInterface
             }
         }
 
-        // 2. Handle Group Validation
+        // 2. Validation des conversations de groupe
         if ($data->isGroup && empty($data->groupName)) {
             throw new BadRequestException('Group conversations must have a name.');
         }
@@ -74,7 +79,7 @@ final readonly class ConversationCreateProcessor implements ProcessorInterface
         foreach ($data->participants as $userId) {
             $user = $this->userRepository->find($userId);
 
-            // Check if user exists, isn't the creator, and isn't already in the collection
+            // On ignore l'utilisateur s'il n'existe pas, s'il est le créateur, ou s'il est déjà dans la liste
             if (!$user || $user === $currentUser || $conversation->hasUser($user)) {
                 continue;
             }

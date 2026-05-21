@@ -62,6 +62,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Table(name: 'comment')]
+/**
+ * Commentaire d'un utilisateur sur une publication.
+ *
+ * Les hooks de cycle de vie PostPersist/PostRemove maintiennent `Post.commentsCount` à jour via une requête DQL UPDATE directe
+ * afin d'éviter les conflits d'unité de travail Doctrine lors des flush en cascade.
+ * La propriété virtuelle `isLiked` est injectée au moment de la requête par {@see IsLikedProvider}.
+ */
 class Comment implements LikeableInterface, TimeStampableInterface
 {
     use Trait\LikeableTrait;

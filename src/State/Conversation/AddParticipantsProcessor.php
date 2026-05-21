@@ -64,7 +64,7 @@ final readonly class AddParticipantsProcessor implements ProcessorInterface
             throw new BadRequestHttpException('Cannot add participants to a private conversation');
         }
 
-        // Check if current user is an active participant and is admin
+        // Vérifier que l'utilisateur courant est un participant actif et administrateur
         $currentParticipant = null;
         foreach ($conversation->getActiveParticipants() as $participant) {
             if ($participant->getUser()->getId() === $currentUser->getId()) {
@@ -95,7 +95,7 @@ final readonly class AddParticipantsProcessor implements ProcessorInterface
                 continue;
             }
 
-            // Check if user previously left and needs to be re-added to the group
+            // Vérifier si l'utilisateur avait quitté le groupe et doit être réintégré
             $previousParticipant = null;
             foreach ($conversation->getParticipants() as $participant) {
                 if ($participant->getUser()->getId() === $user->getId() && !$participant->isActive()) {

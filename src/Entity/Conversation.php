@@ -78,6 +78,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: ConversationRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Table(name: 'conversation')]
+/**
+ * Représente une conversation privée (1:1) ou de groupe entre utilisateurs.
+ *
+ * Les participants sont suivis via des entités de jonction ConversationParticipant, qui enregistrent le rôle (admin/membre)
+ * et les horodatages de départ logique. `unreadCount` est une propriété transitoire définie au moment de la requête par
+ * {@see ConversationListProvider} — elle n'est pas persistée. La propriété calculée `getFlattenedParticipants()`
+ * est sérialisée comme `participants` pour exposer directement les objets User aux consommateurs de l'API.
+ */
 class Conversation implements TimeStampableInterface
 {
     use Trait\TimeStampableTrait;

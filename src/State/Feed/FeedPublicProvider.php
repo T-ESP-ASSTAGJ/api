@@ -13,6 +13,10 @@ use App\Service\isLikedEnricher;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
+ * Fournit un fil d'actualité paginé et enrichi des "j'aime", composé de toutes les publications publiques, triées par date décroissante.
+ *
+ * Accessible sans authentification. Le drapeau `isLiked` est mis à false pour les requêtes non authentifiées.
+ *
  * @implements ProviderInterface<Post>
  */
 final readonly class FeedPublicProvider implements ProviderInterface

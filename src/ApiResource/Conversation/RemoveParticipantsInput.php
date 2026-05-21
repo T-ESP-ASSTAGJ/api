@@ -10,7 +10,7 @@ readonly class RemoveParticipantsInput
 {
     public function __construct(
         /**
-         * @var array<int> Array of user IDs to remove
+         * @var array<int> Tableau des identifiants d'utilisateurs à retirer
          */
         #[Assert\NotBlank(message: 'Vous devez fournir au moins un participant à retirer')]
         #[Assert\Type('array')]
