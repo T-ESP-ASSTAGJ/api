@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Entity\Enum\VisibilityEnum;
 use App\Message\CommentCreatedMessage;
-use App\Repository\FollowRepository;
 use App\Repository\PostRepository;
 use App\Repository\UserRepository;
 use App\Service\PushNotificationService;
@@ -19,7 +17,6 @@ readonly class CommentCreatedHandler
         private PushNotificationService $push,
         private PostRepository $postRepository,
         private UserRepository $userRepository,
-        private FollowRepository $followRepository,
     ) {
     }
 
@@ -33,13 +30,9 @@ readonly class CommentCreatedHandler
             return;
         }
 
-        $setting = $owner->getParameters()?->getNotifNewComment() ?? VisibilityEnum::Public;
+        $setting = $owner->getParameters()?->getNotifNewComment() ?? true;
 
-        if (VisibilityEnum::Private === $setting) {
-            return;
-        }
-
-        if (VisibilityEnum::Friends === $setting && !$this->followRepository->isMutualFollow($user->getId(), $owner->getId())) {
+        if (false === $setting) {
             return;
         }
 

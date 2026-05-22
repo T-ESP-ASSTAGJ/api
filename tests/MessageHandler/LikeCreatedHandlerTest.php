@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\MessageHandler;
 
-use App\Entity\Enum\VisibilityEnum;
 use App\Entity\Like;
 use App\Entity\Post;
 use App\Entity\User;
 use App\Message\LikeCreatedMessage;
 use App\MessageHandler\LikeCreatedHandler;
-use App\Repository\FollowRepository;
 use App\Repository\LikeRepository;
 use App\Repository\PostRepository;
 use App\Repository\UserRepository;
@@ -40,11 +38,6 @@ class LikeCreatedHandlerTest extends TestCase
      */
     private PostRepository $postRepository;
 
-    /**
-     * @var FollowRepository&MockObject
-     */
-    private FollowRepository $followRepository;
-
     private LikeCreatedHandler $handler;
 
     protected function setUp(): void
@@ -53,14 +46,12 @@ class LikeCreatedHandlerTest extends TestCase
         $this->userRepository = $this->createMock(UserRepository::class);
         $this->likeRepository = $this->createMock(LikeRepository::class);
         $this->postRepository = $this->createMock(PostRepository::class);
-        $this->followRepository = $this->createMock(FollowRepository::class);
 
         $this->handler = new LikeCreatedHandler(
             $this->pushNotificationService,
             $this->userRepository,
             $this->likeRepository,
             $this->postRepository,
-            $this->followRepository,
         );
     }
 
@@ -77,7 +68,7 @@ class LikeCreatedHandlerTest extends TestCase
         $liker->method('getProfilePicture')->willReturn('pic.jpg');
 
         $ownerParameters = $this->createMock(\App\Entity\UserParameter::class);
-        $ownerParameters->method('getNotifNewLike')->willReturn(VisibilityEnum::Public);
+        $ownerParameters->method('getNotifNewLike')->willReturn(true);
 
         $owner = $this->createMock(User::class);
         $owner->method('getId')->willReturn($ownerId);
@@ -119,7 +110,7 @@ class LikeCreatedHandlerTest extends TestCase
         ($this->handler)(new LikeCreatedMessage($likerId, $ownerId, $likeId, $postId));
     }
 
-    public function testInvokeDoesNotSendPushNotificationIfPrivate(): void
+    public function testInvokeDoesNotSendPushNotificationIfDisabled(): void
     {
         $likerId = 1;
         $ownerId = 99;
@@ -128,7 +119,7 @@ class LikeCreatedHandlerTest extends TestCase
 
         $liker = $this->createMock(User::class);
         $ownerParameters = $this->createMock(\App\Entity\UserParameter::class);
-        $ownerParameters->method('getNotifNewLike')->willReturn(VisibilityEnum::Private);
+        $ownerParameters->method('getNotifNewLike')->willReturn(false);
 
         $owner = $this->createMock(User::class);
         $owner->method('getParameters')->willReturn($ownerParameters);
@@ -142,80 +133,6 @@ class LikeCreatedHandlerTest extends TestCase
         ]);
         $this->likeRepository->method('find')->with($likeId)->willReturn($like);
         $this->postRepository->method('find')->with($postId)->willReturn($content);
-
-        $this->pushNotificationService->expects($this->never())->method('sendToUser');
-
-        ($this->handler)(new LikeCreatedMessage($likerId, $ownerId, $likeId, $postId));
-    }
-
-    public function testInvokeSendsNotificationIfFriendsAndMutualFollow(): void
-    {
-        $likerId = 1;
-        $ownerId = 99;
-        $likeId = 777;
-        $postId = 1;
-
-        $liker = $this->createMock(User::class);
-        $liker->method('getId')->willReturn($likerId);
-        $liker->method('getUsername')->willReturn('JaneDoe');
-        $liker->method('getProfilePicture')->willReturn('pic.jpg');
-
-        $ownerParameters = $this->createMock(\App\Entity\UserParameter::class);
-        $ownerParameters->method('getNotifNewLike')->willReturn(VisibilityEnum::Friends);
-
-        $owner = $this->createMock(User::class);
-        $owner->method('getId')->willReturn($ownerId);
-        $owner->method('getParameters')->willReturn($ownerParameters);
-
-        $like = $this->createMock(Like::class);
-        $like->method('getEntityClassLabel')->willReturn('post');
-        $like->method('getEntityClass')->willReturn(Post::class);
-        $like->method('getEntityId')->willReturn(456);
-
-        $content = $this->createMock(Post::class);
-        $content->method('getId')->willReturn($postId);
-        $content->method('getFrontImage')->willReturn('img.jpg');
-
-        $this->userRepository->method('find')->willReturnMap([
-            [$likerId, null, null, $liker],
-            [$ownerId, null, null, $owner],
-        ]);
-        $this->likeRepository->method('find')->with($likeId)->willReturn($like);
-        $this->postRepository->method('find')->with($postId)->willReturn($content);
-        $this->followRepository->method('isMutualFollow')->with($likerId, $ownerId)->willReturn(true);
-
-        $this->pushNotificationService->expects($this->once())->method('sendToUser');
-
-        ($this->handler)(new LikeCreatedMessage($likerId, $ownerId, $likeId, $postId));
-    }
-
-    public function testInvokeDoesNotSendNotificationIfFriendsAndNotMutualFollow(): void
-    {
-        $likerId = 1;
-        $ownerId = 99;
-        $likeId = 777;
-        $postId = 1;
-
-        $liker = $this->createMock(User::class);
-        $liker->method('getId')->willReturn($likerId);
-
-        $ownerParameters = $this->createMock(\App\Entity\UserParameter::class);
-        $ownerParameters->method('getNotifNewLike')->willReturn(VisibilityEnum::Friends);
-
-        $owner = $this->createMock(User::class);
-        $owner->method('getId')->willReturn($ownerId);
-        $owner->method('getParameters')->willReturn($ownerParameters);
-
-        $like = $this->createMock(Like::class);
-        $content = $this->createMock(Post::class);
-
-        $this->userRepository->method('find')->willReturnMap([
-            [$likerId, null, null, $liker],
-            [$ownerId, null, null, $owner],
-        ]);
-        $this->likeRepository->method('find')->with($likeId)->willReturn($like);
-        $this->postRepository->method('find')->with($postId)->willReturn($content);
-        $this->followRepository->method('isMutualFollow')->with($likerId, $ownerId)->willReturn(false);
 
         $this->pushNotificationService->expects($this->never())->method('sendToUser');
 

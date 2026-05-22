@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Entity\Enum\VisibilityEnum;
 use App\Entity\Message;
 use App\Message\MessageCreatedMessage;
 use App\Repository\ConversationRepository;
-use App\Repository\FollowRepository;
 use App\Repository\UserRepository;
 use App\Service\PushNotificationService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,7 +20,6 @@ class MessageCreatedHandler
         private UserRepository $userRepository,
         private ConversationRepository $conversationRepository,
         private EntityManagerInterface $entityManager,
-        private FollowRepository $followRepository,
     ) {
     }
 
@@ -45,13 +42,9 @@ class MessageCreatedHandler
                 continue;
             }
 
-            $setting = $user->getParameters()?->getNotifNewMessage() ?? VisibilityEnum::Public;
+            $setting = $user->getParameters()?->getNotifNewMessage() ?? true;
 
-            if (VisibilityEnum::Private === $setting) {
-                continue;
-            }
-
-            if (VisibilityEnum::Friends === $setting && !$this->followRepository->isMutualFollow($sender->getId(), $user->getId())) {
+            if (false === $setting) {
                 continue;
             }
 
