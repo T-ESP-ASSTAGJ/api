@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Entity\Enum\VisibilityEnum;
 use App\Message\FollowCreatedMessage;
 use App\Repository\UserRepository;
 use App\Service\PushNotificationService;
@@ -28,9 +27,9 @@ class FollowCreatedHandler
             return;
         }
 
-        $setting = $userToFollow->getParameters()?->getNotifNewFollower() ?? VisibilityEnum::Public;
+        $setting = $userToFollow->getParameters()?->getNotifNewFollower() ?? true;
 
-        if (VisibilityEnum::Private === $setting) {
+        if (false === $setting) {
             return;
         }
 
