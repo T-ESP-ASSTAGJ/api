@@ -56,6 +56,16 @@ final readonly class LikeCreateProcessor implements ProcessorInterface
             throw new BadRequestHttpException('Cannot like your own content.');
         }
 
+        $existing = $this->entityManager->getRepository(Like::class)->findOneBy([
+            'user' => $user,
+            'entityClass' => $data->entityClass,
+            'entityId' => $data->entityId,
+        ]);
+
+        if ($existing) {
+            throw new BadRequestHttpException('You have already liked this entity.');
+        }
+
         $like = new Like();
         $like
             ->setEntityClass($data->entityClass)
@@ -73,17 +83,13 @@ final readonly class LikeCreateProcessor implements ProcessorInterface
             $content = $entityToLike;
         }
 
-        try {
-            $this->entityManager->persist($like);
-            $this->entityManager->flush();
-            $this->bus->dispatch(new LikeCreatedMessage(
-                $user->getId(),
-                $owner->getId(),
-                $like->getId(),
-                $content->getId(),
-            ));
-        } catch (\Throwable) {
-            throw new BadRequestHttpException('You have already liked this entity.');
-        }
+        $this->entityManager->persist($like);
+        $this->entityManager->flush();
+        $this->bus->dispatch(new LikeCreatedMessage(
+            $user->getId(),
+            $owner->getId(),
+            $like->getId(),
+            $content->getId(),
+        ));
     }
 }
