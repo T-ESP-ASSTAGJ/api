@@ -35,7 +35,8 @@ readonly class AuthRequestProcessor implements ProcessorInterface
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *
-     * @throws RandomException|TransportExceptionInterface
+     * @throws RandomException
+     * @throws TransportExceptionInterface
      */
     public function process(mixed $data, $operation = null, array $uriVariables = [], array $context = []): AuthRequestOutput
     {
@@ -48,24 +49,19 @@ readonly class AuthRequestProcessor implements ProcessorInterface
         /** @var VerificationUser|null $existingVerificationUser */
         $existingVerificationUser = $this->entityManager->getRepository(VerificationUser::class)->findOneBy(['email' => $data->email]);
 
-        try {
-            if ($existingVerificationUser) {
-                $existingVerificationUser->setCode($hashedCode);
-                $existingVerificationUser->setExpiresAt($expiresAt);
-                $this->entityManager->persist($existingVerificationUser);
-            } else {
-                $verificationUser = new VerificationUser();
-                $verificationUser->setEmail($data->email);
-                $verificationUser->setCode($hashedCode);
-                $verificationUser->setExpiresAt($expiresAt);
-                $this->entityManager->persist($verificationUser);
-            }
-
-            $this->entityManager->flush();
-        } catch (\Exception $e) {
-            $this->logger->error('Could not process auth request: '.$e->getMessage());
-            throw new \RuntimeException('Could not process the request.', previous: $e);
+        if ($existingVerificationUser) {
+            $existingVerificationUser->setCode($hashedCode);
+            $existingVerificationUser->setExpiresAt($expiresAt);
+            $this->entityManager->persist($existingVerificationUser);
+        } else {
+            $verificationUser = new VerificationUser();
+            $verificationUser->setEmail($data->email);
+            $verificationUser->setCode($hashedCode);
+            $verificationUser->setExpiresAt($expiresAt);
+            $this->entityManager->persist($verificationUser);
         }
+
+        $this->entityManager->flush();
 
         $this->logger->debug(\sprintf('Verification code for %s is: %s', $data->email, $rawCode));
         $email = (new TemplatedEmail())

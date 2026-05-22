@@ -56,6 +56,16 @@ final readonly class ReportCreateProcessor implements ProcessorInterface
             throw new UnauthorizedHttpException('Bearer', 'Authentication required');
         }
 
+        $existing = $this->em->getRepository(Report::class)->findOneBy([
+            'user' => $user,
+            'entityId' => $data->entityId,
+            'entityClass' => $data->entityClass,
+        ]);
+
+        if ($existing) {
+            throw new UnprocessableEntityHttpException('Vous avez déjà signalé ce contenu.');
+        }
+
         $report = new Report();
         $report
             ->setUser($user)
@@ -65,10 +75,6 @@ final readonly class ReportCreateProcessor implements ProcessorInterface
             ->setMessage($data->message)
         ;
 
-        try {
-            $this->persistProcessor->process($report, $operation, $uriVariables, $context);
-        } catch (\Throwable) {
-            throw new UnprocessableEntityHttpException('Vous avez déjà signalé ce contenu.');
-        }
+        $this->persistProcessor->process($report, $operation, $uriVariables, $context);
     }
 }

@@ -214,8 +214,8 @@ class AuthVerifyProcessorTest extends ApiTestCase
             $this->createMock(JWTTokenManagerInterface::class),
         );
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Failed to verify user: Database connection lost');
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Database connection lost');
 
         $input = new AuthVerificationInput($email, $code);
         $processor->process($input);

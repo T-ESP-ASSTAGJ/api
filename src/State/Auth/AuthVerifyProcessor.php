@@ -61,28 +61,22 @@ readonly class AuthVerifyProcessor implements ProcessorInterface
         /** @var User|null $user */
         $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $data->email]);
 
-        try {
-            if (!$user) {
-                $user = new User();
-                $user->setEmail($data->email);
-                $user->setNeedsProfile(true);
-                $this->entityManager->persist($user);
-            }
-
-            $user->setIsVerified(true);
-
-            $violations = $this->validator->validate($user);
-            if ($violations->count() > 0) {
-                throw new ValidationException($violations);
-            }
-
-            $this->entityManager->remove($verificationUser);
-            $this->entityManager->flush();
-        } catch (ValidationException $e) {
-            throw $e;
-        } catch (\Exception $e) {
-            throw new \RuntimeException('Failed to verify user: '.$e->getMessage());
+        if (!$user) {
+            $user = new User();
+            $user->setEmail($data->email);
+            $user->setNeedsProfile(true);
+            $this->entityManager->persist($user);
         }
+
+        $user->setIsVerified(true);
+
+        $violations = $this->validator->validate($user);
+        if ($violations->count() > 0) {
+            throw new ValidationException($violations);
+        }
+
+        $this->entityManager->remove($verificationUser);
+        $this->entityManager->flush();
 
         $token = $this->jwtManager->create($user);
 
