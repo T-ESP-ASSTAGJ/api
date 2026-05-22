@@ -117,13 +117,13 @@ phpcs:           ## Execute phpcs
 .PHONY: phpcs
 
 phpstan:         ## Execute PHPStan
-	@docker exec -it -u $$(id -u):$$(id -g) jamly-api vendor/bin/phpstan analyse --memory-limit=512M
+	@docker exec -it jamly-api vendor/bin/phpstan analyse --memory-limit=512M
 
 .PHONY: phpstan
 
 unit-test:       ## Run unit tests
 	@echo -e "\r\n${BOLD_GREEN}# Testing API${NC}\r\n"
-	@docker exec -it -u $$(id -u):$$(id -g) -eCOMPOSER_NO_INTERACTION=1 -eXDEBUG_MODE=coverage,debug jamly-api php -d memory_limit=512M bin/phpunit
+	@docker exec -it -eCOMPOSER_NO_INTERACTION=1 -eXDEBUG_MODE=coverage,debug jamly-api php -d memory_limit=512M bin/phpunit
 
 .PHONY: unit-test
 

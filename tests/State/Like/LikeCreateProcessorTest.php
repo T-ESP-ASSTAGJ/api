@@ -92,6 +92,7 @@ class LikeCreateProcessorTest extends TestCase
 
         $repo = $this->createMock(EntityRepository::class);
         $repo->method('find')->willReturn($post);
+        $repo->method('findOneBy')->willReturn(null);
         $this->em->method('getRepository')->willReturn($repo);
 
         $this->em->expects($this->once())->method('persist')
@@ -130,6 +131,7 @@ class LikeCreateProcessorTest extends TestCase
 
         $repo = $this->createMock(EntityRepository::class);
         $repo->method('find')->willReturn($comment);
+        $repo->method('findOneBy')->willReturn(null);
         $this->em->method('getRepository')->willReturn($repo);
 
         $this->em->expects($this->once())->method('persist')
@@ -163,10 +165,14 @@ class LikeCreateProcessorTest extends TestCase
         $post->method('getUser')->willReturn($owner);
         $post->method('getId')->willReturn(5);
 
+        $existingLike = new \App\Entity\Like();
+
         $repo = $this->createMock(EntityRepository::class);
         $repo->method('find')->willReturn($post);
+        $repo->method('findOneBy')->willReturn($existingLike);
         $this->em->method('getRepository')->willReturn($repo);
-        $this->em->method('flush')->willThrowException(new \Exception('Unique constraint'));
+
+        $this->em->expects($this->never())->method('flush');
 
         $input = new LikeCreateInput();
         $input->entityClass = LikeableTypeEnum::Post;
