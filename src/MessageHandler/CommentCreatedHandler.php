@@ -26,7 +26,7 @@ readonly class CommentCreatedHandler
         $user = $this->userRepository->find($message->userId);
         $owner = $post?->getUser();
 
-        if (!$post || !$user || !$owner) {
+        if (!$post || !$user || !$owner || $owner === $user) {
             return;
         }
 
