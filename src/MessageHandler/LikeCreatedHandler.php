@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Entity\Enum\VisibilityEnum;
 use App\Message\LikeCreatedMessage;
-use App\Repository\FollowRepository;
 use App\Repository\LikeRepository;
 use App\Repository\PostRepository;
 use App\Repository\UserRepository;
@@ -21,7 +19,6 @@ class LikeCreatedHandler
         private UserRepository $userRepository,
         private LikeRepository $likeRepository,
         private PostRepository $postRepository,
-        private FollowRepository $followRepository,
     ) {
     }
 
@@ -36,13 +33,9 @@ class LikeCreatedHandler
             return;
         }
 
-        $setting = $owner->getParameters()?->getNotifNewLike() ?? VisibilityEnum::Public;
+        $setting = $owner->getParameters()?->getNotifNewLike() ?? true;
 
-        if (VisibilityEnum::Private === $setting) {
-            return;
-        }
-
-        if (VisibilityEnum::Friends === $setting && !$this->followRepository->isMutualFollow($user->getId(), $owner->getId())) {
+        if (false === $setting) {
             return;
         }
 

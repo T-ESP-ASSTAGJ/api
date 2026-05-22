@@ -75,21 +75,21 @@ class UserParameter implements TimeStampableInterface
     #[Groups([self::SERIALIZATION_GROUP_READ, self::SERIALIZATION_GROUP_WRITE, User::SERIALIZATION_GROUP_DETAIL])]
     private VisibilityEnum $likesVisibility = VisibilityEnum::Public;
 
-    #[ORM\Column(type: 'string', enumType: VisibilityEnum::class, options: ['default' => 'public'])]
+    #[ORM\Column(type: 'boolean', options:['default' => true])]
     #[Groups([self::SERIALIZATION_GROUP_READ, self::SERIALIZATION_GROUP_WRITE, User::SERIALIZATION_GROUP_DETAIL])]
-    private VisibilityEnum $notifNewFollower = VisibilityEnum::Public;
+    private bool $notifNewFollower = true;
 
-    #[ORM\Column(type: 'string', enumType: VisibilityEnum::class, options: ['default' => 'public'])]
+    #[ORM\Column(type: 'boolean', options:['default' => true])]
     #[Groups([self::SERIALIZATION_GROUP_READ, self::SERIALIZATION_GROUP_WRITE, User::SERIALIZATION_GROUP_DETAIL])]
-    private VisibilityEnum $notifNewLike = VisibilityEnum::Public;
+    private bool $notifNewLike = true;
 
-    #[ORM\Column(type: 'string', enumType: VisibilityEnum::class, options: ['default' => 'public'])]
+    #[ORM\Column(type: 'boolean', options: ['default' => true])]
     #[Groups([self::SERIALIZATION_GROUP_READ, self::SERIALIZATION_GROUP_WRITE, User::SERIALIZATION_GROUP_DETAIL])]
-    private VisibilityEnum $notifNewComment = VisibilityEnum::Public;
+    private bool $notifNewComment = true;
 
-    #[ORM\Column(type: 'string', enumType: VisibilityEnum::class, options: ['default' => 'public'])]
+    #[ORM\Column(type: 'boolean', options: ['default' => true])]
     #[Groups([self::SERIALIZATION_GROUP_READ, self::SERIALIZATION_GROUP_WRITE, User::SERIALIZATION_GROUP_DETAIL])]
-    private VisibilityEnum $notifNewMessage = VisibilityEnum::Public;
+    private bool $notifNewMessage = true;
 
     public function getId(): ?int
     {
@@ -168,48 +168,48 @@ class UserParameter implements TimeStampableInterface
         return $this;
     }
 
-    public function getNotifNewFollower(): VisibilityEnum
+    public function getNotifNewFollower(): bool
     {
         return $this->notifNewFollower;
     }
 
-    public function setNotifNewFollower(VisibilityEnum $notifNewFollower): static
+    public function setNotifNewFollower(bool $notifNewFollower): static
     {
         $this->notifNewFollower = $notifNewFollower;
 
         return $this;
     }
 
-    public function getNotifNewLike(): VisibilityEnum
+    public function getNotifNewLike(): bool
     {
         return $this->notifNewLike;
     }
 
-    public function setNotifNewLike(VisibilityEnum $notifNewLike): static
+    public function setNotifNewLike(bool $notifNewLike): static
     {
         $this->notifNewLike = $notifNewLike;
 
         return $this;
     }
 
-    public function getNotifNewComment(): VisibilityEnum
+    public function getNotifNewComment(): bool
     {
         return $this->notifNewComment;
     }
 
-    public function setNotifNewComment(VisibilityEnum $notifNewComment): static
+    public function setNotifNewComment(bool $notifNewComment): static
     {
         $this->notifNewComment = $notifNewComment;
 
         return $this;
     }
 
-    public function getNotifNewMessage(): VisibilityEnum
+    public function getNotifNewMessage(): bool
     {
         return $this->notifNewMessage;
     }
 
-    public function setNotifNewMessage(VisibilityEnum $notifNewMessage): static
+    public function setNotifNewMessage(bool $notifNewMessage): static
     {
         $this->notifNewMessage = $notifNewMessage;
 
