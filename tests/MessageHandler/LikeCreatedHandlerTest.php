@@ -118,10 +118,13 @@ class LikeCreatedHandlerTest extends TestCase
         $postId = 1;
 
         $liker = $this->createMock(User::class);
+        $liker->method('getId')->willReturn($likerId);
+
         $ownerParameters = $this->createMock(\App\Entity\UserParameter::class);
         $ownerParameters->method('getNotifNewLike')->willReturn(false);
 
         $owner = $this->createMock(User::class);
+        $owner->method('getId')->willReturn($ownerId);
         $owner->method('getParameters')->willReturn($ownerParameters);
 
         $like = $this->createMock(Like::class);
@@ -137,6 +140,27 @@ class LikeCreatedHandlerTest extends TestCase
         $this->pushNotificationService->expects($this->never())->method('sendToUser');
 
         ($this->handler)(new LikeCreatedMessage($likerId, $ownerId, $likeId, $postId));
+    }
+
+    public function testInvokeDoesNotSendPushNotificationIfUserLikesOwnContent(): void
+    {
+        $userId = 1;
+        $likeId = 777;
+        $postId = 1;
+
+        $user = $this->createMock(User::class);
+        $user->method('getId')->willReturn($userId);
+
+        $like = $this->createMock(Like::class);
+        $content = $this->createMock(Post::class);
+
+        $this->userRepository->method('find')->willReturn($user);
+        $this->likeRepository->method('find')->with($likeId)->willReturn($like);
+        $this->postRepository->method('find')->with($postId)->willReturn($content);
+
+        $this->pushNotificationService->expects($this->never())->method('sendToUser');
+
+        ($this->handler)(new LikeCreatedMessage($userId, $userId, $likeId, $postId));
     }
 
     public function testInvokeDoesNothingIfEntityNotFound(): void

@@ -97,12 +97,14 @@ class ReportCreateProcessorTest extends TestCase
     {
         $user = new User();
         $post = new PostEntity();
+        $existing = new \App\Entity\Report();
 
         $repo = $this->createMock(EntityRepository::class);
         $repo->method('find')->willReturn($post);
+        $repo->method('findOneBy')->willReturn($existing);
         $this->em->method('getRepository')->willReturn($repo);
         $this->security->method('getUser')->willReturn($user);
-        $this->persistProcessor->method('process')->willThrowException(new \Exception('Duplicate'));
+        $this->persistProcessor->expects($this->never())->method('process');
 
         $this->expectException(UnprocessableEntityHttpException::class);
         $this->processor->process($this->makeInput(), new PostOperation());
