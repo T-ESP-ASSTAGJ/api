@@ -29,7 +29,7 @@ class LikeCreatedHandler
         $like = $this->likeRepository->find($message->likeId);
         $content = $this->postRepository->find($message->postId);
 
-        if (!$user || !$owner || !$like || !$content) {
+        if (!$user || !$owner || !$like || !$content || $user->getId() === $owner->getId()) {
             return;
         }
 

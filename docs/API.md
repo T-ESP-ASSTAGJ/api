@@ -143,6 +143,55 @@ Voir `https://localhost/api/docs` pour la liste complète et interactive des end
 
 ---
 
+## Algorithme de scoring du fil public
+
+Le fil public (`GET /api/feed/public`) renvoie les publications triées par pertinence lorsque l'utilisateur est authentifié, et par date décroissante dans le cas contraire.
+
+### Principe général
+
+Pour chaque publication, un score est calculé en additionnant plusieurs signaux indépendants. Les publications sont ensuite triées par score décroissant, puis par date décroissante à score égal. Le calcul est entièrement effectué en base de données (une seule requête SQL).
+
+### Profil d'interaction de l'utilisateur
+
+Avant d'exécuter la requête de scoring, l'API constitue le **profil d'interaction** de l'utilisateur à partir de deux sources :
+
+| Source | Données extraites |
+|--------|-------------------|
+| Publications **likées** par l'utilisateur | IDs des tracks, noms des artistes |
+| Publications **commentées** par l'utilisateur | IDs des tracks, noms des artistes |
+
+Les deux ensembles sont maintenus séparément car un commentaire est considéré comme un signal d'intérêt plus fort qu'un like.
+
+### Signaux et pondérations
+
+| Signal | Points | Condition |
+|--------|--------|-----------|
+| Track commentée | **+15** | La publication utilise un track que l'utilisateur a commenté |
+| Track likée | **+10** | La publication utilise un track que l'utilisateur a liké |
+| Artiste commenté | **+8** | La publication utilise un artiste que l'utilisateur a commenté |
+| Artiste liké | **+5** | La publication utilise un artiste que l'utilisateur a liké |
+| Utilisateur suivi | **+4** | L'auteur de la publication est suivi par l'utilisateur |
+| Fraîcheur | **+3** | La publication a moins de 7 jours |
+| Engagement élevé | **+3** | `likesCount > 50` |
+| Engagement moyen | **+2** | `likesCount > 10` |
+| Engagement faible | **+1** | `likesCount > 0` |
+
+Les signaux sont cumulatifs. Une publication peut donc cumuler plusieurs points simultanément (ex. artiste commenté + fraîcheur + engagement = 8 + 3 + 3 = **14 points**).
+
+### Comportements de repli
+
+| Situation | Comportement |
+|-----------|--------------|
+| Utilisateur non authentifié | Tri chronologique (`createdAt DESC`) |
+| Utilisateur authentifié | Scoring systématique (même sans historique d'interactions, la fraîcheur et l'engagement s'appliquent) |
+
+### Limitations actuelles
+
+- **Pas de genres musicaux** — le modèle `Track` ne stocke pas les genres. Une intégration future avec l'API Spotify permettrait d'ajouter ce signal.
+- **Pas de features audio** — énergie, dansabilité, etc. non persistées.
+
+---
+
 ## Temps réel (Mercure)
 
 Jamly utilise le [protocole Mercure](https://mercure.rocks/) pour la messagerie en temps réel via Server-Sent Events.  

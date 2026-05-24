@@ -60,26 +60,6 @@ class LikeCreateProcessorTest extends TestCase
         $this->processor->process($input, new Post());
     }
 
-    public function testThrowsWhenLikingOwnPost(): void
-    {
-        $user = $this->makeUser(1);
-        $this->security->method('getUser')->willReturn($user);
-
-        $post = $this->createMock(PostEntity::class);
-        $post->method('getUser')->willReturn($user);
-
-        $repo = $this->createMock(EntityRepository::class);
-        $repo->method('find')->willReturn($post);
-        $this->em->method('getRepository')->willReturn($repo);
-
-        $input = new LikeCreateInput();
-        $input->entityClass = LikeableTypeEnum::Post;
-        $input->entityId = 1;
-
-        $this->expectException(BadRequestHttpException::class);
-        $this->processor->process($input, new Post());
-    }
-
     public function testLikesPost(): void
     {
         $liker = $this->makeUser(2);
